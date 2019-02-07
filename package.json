@@ -1,18 +1,18 @@
 {
   "name": "ai-app-forms",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=development node_modules/.bin/webpack-dev-server --hot --config webpack.config.js --mode development",
-    "build": "cross-env NODE_ENV=production webpack --config webpack.config.js --progress --colors",
+    "build": "cross-env NODE_ENV=production node_modules/.bin/webpack --config webpack.config.js --progress --colors",
     "test": "karma start"
   },
   "author": "Kartik Rao",
   "license": "UNLICENSED",
   "dependencies": {
     "@adinfinity/ai-core-forms": "^1.2.0",
-    "@adinfinity/ai-lib-forms": "^1.5.0",
+    "@adinfinity/ai-lib-forms": "^1.5.1",
     "antd": "^3.13.1",
     "react": "^16.7.0",
     "react-dom": "^16.7.0"

@@ -12,10 +12,8 @@ export class Creator extends React.Component <any, any> {
         super(props);
         this.state = {
             formData: {
-                form: {
-                    content : {title: "foo", subtitle: "bar", pages:[]},
-                    formLayoutOptions : {}
-                }
+                content : {title: "foo", subtitle: "bar", pages:[]},
+                formLayoutOptions : {}
             }
         };
     }

@@ -1,19 +1,19 @@
 import * as React from "react";
-import {FormWrapper} from "@adinfinity/ai-lib-forms";
+import {FormWrapper, FormFactory} from "@adinfinity/ai-lib-forms";
 
 export class Canvas extends React.Component<any, any> {
     props: any;
     state: any;
+
     constructor(props: any) {
         super(props);
-        this.state = {formData : props.formData};
-        console.log("Canvas props", props)
+        this.state = {formData : FormFactory.createForm(props.formData)};
     }
 
     render() {
-        console.log("wrapper props", this.state.formData)
+        console.log("Wrapper state", this.state.formData);
         return <div><div id="canvas-preview"></div>
-            <FormWrapper target="canvas-preview" {...this.state.formData}/>
+            <FormWrapper target="canvas-preview" form={this.state.formData}/>
         </div>
     }
 }
