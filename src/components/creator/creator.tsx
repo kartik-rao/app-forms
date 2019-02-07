@@ -5,12 +5,19 @@ import {Properties} from "./properties";
 import {Toolbar} from "./toolbar";
 
 export class Creator extends React.Component <any, any> {
-    props : any = {};
-    state : any = {};
+    props : any;
+    state : any;
 
     constructor(props: any) {
         super(props);
-        this.props = {};
+        this.state = {
+            formData: {
+                form: {
+                    content : {title: "foo", subtitle: "bar", pages:[]},
+                    formLayoutOptions : {}
+                }
+            }
+        };
     }
 
     render() {
@@ -20,7 +27,7 @@ export class Creator extends React.Component <any, any> {
                 <Row><Col span={24}></Col></Row>
                 <Row>
                     <Col span={6}><Toolbar/></Col>
-                    <Col span={12}><Canvas/></Col>
+                    <Col span={12}><Canvas formData={...this.state.formData}/></Col>
                     <Col span={6}><Properties/></Col>
                 </Row>
             </Col>

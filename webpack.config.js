@@ -14,7 +14,13 @@ module.exports = {
         rules: [
             {
                 test: /\.ts(x?)$/,
-                use: { loader: 'awesome-typescript-loader' },
+                use: { loader: 'awesome-typescript-loader',
+                    options : {
+                        reportFiles: [
+                            'src/**/*.{ts,tsx}'
+                        ]
+                    }
+                },
                 exclude: /\/node_modules\//
             },
             { test: /\.png$|\.eot$|\.woff$|\.ttf$/, loader: "url-loader?limit=100000" },
@@ -32,18 +38,28 @@ module.exports = {
         extensions: ['.ts', '.js', '.jsx', '.tsx', '.css'],
     },
     output: {
+        filename: '[name].js',
+        path: path.join(__dirname, 'dist/'),
         libraryTarget: 'window',
-        library: 'FormsApp',
-        path: path.join(__dirname, 'dist'),
-        filename: '[name].js'
+        library: 'FormsApp'
+    },
+    externals: {
+        "react": "React",
+        "react-dom": "ReactDOM",
+        "antd" : "antd"
+    },
+    watchOptions: {
+        ignored: /node_modules/
     },
     devServer: {
         compress: true,
-        contentBase: path.join(__dirname, "dist/"),
+        publicPath: path.resolve("/"),
+        hot: true,
         port: 8085
     },
     plugins: [
         new CheckerPlugin(),
+        new HtmlWebpackPlugin({template: 'public/index.html', inject: false}),
         new ExtractTextPlugin({filename:"style.css", allChunks: true})
     ],
     optimization: {

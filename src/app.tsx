@@ -15,14 +15,13 @@ class FormsApp extends React.Component <any, any> {
 
     constructor(props: any) {
         super(props);
-        this.props = {};
     }
 
     render() {
+        console.log("FormsApp.render");
         const { initialState, ...rest } = this.props
         return (
             <Layout style={{height:"100vh"}}>
-                <Row><br/></Row>
                 <Row justify="space-around">
                     <Col span={20} offset={2}>
                         <Row><Col span={24}><Header/></Col></Row>
