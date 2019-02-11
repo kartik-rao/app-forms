@@ -11,16 +11,17 @@ import {Footer} from "./components/common/footer";
 import { connect } from "react-redux";
 import Logout from "./components/partials/Logout";
 import AuthCallback from "./components/auth/AuthCallback";
-import Index from "./components/partials/Index";
+import Index from "./components/partials/Home";
 
 import {withRouter, Switch, Route} from 'react-router-dom';
 
 class App extends React.Component <any, any> {
-    props : any = {};
-    state : any = {};
+    props : any;
+    state : any;
 
     constructor(props: any) {
         super(props);
+        this.props = props;
     }
 
     render() {

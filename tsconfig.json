@@ -9,7 +9,9 @@
       "forceConsistentCasingInFileNames": true,
       "moduleResolution": "node",
       "allowSyntheticDefaultImports": true,
-      "skipLibCheck": true
+      "skipLibCheck": true,
+      "outDir": "lib",
+      "sourceMap": true
     },
     "include": [
       "src/**/*.ts",

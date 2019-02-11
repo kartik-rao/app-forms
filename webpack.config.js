@@ -1,5 +1,6 @@
 var path = require('path');
 var webpack = require('webpack');
+const tsImportPluginFactory = require('ts-import-plugin');
 
 const env = process.env.NODE_ENV;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -14,11 +15,20 @@ module.exports = {
         rules: [
             {
                 test: /\.ts(x?)$/,
-                use: { loader: 'awesome-typescript-loader',
+                use: { loader: 'ts-loader',
                     options : {
+                        // useCache: true,
                         reportFiles: [
                             'src/**/*.{ts,tsx}'
-                        ]
+                        ],
+                        // useTranspileModule: true,
+                        // getCustomTransformers: () => ({
+                        //     before: [ tsImportPluginFactory( {
+                        //         libraryName: 'antd',
+                        //         libraryDirectory: 'node_modules',
+                        //         style: true
+                        //       }) ]
+                        // })
                     }
                 },
                 exclude: /\/node_modules\//
@@ -36,7 +46,7 @@ module.exports = {
             }
         ],
     },
-    devtool: 'source-map',
+    devtool: 'eval-source-map',
     resolve: {
         extensions: ['.ts', '.js', '.jsx', '.tsx', '.css'],
     },
