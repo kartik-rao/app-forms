@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+
 import './app.css';
 import "antd/dist/antd.css"
 
@@ -10,14 +10,12 @@ import {Header} from "./components/common/header";
 import {Footer} from "./components/common/footer";
 import { connect } from "react-redux";
 import Logout from "./components/partials/Logout";
-// import Header from "./components/partials/Header";
-// import Footer from "./components/partials/Footer";
 import AuthCallback from "./components/auth/AuthCallback";
 import Index from "./components/partials/Index";
-// import NotFound from "./components/partials/NotFound";
+
 import {withRouter, Switch, Route} from 'react-router-dom';
 
-export class App extends React.Component <any, any> {
+class App extends React.Component <any, any> {
     props : any = {};
     state : any = {};
 
@@ -26,8 +24,9 @@ export class App extends React.Component <any, any> {
     }
 
     render() {
-        console.log("FormsApp.render");
         const { initialState, ...rest } = this.props
+
+        console.log("App.render");
         return (
             <Layout style={{height:"100vh"}}>
                 <Row justify="space-around">

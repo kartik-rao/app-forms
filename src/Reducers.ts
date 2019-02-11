@@ -1,6 +1,3 @@
-
-
-
 import { combineReducers } from 'redux';
 import { authReducer } from './reducers/Auth';
 import { constantsReducer } from './reducers/Config';

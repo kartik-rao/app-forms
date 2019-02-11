@@ -8,7 +8,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
     mode: env,
-    entry: {main: path.join(__dirname, 'src/app.tsx'), style: path.join(__dirname, 'src/app.css')},
+    entry: {main: path.join(__dirname, 'src/index.tsx'), style: path.join(__dirname, 'src/app.css')},
     target: 'web',
     module: {
         rules: [
@@ -30,6 +30,9 @@ module.exports = {
                     allChunks: true, fallback: "style-loader", use: "css-loader"
                   }),
                 include: /src\/app.css|node_modules\/antd\//
+            },
+            {
+                test: /\.svg/, loader: 'svg-inline-loader'
             }
         ],
     },
@@ -41,7 +44,7 @@ module.exports = {
         filename: '[name].js',
         path: path.join(__dirname, 'dist/'),
         libraryTarget: 'window',
-        library: 'FormsApp'
+        library: ''
     },
     externals: {
         "react": "React",
