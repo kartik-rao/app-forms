@@ -6,13 +6,19 @@ export class Toolbar extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.props = props;
+        console.log("Toolbar props", props);
+        console.log(this.props);
+    }
+
+    handleClick(context: any) : void {
+        this.props.onItemAdd('page');
     }
 
     render() {
         return <Menu mode="inline">
         <Menu.Item>Form Controls</Menu.Item>
             <Menu.SubMenu key="Layout" title="Layout">
-                <Menu.Item key={1}>Page</Menu.Item>
+                <Menu.Item key={1} onClick={() => this.handleClick({context:'page'})}>Page</Menu.Item>
                 <Menu.Item key={2}>Column</Menu.Item>
                 <Menu.Item key={3}>Section</Menu.Item>
             </Menu.SubMenu>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FormWrapper, FormFactory} from "@adinfinity/ai-lib-forms";
+import {FormWrapper} from "@adinfinity/ai-lib-forms";
 
 export class Canvas extends React.Component<any, any> {
     props: any;
@@ -7,13 +7,13 @@ export class Canvas extends React.Component<any, any> {
 
     constructor(props: any) {
         super(props);
-        this.state = {formData : FormFactory.createForm(props.formData)};
+        this.state = {formData : props.formData};
     }
 
     render() {
         console.log("Wrapper state", this.state.formData);
         return <div><div id="canvas-preview"></div>
-            <FormWrapper target="canvas-preview" form={this.state.formData}/>
+            <FormWrapper formData={this.state.formData}/>
         </div>
     }
 }

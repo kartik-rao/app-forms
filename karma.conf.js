@@ -2,12 +2,14 @@
 // Generated on Mon Feb 12 2018 13:30:49 GMT+1100 (AEDT)
 var path = require('path');
 require('jasmine').DEFAULT_TIMEOUT_INTERVAL = 2000;
+const tsImportPluginFactory = require('ts-import-plugin');
 module.exports = function (config) {
   config.set({    // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
+    plugins: ['karma-jasmine', 'karma-webpack',  'karma-mocha-reporter', 'karma-chrome-launcher', 'karma-sourcemap-loader'],
     // list of files / patterns to load in the browser
     files: [
       'test/spec*.tsx'
@@ -18,7 +20,7 @@ module.exports = function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'test/spec*.tsx': ['webpack']
+      'test/spec*.tsx': ['webpack', 'sourcemap']
     },
     // test results reporter to use
     // possible values: 'dots', 'progress'
@@ -46,7 +48,7 @@ module.exports = function (config) {
     },
     useIframe: false,
     webpack: {
-      entry: path.join(__dirname, '/test/spec.index.tsx'),
+      entry: path.join(__dirname, '/test/spec.field.tsx'),
       resolve: {
         extensions: ['.ts', '.tsx', '.js']
       },
@@ -55,8 +57,23 @@ module.exports = function (config) {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: { loader: 'ts-loader', options: { compilerOptions: { declaration: false } } },
-                exclude: /node_modules/
+                use: { loader: 'awesome-typescript-loader',
+                options : {
+                    useCache: true,
+                    declaration: false,
+                    reportFiles: [
+                        'src/**/*.{ts,tsx}'
+                    ],
+                    getCustomTransformers: () => ({
+                      before: [ tsImportPluginFactory( {
+                          libraryName: 'antd',
+                          libraryDirectory: 'node_modules',
+                          style: true
+                        }) ]
+                  })
+                }
+            },
+            exclude: /node_modules/
             }
         ]
     },
