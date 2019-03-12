@@ -49,6 +49,7 @@ class App extends React.Component <any, any> {
         );
   }
 }
+
 const mapStateToProps = (state: any, ownProps: any) => {
     return { auth: state.auth, constants: state.constants, canvas: state.canvas, history: ownProps.history, location: ownProps.location, path: ownProps.location.pathname};
 };
