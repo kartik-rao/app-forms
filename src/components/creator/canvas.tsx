@@ -11,7 +11,6 @@ export class Canvas extends React.Component<any, any> {
     }
 
     render() {
-        console.log("Wrapper state", this.state.formData);
         return <div><div id="canvas-preview"></div>
             <FormWrapper formData={this.state.formData}/>
         </div>

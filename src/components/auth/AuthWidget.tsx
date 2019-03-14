@@ -1,51 +1,55 @@
 import * as React from 'react';
-import { connect } from "react-redux";
-import { startLogin, startLogout } from "../../actions/Auth";
+import {IRootStore} from '../../stores/RootStore';
+import { observer } from 'mobx-react';
 
-export interface IAuthWidgetProps  extends React.Props<any>{
-    auth: any,
-    handleLogin?: () => void,
-    handleLogout?: () => void
+import {Authenticator, Greetings, SignIn, ConfirmSignIn, RequireNewPassword, SignUp,
+    ConfirmSignUp, VerifyContact, ForgotPassword, TOTPSetup} from "aws-amplify-react";
+
+export interface IAuthProps {
+    store: IRootStore;
 }
 
-class AuthWidget extends React.Component<IAuthWidgetProps, any> {
-    constructor(props: any) {
+@observer
+export class Auth extends React.Component<IAuthProps, any> {
+    store: IRootStore
+    constructor(props: IAuthProps) {
         super(props);
     }
 
     render() {
+        let {authStore} = this.props.store;
         return (
-            <span>
-                {
-                    !this.props.auth.is_valid && (
-                        <a className="nav-link nav-link--rounded ml-lg-2" href="#" onClick={this.props.handleLogin}>
-                            Log In
-                </a>
-                    )
+            <Authenticator
+                // Optionally hard-code an initial state
+                authState="signIn"
+                // Pass in an already authenticated CognitoUser or FederatedUser object
+                authData={authStore.user}
+                // Fired when Authentication State changes
+                onStateChange={(authState) => authStore.setAuthState(authState)}
+
+                hide={
+                    [
+                        Greetings
+                    ]
                 }
-                {
-                    this.props.auth.is_valid && (
-                        <a className="nav-link nav-link--rounded ml-lg-2" href="#" onClick={this.props.handleLogout}>
-                            Log Out
-                        </a>
-                    )
-                }
-            </span>
-        );
+                // or hide all the default components
+                // hideDefault={true}
+                // Pass in an aws-exports configuration
+                // amplifyConfig={myAWSExports}
+                // Pass in a message map for error strings
+                // errorMessage={myMessageMap}
+            >
+                <SignIn />
+                <ConfirmSignIn/>
+                <RequireNewPassword/>
+                <SignUp/>
+                <ConfirmSignUp/>
+                <VerifyContact/>
+                <ForgotPassword/>
+                <TOTPSetup/>
+            </Authenticator>
+        )
     }
 }
 
-const mapDispatchToProps = (dispatch: any) => {
-    return {
-        'handleLogin': () => { dispatch(startLogin()) },
-        'handleLogout': () => { dispatch(startLogout()) }
-    }
-}
-
-const mapStateToProps = (state: any): IAuthWidgetProps => {
-    return { auth: state.auth};
-};
-
-const ConnectedAuthWidget = connect(mapStateToProps, mapDispatchToProps)(AuthWidget)
-
-export default ConnectedAuthWidget;
+export default Auth

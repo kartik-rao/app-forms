@@ -6,8 +6,6 @@ export class Toolbar extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.props = props;
-        console.log("Toolbar props", props);
-        console.log(this.props);
     }
 
     handleClick(context: any) : void {

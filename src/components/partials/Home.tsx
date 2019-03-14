@@ -1,43 +1,37 @@
 import * as React from 'react';
 
-import { withRouter } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { IRootStore } from '../../stores/RootStore';
+import { Row, Col } from 'antd';
+import {Creator} from "../creator/creator";
+import {Header} from "../common/header";
+import {Footer} from "../common/footer";
 
-
-export interface IIndexProps {
-    auth: any,
-    constants: any,
-    history: any,
-    location: any
+export interface IHomeProps {
+    store: IRootStore
 }
 
-class Index extends React.Component<IIndexProps, {}> {
+class Home extends React.Component<IHomeProps, {}> {
     constructor(props: any) {
         super(props);
     }
 
-    public componentDidMount() {
-
-    }
-
     public render() {
+        let {authStore} = this.props.store;
+
         return (
             <div className="container">
-                <div className="row">
-                    <div className="col-lg-12">
-                        {this.props.auth.is_valid && (<h1>Is Logged In</h1>)}
-                        {!this.props.auth.is_valid && (<h1>Is NOT Logged In {this.props.auth.error}</h1>)}
-                    </div>
-                </div>
+                <Row><Col span={24}><Header store={this.props.store}/></Col></Row>
+                <Row justify="space-around" type="flex">
+                    <Col span={8}>
+                        {authStore.user && (<h1>Is Logged In</h1>)}
+                        {!authStore.user && (<h1>Is NOT Logged In {authStore.authState}</h1>)}
+                    </Col>
+                </Row>
+                <Row><Col span={24}><Creator store={this.props.store}/></Col></Row>
+                <Row><Col span={24}><Footer store={this.props.store}/></Col></Row>
             </div>
         );
     }
 };
 
-const mapStateToProps = (state: any, ownProps: any): IIndexProps => {
-    return { auth: state.auth, constants: state.constants, history: ownProps.history, location: ownProps.location };
-};
-
-const ConnectedIndex = connect<{},{}, any>(mapStateToProps)(withRouter(Index))
-
-export default ConnectedIndex;
+export default Home;

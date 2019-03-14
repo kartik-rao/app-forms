@@ -1,10 +1,3 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import {App} from './App';
-
-import rootStore from "./stores/RootStore";
-import {Layout, Row, Col} from "antd";
-import { Authenticator, Greetings } from 'aws-amplify-react';
 import Amplify from 'aws-amplify';
 
 Amplify.configure({
@@ -14,9 +7,9 @@ Amplify.configure({
         // Authorized scopes
         scope : ['phone', 'email', 'profile', 'openid'],
         // Callback URL
-        redirectSignIn : 'http://localhost:8085/', // or 'exp://127.0.0.1:19000/--/', 'myapp://main/'
+        redirectSignIn : 'http://localhost:8085', // or 'exp://127.0.0.1:19000/--/', 'myapp://main/'
         // Sign out URL
-        redirectSignOut : 'http://localhost:8085/', // or 'exp://127.0.0.1:19000/--/', 'myapp://main/'
+        redirectSignOut : 'http://localhost:8085', // or 'exp://127.0.0.1:19000/--/', 'myapp://main/'
         responseType: 'code'
     },
     'aws_appsync_graphqlEndpoint': 'https://q6x74cjifbblvmg3dss7t3ukfi.appsync-api.ap-southeast-2.amazonaws.com/graphql',
@@ -31,18 +24,4 @@ Amplify.configure({
     }
 });
 
-import { startRouter } from './Router';
-startRouter(rootStore);
-
-ReactDOM.render(
-  <Layout>
-    <Row justify="space-around">
-        <Col span={24}>
-          <Authenticator hide={[Greetings]}>
-            <App store={rootStore}/>
-          </Authenticator>
-        </Col>
-    </Row>
-  </Layout>,
-  document.getElementById('root')
-);
+export default Amplify;

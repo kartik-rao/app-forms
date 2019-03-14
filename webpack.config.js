@@ -4,7 +4,7 @@ const tsImportPluginFactory = require('ts-import-plugin');
 
 const env = process.env.NODE_ENV;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CheckerPlugin } = require('awesome-typescript-loader')
+var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
@@ -17,18 +17,20 @@ module.exports = {
                 test: /\.ts(x?)$/,
                 use: { loader: 'ts-loader',
                     options : {
-                        // useCache: true,
+                        transpileOnly: true,
                         reportFiles: [
                             'src/**/*.{ts,tsx}'
                         ],
-                        // useTranspileModule: true,
-                        // getCustomTransformers: () => ({
-                        //     before: [ tsImportPluginFactory( {
-                        //         libraryName: 'antd',
-                        //         libraryDirectory: 'node_modules',
-                        //         style: true
-                        //       }) ]
-                        // })
+                        getCustomTransformers: () => ({
+                            before: [ tsImportPluginFactory( {
+                                libraryName: 'antd',
+                                libraryDirectory: 'node_modules',
+                                style: true
+                              }) ]
+                        }),
+                        compilerOptions: {
+                            module: 'es2015'
+                        }
                     }
                 },
                 exclude: /\/node_modules\//
@@ -39,7 +41,7 @@ module.exports = {
                 use: ExtractTextPlugin.extract({
                     allChunks: true, fallback: "style-loader", use: "css-loader"
                   }),
-                include: /src\/app.css|node_modules\/antd\//
+                include: /src\/app.css|node_modules\/antd\/|node_modules\/@aws\-amplify\//
             },
             {
                 test: /\.svg/, loader: 'svg-inline-loader'
@@ -71,7 +73,7 @@ module.exports = {
         port: 8085
     },
     plugins: [
-        new CheckerPlugin(),
+        new ForkTsCheckerWebpackPlugin(),
         new HtmlWebpackPlugin({template: 'public/index.html', inject: false}),
         new ExtractTextPlugin({filename:"style.css", allChunks: true})
     ],

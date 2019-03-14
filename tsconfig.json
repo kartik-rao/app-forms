@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
       "rootDir": ".",
-      "module": "commonjs",
+      "module": "ESNext",
       "target": "es6",
       "lib": ["es6", "dom"],
       "allowJs": true,
@@ -9,6 +9,7 @@
       "forceConsistentCasingInFileNames": true,
       "moduleResolution": "node",
       "allowSyntheticDefaultImports": true,
+      "experimentalDecorators": true,
       "skipLibCheck": true,
       "outDir": "lib",
       "sourceMap": true

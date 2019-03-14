@@ -1,59 +1,49 @@
-import * as React from "react";
-
-import './app.css';
-import "antd/dist/antd.css"
-
 import 'airbnb-browser-shims';
-import {Row, Col, Layout} from "antd";
-import {Creator} from "./components/creator/creator";
-import {Header} from "./components/common/header";
-import {Footer} from "./components/common/footer";
-import { connect } from "react-redux";
-import Logout from "./components/partials/Logout";
-import AuthCallback from "./components/auth/AuthCallback";
-import Index from "./components/partials/Home";
+import "antd/dist/antd.css";
+import { observer } from "mobx-react";
+import * as React from "react";
+import './app.css';
+import Home from "./components/partials/Home";
+import { IRootStore } from "./stores/RootStore";
 
-import {withRouter, Switch, Route} from 'react-router-dom';
+export interface IAppProps {
+    store: IRootStore;
+    authState?: string;
+    authData?: any;
+}
 
-class App extends React.Component <any, any> {
-    props : any;
-    state : any;
+@observer
+export class App extends React.Component <IAppProps, any> {
+    props : IAppProps;
+    _validAuthStates = ['signedIn'];
 
-    constructor(props: any) {
+    constructor(props: IAppProps) {
         super(props);
         this.props = props;
+        props.store.authStore.setAuthData(this.props.authData);
+    }
+
+    showComponent(theme: any) {
+        const { store } = this.props
+        const view = store.viewStore.currentView;
+
+        // switch(view) {
+        //     case "home" :
+        //         return <Home store={this.props.store} />
+        //         break;
+        //     default:
+        //         return <Home store={this.props.store} />
+        //         break;
+        // }
+        return <Home store={this.props.store} />
     }
 
     render() {
-        const { initialState, ...rest } = this.props
-
-        console.log("App.render");
-        return (
-            <Layout style={{height:"100vh"}}>
-                <Row justify="space-around">
-                    <Col span={20} offset={2}>
-                        <Row><Col span={24}><Header/></Col></Row>
-                        <Switch>
-                            <Route path="/auth" render={(props) => {
-                                return <AuthCallback history={history} {...props} />
-                            }}/>
-                            <Route exact={true} path="/home" component={App}/>
-                            <Route exact={true} path="/" component={Index}/>
-                            <Route path="/logout" render={(props) => <Logout history={history} location={location} {...props} />} />
-                        </Switch>
-                        <Row><Col span={24}><Creator/></Col></Row>
-                        <Row><Col span={24}><Footer/></Col></Row>
-                    </Col>
-                </Row>
-            </Layout>
-        );
-  }
+        if (this.props.store.authStore.authState == 'signedIn') {
+            return this.showComponent(null);
+        } else {
+            return <span></span>
+        }
+    }
 }
 
-const mapStateToProps = (state: any, ownProps: any) => {
-    return { auth: state.auth, constants: state.constants, canvas: state.canvas, history: ownProps.history, location: ownProps.location, path: ownProps.location.pathname};
-};
-
-const ConnectedApp = connect<{},{}, any>(mapStateToProps)(withRouter(App))
-
-export default ConnectedApp;

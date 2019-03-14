@@ -1,10 +1,9 @@
 import * as React from 'react';
 
-import { withRouter } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { IRootStore } from '../../stores/RootStore';
 
 export interface ILogoutProps {
-    auth: any,
+    store: IRootStore,
     constants: any,
     history: any,
     location: any
@@ -20,12 +19,12 @@ class Logout extends React.Component<ILogoutProps, {}> {
     }
 
     public render() {
+        let {authStore} = this.props.store;
         return (
             <div className="container">
                 <div className="row">
                     <div className="col-lg-12">
-                        {this.props.auth.is_valid && (<h1>Is Logged In</h1>)}
-                        {!this.props.auth.is_valid && (<h1>Is NOT Logged In {this.props.auth.error}</h1>)}
+                       <h1>LOGOUT</h1>
                     </div>
                 </div>
             </div>
@@ -33,10 +32,5 @@ class Logout extends React.Component<ILogoutProps, {}> {
     }
 };
 
-const mapStateToProps = (state: any, ownProps: any): ILogoutProps => {
-    return { auth: state.auth, constants: state.constants, history: ownProps.history, location: ownProps.location };
-};
 
-const ConnectedLogout = connect<{},{}, any>(mapStateToProps)(withRouter(Logout))
-
-export default ConnectedLogout;
+export default Logout;
