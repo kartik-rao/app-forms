@@ -1,53 +1,58 @@
+import { Button, Icon, Menu } from 'antd';
 import * as React from "react";
-import { Menu, Icon } from 'antd';
+import { IRootStore } from '../../stores/RootStore';
 
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 
-export class AppMenu extends React.Component {
-  props: any;
-  constructor(props: any) {
-      super(props);
-      this.props = props;
-  }
+export interface IAppMenuProps {
+    store: IRootStore;
+}
 
-  state = {
-    current: 'mail',
-  }
+export class AppMenu extends React.Component<IAppMenuProps, any> {
+    props: IAppMenuProps;
+    constructor(props: any) {
+        super(props);
+        this.props = props;
+    }
 
-  handleClick = (e) => {
-    this.setState({
-      current: e.key,
-    });
-  }
+    state = {
+        current: 'mail',
+    }
 
-  render() {
-    return (
-      <Menu
-        onClick={this.handleClick}
-        selectedKeys={[this.state.current]}
-        mode="horizontal"
-      >
-        <Menu.Item key="mail">
-          <Icon type="mail" />Navigation One
-        </Menu.Item>
-        <Menu.Item key="app" disabled>
-          <Icon type="appstore" />Navigation Two
-        </Menu.Item>
-        <SubMenu title={<span className="submenu-title-wrapper"><Icon type="setting" />Navigation Three - Submenu</span>}>
-          <MenuItemGroup title="Item 1">
-            <Menu.Item key="setting:1">Option 1</Menu.Item>
-            <Menu.Item key="setting:2">Option 2</Menu.Item>
-          </MenuItemGroup>
-          <MenuItemGroup title="Item 2">
-            <Menu.Item key="setting:3">Option 3</Menu.Item>
-            <Menu.Item key="setting:4">Option 4</Menu.Item>
-          </MenuItemGroup>
-        </SubMenu>
-        <Menu.Item key="alipay">
-          <a href="https://ant.design" target="_blank" rel="noopener noreferrer">Navigation Four - Link</a>
-        </Menu.Item>
-      </Menu>
-    );
-  }
+    handleClick = (e) => {
+        this.setState({
+            current: e.key,
+        });
+    }
+
+    logout() {
+        this.props.store.authStore.signOut();
+    }
+
+    render() {
+        let {viewStore} = this.props.store;
+        return (
+        <Menu selectedKeys={[this.state.current]} mode="horizontal">
+            <Menu.Item key="accounts" onClick={(e) => viewStore.showAccounts()}>
+                <Icon type="book" />Accounts
+            </Menu.Item>
+            <Menu.Item key="users" onClick={(e) => viewStore.showUsers()}>
+                <Icon type="team" />Users
+            </Menu.Item>
+            <Menu.Item key="forms" onClick={(e) => viewStore.showForms()}>
+                <Icon type="file-text" />Forms
+            </Menu.Item>
+            <Menu.Item key="admin" onClick={(e) => viewStore.showAdmin()}>
+                <Icon type="setting" />Admin
+            </Menu.Item>
+            <Menu.Item key="profile" onClick={(e) => viewStore.showProfile()}>
+                <Icon type="user" />Profile
+            </Menu.Item>
+            <Menu.Item key="logout">
+                <Button onClick={(e) => this.logout()} type="primary" icon="logout">Sign Out</Button>
+            </Menu.Item>
+        </Menu>
+        );
+    }
 }

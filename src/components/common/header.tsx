@@ -11,6 +11,6 @@ export class Header extends React.Component<any, any> {
     }
 
     render() {
-        return <Affix><AppMenu/></Affix>
+        return <Affix><AppMenu store={this.props.store}/></Affix>
     }
 }

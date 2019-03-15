@@ -10,7 +10,7 @@ import Amplify from 'aws-amplify';
 Amplify.configure({
     oauth: {
         // Domain name
-        domain : 'auth.ap-southeast-2.amazoncognito.com',
+        domain : 'dev-formsli.auth.ap-southeast-2.amazoncognito.com',
         // Authorized scopes
         scope : ['phone', 'email', 'profile', 'openid'],
         // Callback URL

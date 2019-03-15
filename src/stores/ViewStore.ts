@@ -16,10 +16,12 @@ class ViewStore {
 
         switch(this.currentView.name) {
             case "home" : return "/home"
+            case "accounts" : return "/accounts"
             case "users" : return "/users"
-            case "profile" : return "/profile"
+            case "admin" : return "/admin"
             case "forms" : return "/forms"
             case "canvas" : return "/canvas"
+            case "profile" : return "/profile"
             default: return "home";
         }
     }
@@ -27,6 +29,18 @@ class ViewStore {
     @action showHome() {
         this.currentView = {
             name: 'home'
+        }
+    }
+
+    @action showAccounts() {
+        this.currentView = {
+            name: 'accounts'
+        }
+    }
+
+    @action showAdmin() {
+        this.currentView = {
+            name: 'admin'
         }
     }
 
