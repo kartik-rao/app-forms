@@ -3,7 +3,7 @@
       "rootDir": ".",
       "module": "ESNext",
       "target": "es6",
-      "lib": ["es6", "dom"],
+      "lib": ["es5", "es6", "dom"],
       "allowJs": true,
       "jsx": "react",
       "forceConsistentCasingInFileNames": true,

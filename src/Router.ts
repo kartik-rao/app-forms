@@ -21,8 +21,10 @@ export function startRouter(store: IRootStore) {
 
     // update url on state changes
     autorun(() => {
-        const path = viewStore.currentPath
+
+        const path = viewStore.currentPath;
+        console.log("Router", path);
         if (path !== window.location.pathname)
-                window.history.pushState(null, null, path)
+            window.history.pushState(null, null, path)
     })
 }

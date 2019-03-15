@@ -1,6 +1,6 @@
-import {action, observable, computed, decorate} from "mobx";
-import {Auth, Hub} from "aws-amplify";
 import { CognitoUser } from "@aws-amplify/auth";
+import { Auth, Hub } from "aws-amplify";
+import { action, computed, decorate, observable } from "mobx";
 
 export interface IAuthStore {
     user : any;
@@ -9,6 +9,8 @@ export interface IAuthStore {
     setAuthData: (user: any) => void;
     signOut: () => void;
     isSignedIn : boolean;
+    userGroup: string;
+    currentUser: CognitoUser;
 }
 
 // https://github.com/aws-amplify/amplify-js/issues/31
@@ -68,6 +70,14 @@ class AuthStore implements IAuthStore {
 
     @computed get isSignedIn() {
         return this.authState == 'signedIn';
+    }
+
+    @computed get userGroup() : string {
+        if (this.authState == 'signedIn') {
+            return this.user.attributes["custom:group"];
+        } else {
+            return null;
+        }
     }
 
     @computed get currentUser() : CognitoUser {

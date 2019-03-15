@@ -1,11 +1,12 @@
+import { Col, Layout, Row } from "antd";
+import Amplify from 'aws-amplify';
+import { Authenticator, Greetings } from 'aws-amplify-react';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {App} from './App';
-
+import { App } from './App';
+import { startRouter } from './Router';
 import rootStore from "./stores/RootStore";
-import {Layout, Row, Col} from "antd";
-import { Authenticator, Greetings } from 'aws-amplify-react';
-import Amplify from 'aws-amplify';
+
 
 Amplify.configure({
     oauth: {
@@ -21,7 +22,7 @@ Amplify.configure({
     },
     'aws_appsync_graphqlEndpoint': 'https://q6x74cjifbblvmg3dss7t3ukfi.appsync-api.ap-southeast-2.amazonaws.com/graphql',
     'aws_appsync_region': 'ap-southeast-2',
-    'aws_appsync_authenticationType': 'COGNITO_USER_POOLS',
+    'aws_appsync_authenticationType': 'AMAZON_COGNITO_USER_POOLS',
     Auth: {
         userPoolId: 'ap-southeast-2_SttSHpNG3',
         userPoolWebClientId: "24h1tgst915lji221gtc94hok8",
@@ -31,7 +32,6 @@ Amplify.configure({
     }
 });
 
-import { startRouter } from './Router';
 startRouter(rootStore);
 
 ReactDOM.render(

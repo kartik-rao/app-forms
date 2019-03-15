@@ -3,7 +3,8 @@ import "antd/dist/antd.css";
 import { observer } from "mobx-react";
 import * as React from "react";
 import './app.css';
-import Home from "./components/partials/Home";
+import {Home} from "./components/partials/Home";
+
 import { IRootStore } from "./stores/RootStore";
 
 export interface IAppProps {
@@ -24,17 +25,6 @@ export class App extends React.Component <IAppProps, any> {
     }
 
     showComponent(theme: any) {
-        const { store } = this.props
-        const view = store.viewStore.currentView;
-
-        // switch(view) {
-        //     case "home" :
-        //         return <Home store={this.props.store} />
-        //         break;
-        //     default:
-        //         return <Home store={this.props.store} />
-        //         break;
-        // }
         return <Home store={this.props.store} />
     }
 
