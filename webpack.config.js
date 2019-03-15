@@ -1,11 +1,11 @@
 var path = require('path');
-var webpack = require('webpack');
-const tsImportPluginFactory = require('ts-import-plugin');
-
 const env = process.env.NODE_ENV;
+
+const tsImportPluginFactory = require('ts-import-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
     mode: env,
@@ -78,7 +78,8 @@ module.exports = {
     plugins: [
         new ForkTsCheckerWebpackPlugin(),
         new HtmlWebpackPlugin({template: 'public/index.html', inject: false}),
-        new ExtractTextPlugin({filename:"style.css", allChunks: true})
+        new ExtractTextPlugin({filename:"style.css", allChunks: true}),
+        new BundleAnalyzerPlugin()
     ],
     optimization: {
         minimize: true,

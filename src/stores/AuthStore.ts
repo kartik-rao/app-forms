@@ -1,5 +1,5 @@
-import { CognitoUser } from "@aws-amplify/auth";
-import { Auth, Hub } from "aws-amplify";
+import Auth, { CognitoUser } from "@aws-amplify/auth";
+import { Hub } from "@aws-amplify/core";
 import { action, computed, decorate, observable } from "mobx";
 
 export interface IAuthStore {

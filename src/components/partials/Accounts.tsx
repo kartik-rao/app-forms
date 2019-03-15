@@ -1,8 +1,7 @@
 import * as React from "react";
 import { IRootStore } from "../../stores/RootStore";
-
 import {observable, action} from "mobx";
-import { API, graphqlOperation } from "aws-amplify";
+import  API, {graphqlOperation } from "@aws-amplify/api";
 import * as queries from '../../graphql/queries';
 import { Table, List } from "antd";
 

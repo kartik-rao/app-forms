@@ -1,5 +1,5 @@
 import { Col, Layout, Row } from "antd";
-import Amplify from 'aws-amplify';
+import Amplify from '@aws-amplify/core';
 import { Authenticator, Greetings } from 'aws-amplify-react';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
