@@ -1,6 +1,25 @@
 import { observable, computed, action } from 'mobx';
 
 class ViewStore {
+    static Paths : any = {
+        "/home"    : {name: "home", view: 'Home'},
+        "/accounts": {name: "accounts", view: 'Accounts'},
+        "/users"   : {name: "users", view: 'Users'},
+        "/admin"   : {name: "admin", vieW: "Admin"},
+        "/forms"   : {name: "forms", view: "Forms"},
+        "/canvas"  : {name: "canvas", view: "Canvas"},
+        "/profile" : {name: "profile", view: "Profile"},
+    }
+
+    static Views : any = {
+        "home"    : {path: "/home", view: 'Home', name: "home"},
+        "accounts": {path: "/accounts", view: 'Accounts', name: "accounts"},
+        "users"   : {path: "/users", view: 'Users', name: "users"},
+        "admin"   : {path: "/admin", vieW: "Admin", name: "admin"},
+        "forms"   : {path: "/forms", view: "Forms", name: "forms"},
+        "canvas"  : {path: "/canvas", view: "Canvas", name: "canvas"},
+        "profile" : {path: "/profile", view: "Profile", name: "profile"},
+    }
 
     fetch: any;
     @observable currentView = null;
@@ -10,20 +29,19 @@ class ViewStore {
     }
 
     @computed get currentPath() {
-        if(!this.currentView) {
+        if(!this.currentView || !ViewStore.Views[this.currentView.name]) {
             return "";
         }
+        return ViewStore.Views[this.currentView.name].path;
+    }
 
-        switch(this.currentView.name) {
-            case "home" : return "/home"
-            case "accounts" : return "/accounts"
-            case "users" : return "/users"
-            case "admin" : return "/admin"
-            case "forms" : return "/forms"
-            case "canvas" : return "/canvas"
-            case "profile" : return "/profile"
-            default: return "home";
+    @action showView(name: string) {
+        if (name && ViewStore.Views[name]) {
+            this.currentView = ViewStore.Views[name]
+        } else {
+            console.warn(`ViewStore.showView - view [${name}] does not exist`)
         }
+
     }
 
     @action showHome() {

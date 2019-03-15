@@ -70,7 +70,10 @@ module.exports = {
         compress: true,
         publicPath: path.resolve("/"),
         hot: true,
-        port: 8085
+        port: 8085,
+        historyApiFallback: {
+            index: 'public/index.html'
+        }
     },
     plugins: [
         new ForkTsCheckerWebpackPlugin(),

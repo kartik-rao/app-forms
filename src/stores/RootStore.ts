@@ -16,7 +16,7 @@ class RootStore {
     editorStore: EditorStore;
     viewStore: ViewStore;
     contentStore: ContentStore;
-    isDebug: boolean = location.href.indexOf('localhost') > -1;
+    debug: boolean = location.href.indexOf('localhost') > -1;
 
     constructor() {
         this.authStore = new AuthStore();

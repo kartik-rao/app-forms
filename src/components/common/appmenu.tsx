@@ -3,9 +3,6 @@ import * as React from "react";
 import { IRootStore } from '../../stores/RootStore';
 import { observer } from 'mobx-react';
 
-const SubMenu = Menu.SubMenu;
-const MenuItemGroup = Menu.ItemGroup;
-
 export interface IAppMenuProps {
     store: IRootStore;
 }
