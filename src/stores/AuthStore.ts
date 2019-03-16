@@ -9,14 +9,35 @@ export interface IAuthStore {
     setAuthData: (user: any) => void;
     signOut: () => void;
     isSignedIn : boolean;
-    userGroup: string;
-    currentUser: CognitoUser;
+    group: string;
+    tenant: string;
+    authData: CognitoUser;
+    authError: any;
 }
 
 // https://github.com/aws-amplify/amplify-js/issues/31
 class AuthStore implements IAuthStore {
-    user : any;
+    authData : CognitoUser;
     authState: string;
+    authError: any;
+    attributes: any;
+
+    @action handleAuthResponse(user: CognitoUser) {
+        user.getUserAttributes((err, attributes=[]) => {
+            if(!err) {
+                let attrs = {}
+                attributes.forEach((attr) => {
+                    attrs[attr["Name"]] = attr["Value"];
+                })
+                this.setUserAttributes(attrs);
+                this.setAuthState('signedIn');
+                this.setAuthData(user);
+            } else {
+                this.authError = err.message;
+                console.log(err);
+            }
+        });
+    }
 
     @action.bound onHubCapsule(capsule) {
         // The Auth module will emit events when user signs in, signs out, etc
@@ -25,17 +46,22 @@ class AuthStore implements IAuthStore {
             console.log("Hub event", payload);
             switch (payload.event) {
                 case 'signIn':
-                    this.setAuthState('signedIn');
-                    Auth.currentAuthenticatedUser().then(user => {
-                        this.setAuthData(user);
+                    Auth.currentAuthenticatedUser().then((user:CognitoUser) => {
+                        this.handleAuthResponse(user);
                     }).catch(e => {
+                        this.authError = e.message;
                         this.setAuthState('signIn');
                     });
                     break;
                 case 'signIn_failure':
                     this.setAuthState('signIn');
                     this.setAuthData(null);
+                    this.authError = payload.data.message;
                     break;
+                case 'signUp_failure':
+                    this.setAuthData(null);
+                    this.setAuthState('signIn');
+                    this.authError = payload.data.message;
                 default:
                     break;
             }
@@ -55,8 +81,7 @@ class AuthStore implements IAuthStore {
         Hub.listen('auth', this);
         this.setAuthState("loading");
         Auth.currentAuthenticatedUser().then(user => {
-            this.setAuthState('signedIn');
-            this.setAuthData(user);
+            this.handleAuthResponse(user);
         }).catch(e => {
             this.setAuthState('signIn');
         });
@@ -69,24 +94,36 @@ class AuthStore implements IAuthStore {
 
     @action setAuthData(user: any) {
         console.log("Auth data changed", user);
-        this.user = user;
+        this.authData = user;
+    }
+
+    @action setUserAttributes(attributes: any) {
+        this.attributes = attributes;
     }
 
     @computed get isSignedIn() {
         return this.authState == 'signedIn';
     }
 
-    @computed get userGroup() : string {
-        if (this.authState == 'signedIn') {
-            return this.user.attributes["custom:group"];
+    @computed get group() : string {
+        if (this.attributes) {
+            return this.attributes["custom:group"];
         } else {
             return null;
         }
     }
 
-    @computed get currentUser() : CognitoUser {
+    @computed get tenant() : string {
+        if (this.attributes) {
+            return this.attributes["custom:tenantId"]
+        } else {
+            return null;
+        }
+    }
+
+    @computed get user() : CognitoUser {
         if (this.authState == 'signedIn') {
-            return this.user;
+            return this.authData;
         } else {
             return null;
         }
@@ -98,8 +135,9 @@ class AuthStore implements IAuthStore {
 }
 
 decorate(AuthStore, {
-    user: observable,
-    authState: observable
+    authData: observable,
+    authState: observable,
+    attributes: observable
 })
 
 export default AuthStore;

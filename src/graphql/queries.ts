@@ -6,24 +6,13 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     id
     name
     addresses {
-      id
-      name
-      addressee
-      addressType
-      phone_number
-      email
-      street
-      city
-      state
-      country
+      nextToken
     }
     website
     taxId
     owner
     planId
-    createdAt
-    updatedAt
-    users {
+    ownedBy {
       id
       owner
       accountId
@@ -34,24 +23,15 @@ export const getAccount = `query GetAccount($accountId: ID!) {
       phone_number
       createdAt
       updatedAt
+      isDeleted
+    }
+    createdAt
+    updatedAt
+    users {
+      nextToken
     }
     forms {
-      id
-      owner
-      exid
-      desc
-      name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
-      createdAt
-      updatedAt
+      nextToken
     }
     plan {
       id
@@ -89,6 +69,16 @@ export const getUser = `query GetUser($userId: ID!) {
     id
     owner
     accountId
+    account {
+      id
+      name
+      website
+      taxId
+      owner
+      planId
+      createdAt
+      updatedAt
+    }
     email
     group
     given_name
@@ -96,6 +86,7 @@ export const getUser = `query GetUser($userId: ID!) {
     phone_number
     createdAt
     updatedAt
+    isDeleted
   }
 }
 `;
@@ -112,6 +103,7 @@ export const listAllUsers = `query ListAllUsers($limit: Int, $nextToken: String)
       phone_number
       createdAt
       updatedAt
+      isDeleted
     }
     nextToken
   }
@@ -138,6 +130,7 @@ export const listAllAccountUsers = `query ListAllAccountUsers(
       phone_number
       createdAt
       updatedAt
+      isDeleted
     }
     nextToken
   }
@@ -164,6 +157,7 @@ export const listAllAccountUsersActive = `query ListAllAccountUsersActive(
       phone_number
       createdAt
       updatedAt
+      isDeleted
     }
     nextToken
   }
@@ -192,6 +186,7 @@ export const listAccountUsersInGroup = `query ListAccountUsersInGroup(
       phone_number
       createdAt
       updatedAt
+      isDeleted
     }
     nextToken
   }
@@ -201,7 +196,30 @@ export const getPlan = `query GetPlan($planId: String!) {
   getPlan(planId: $planId) {
     id
     accountId
+    account {
+      id
+      name
+      website
+      taxId
+      owner
+      planId
+      createdAt
+      updatedAt
+    }
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
     planTypeId
     startDate
     endDate
@@ -288,6 +306,19 @@ export const getPlanType = `query GetPlanType($planTypeId: String!) {
   getPlanType(planTypeId: $planTypeId) {
     id
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
     name
     cost
     active
@@ -333,6 +364,30 @@ export const getForm = `query GetForm($formId: String!) {
   getForm(formId: $formId) {
     id
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
+    accountId
+    account {
+      id
+      name
+      website
+      taxId
+      owner
+      planId
+      createdAt
+      updatedAt
+    }
     exid
     desc
     name
@@ -358,6 +413,7 @@ export const listAllForms = `query ListAllForms($limit: Int, $nextToken: String)
     items {
       id
       owner
+      accountId
       exid
       desc
       name
@@ -390,6 +446,7 @@ export const listAllAccountForms = `query ListAllAccountForms(
     items {
       id
       owner
+      accountId
       exid
       desc
       name
@@ -424,6 +481,7 @@ export const listAllAccountFormsActive = `query ListAllAccountFormsActive(
     items {
       id
       owner
+      accountId
       exid
       desc
       name
@@ -458,6 +516,7 @@ export const listAllAccountFormsByUser = `query ListAllAccountFormsByUser(
     items {
       id
       owner
+      accountId
       exid
       desc
       name
@@ -494,6 +553,7 @@ export const listAllAccountFormsByUserActive = `query ListAllAccountFormsByUserA
     items {
       id
       owner
+      accountId
       exid
       desc
       name
@@ -517,7 +577,30 @@ export const getIntegrationType = `query GetIntegrationType($integrationTypeId: 
   getIntegrationType(integrationTypeId: $integrationTypeId) {
     id
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
     planTypeId
+    planType {
+      id
+      owner
+      name
+      cost
+      active
+      billingTerm
+      createdAt
+      updatedAt
+    }
     name
     active
     createdAt
@@ -604,6 +687,25 @@ export const getIntegration = `query GetIntegration($integrationId: String!) {
     owner
     accountId
     formId
+    form {
+      id
+      owner
+      accountId
+      exid
+      desc
+      name
+      tenant
+      status
+      content
+      layout
+      formLayoutOptions
+      stopSubmit
+      submitTarget
+      successRedirect
+      errorRedirect
+      createdAt
+      updatedAt
+    }
     active
     authType
     auth

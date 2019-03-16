@@ -26,7 +26,7 @@ export class AppMenu extends React.Component<IAppMenuProps, any> {
             <Menu.Item key="home" onClick={(e) => viewStore.showHome()}>
                 <Icon type="home" />Home
             </Menu.Item>
-            {authStore.currentUser && authStore.userGroup == 'Admin' && <Menu.Item key="accounts" onClick={(e) => viewStore.showAccounts()}>
+            {authStore.user && authStore.group == 'Admin' && <Menu.Item key="accounts" onClick={(e) => viewStore.showAccounts()}>
                 <Icon type="book" />Accounts
             </Menu.Item>}
             <Menu.Item key="users" onClick={(e) => viewStore.showUsers()}>

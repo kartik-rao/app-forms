@@ -21,7 +21,24 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
     @action async fetch() {
         let allUsers;
         try {
-            allUsers = await API.graphql(graphqlOperation(queries.listAllUsers, {limit: 50, nextToken: this.nextToken}));
+            let {group, tenant} = this.props.store.authStore;
+            let args = {limit: 50, nextToken: this.nextToken};
+            let query;
+            console.log(this.props.store.authStore.tenant);
+            switch(group) {
+                case "Admin":
+                    query = queries.listAllUsers;
+                    allUsers = await API.graphql(graphqlOperation(query, args));
+                    break;
+                default:
+                    query = queries.getAccount;
+                    args["accountId"] = tenant;
+                    let account = await API.graphql(graphqlOperation(query, args));
+                    allUsers = account["users"];
+                    break;
+            }
+
+            // allUsers = await API.graphql(graphqlOperation(query, args));
             this.nextToken = allUsers["nextToken"];
             this.users = allUsers["items"];
         } catch (errorResponse) {

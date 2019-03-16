@@ -5,6 +5,19 @@ export const addPlanType = `mutation AddPlanType($input: AddPlanTypeInput) {
   addPlanType(input: $input) {
     id
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
     name
     cost
     active
@@ -18,7 +31,30 @@ export const addPlan = `mutation AddPlan($input: AddPlanInput) {
   addPlan(input: $input) {
     id
     accountId
+    account {
+      id
+      name
+      website
+      taxId
+      owner
+      planId
+      createdAt
+      updatedAt
+    }
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
     planTypeId
     startDate
     endDate
@@ -44,24 +80,13 @@ export const addAccount = `mutation AddAccount($input: AddAccountInput) {
     id
     name
     addresses {
-      id
-      name
-      addressee
-      addressType
-      phone_number
-      email
-      street
-      city
-      state
-      country
+      nextToken
     }
     website
     taxId
     owner
     planId
-    createdAt
-    updatedAt
-    users {
+    ownedBy {
       id
       owner
       accountId
@@ -72,24 +97,15 @@ export const addAccount = `mutation AddAccount($input: AddAccountInput) {
       phone_number
       createdAt
       updatedAt
+      isDeleted
+    }
+    createdAt
+    updatedAt
+    users {
+      nextToken
     }
     forms {
-      id
-      owner
-      exid
-      desc
-      name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
-      createdAt
-      updatedAt
+      nextToken
     }
     plan {
       id
@@ -111,6 +127,16 @@ export const addUser = `mutation AddUser($input: AddUserInput) {
     id
     owner
     accountId
+    account {
+      id
+      name
+      website
+      taxId
+      owner
+      planId
+      createdAt
+      updatedAt
+    }
     email
     group
     given_name
@@ -118,6 +144,7 @@ export const addUser = `mutation AddUser($input: AddUserInput) {
     phone_number
     createdAt
     updatedAt
+    isDeleted
   }
 }
 `;
@@ -125,7 +152,30 @@ export const addIntegrationType = `mutation AddIntegrationType($input: AddIntegr
   addIntegrationType(input: $input) {
     id
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
     planTypeId
+    planType {
+      id
+      owner
+      name
+      cost
+      active
+      billingTerm
+      createdAt
+      updatedAt
+    }
     name
     active
     createdAt
@@ -149,6 +199,25 @@ export const addIntegration = `mutation AddIntegration($input: AddIntegrationInp
     owner
     accountId
     formId
+    form {
+      id
+      owner
+      accountId
+      exid
+      desc
+      name
+      tenant
+      status
+      content
+      layout
+      formLayoutOptions
+      stopSubmit
+      submitTarget
+      successRedirect
+      errorRedirect
+      createdAt
+      updatedAt
+    }
     active
     authType
     auth
@@ -166,6 +235,30 @@ export const addForm = `mutation AddForm($input: AddFormInput) {
   addForm(input: $input) {
     id
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
+    accountId
+    account {
+      id
+      name
+      website
+      taxId
+      owner
+      planId
+      createdAt
+      updatedAt
+    }
     exid
     desc
     name
@@ -190,6 +283,19 @@ export const updatePlanType = `mutation UpdatePlanType($input: UpdatePlanTypeInp
   updatePlanType(input: $input) {
     id
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
     name
     cost
     active
@@ -203,7 +309,30 @@ export const updatePlan = `mutation UpdatePlan($input: UpdatePlanInput) {
   updatePlan(input: $input) {
     id
     accountId
+    account {
+      id
+      name
+      website
+      taxId
+      owner
+      planId
+      createdAt
+      updatedAt
+    }
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
     planTypeId
     startDate
     endDate
@@ -229,24 +358,13 @@ export const updateAccount = `mutation UpdateAccount($input: UpdateAccountInput)
     id
     name
     addresses {
-      id
-      name
-      addressee
-      addressType
-      phone_number
-      email
-      street
-      city
-      state
-      country
+      nextToken
     }
     website
     taxId
     owner
     planId
-    createdAt
-    updatedAt
-    users {
+    ownedBy {
       id
       owner
       accountId
@@ -257,24 +375,15 @@ export const updateAccount = `mutation UpdateAccount($input: UpdateAccountInput)
       phone_number
       createdAt
       updatedAt
+      isDeleted
+    }
+    createdAt
+    updatedAt
+    users {
+      nextToken
     }
     forms {
-      id
-      owner
-      exid
-      desc
-      name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
-      createdAt
-      updatedAt
+      nextToken
     }
     plan {
       id
@@ -296,6 +405,16 @@ export const updateUser = `mutation UpdateUser($input: UpdateUserInput) {
     id
     owner
     accountId
+    account {
+      id
+      name
+      website
+      taxId
+      owner
+      planId
+      createdAt
+      updatedAt
+    }
     email
     group
     given_name
@@ -303,6 +422,7 @@ export const updateUser = `mutation UpdateUser($input: UpdateUserInput) {
     phone_number
     createdAt
     updatedAt
+    isDeleted
   }
 }
 `;
@@ -310,7 +430,30 @@ export const updateIntegrationType = `mutation UpdateIntegrationType($input: Upd
   updateIntegrationType(input: $input) {
     id
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
     planTypeId
+    planType {
+      id
+      owner
+      name
+      cost
+      active
+      billingTerm
+      createdAt
+      updatedAt
+    }
     name
     active
     createdAt
@@ -334,6 +477,25 @@ export const updateIntegration = `mutation UpdateIntegration($input: UpdateInteg
     owner
     accountId
     formId
+    form {
+      id
+      owner
+      accountId
+      exid
+      desc
+      name
+      tenant
+      status
+      content
+      layout
+      formLayoutOptions
+      stopSubmit
+      submitTarget
+      successRedirect
+      errorRedirect
+      createdAt
+      updatedAt
+    }
     active
     authType
     auth
@@ -351,6 +513,30 @@ export const updateForm = `mutation UpdateForm($input: UpdateFormInput) {
   updateForm(input: $input) {
     id
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
+    accountId
+    account {
+      id
+      name
+      website
+      taxId
+      owner
+      planId
+      createdAt
+      updatedAt
+    }
     exid
     desc
     name
@@ -375,6 +561,19 @@ export const deletePlanType = `mutation DeletePlanType($id: ID!) {
   deletePlanType(id: $id) {
     id
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
     name
     cost
     active
@@ -388,7 +587,30 @@ export const deletePlan = `mutation DeletePlan($id: ID!) {
   deletePlan(id: $id) {
     id
     accountId
+    account {
+      id
+      name
+      website
+      taxId
+      owner
+      planId
+      createdAt
+      updatedAt
+    }
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
     planTypeId
     startDate
     endDate
@@ -414,24 +636,13 @@ export const deleteAccount = `mutation DeleteAccount($id: ID!) {
     id
     name
     addresses {
-      id
-      name
-      addressee
-      addressType
-      phone_number
-      email
-      street
-      city
-      state
-      country
+      nextToken
     }
     website
     taxId
     owner
     planId
-    createdAt
-    updatedAt
-    users {
+    ownedBy {
       id
       owner
       accountId
@@ -442,24 +653,15 @@ export const deleteAccount = `mutation DeleteAccount($id: ID!) {
       phone_number
       createdAt
       updatedAt
+      isDeleted
+    }
+    createdAt
+    updatedAt
+    users {
+      nextToken
     }
     forms {
-      id
-      owner
-      exid
-      desc
-      name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
-      createdAt
-      updatedAt
+      nextToken
     }
     plan {
       id
@@ -481,6 +683,16 @@ export const deleteUser = `mutation DeleteUser($id: ID!) {
     id
     owner
     accountId
+    account {
+      id
+      name
+      website
+      taxId
+      owner
+      planId
+      createdAt
+      updatedAt
+    }
     email
     group
     given_name
@@ -488,6 +700,7 @@ export const deleteUser = `mutation DeleteUser($id: ID!) {
     phone_number
     createdAt
     updatedAt
+    isDeleted
   }
 }
 `;
@@ -495,7 +708,30 @@ export const deleteIntegrationType = `mutation DeleteIntegrationType($id: ID!) {
   deleteIntegrationType(id: $id) {
     id
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
     planTypeId
+    planType {
+      id
+      owner
+      name
+      cost
+      active
+      billingTerm
+      createdAt
+      updatedAt
+    }
     name
     active
     createdAt
@@ -519,6 +755,25 @@ export const deleteIntegration = `mutation DeleteIntegration($id: ID!) {
     owner
     accountId
     formId
+    form {
+      id
+      owner
+      accountId
+      exid
+      desc
+      name
+      tenant
+      status
+      content
+      layout
+      formLayoutOptions
+      stopSubmit
+      submitTarget
+      successRedirect
+      errorRedirect
+      createdAt
+      updatedAt
+    }
     active
     authType
     auth
@@ -536,6 +791,30 @@ export const deleteForm = `mutation DeleteForm($id: ID!) {
   deleteForm(id: $id) {
     id
     owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
+    accountId
+    account {
+      id
+      name
+      website
+      taxId
+      owner
+      planId
+      createdAt
+      updatedAt
+    }
     exid
     desc
     name
@@ -574,24 +853,13 @@ export const attachPlan = `mutation AttachPlan($input: AddPlanInput) {
     id
     name
     addresses {
-      id
-      name
-      addressee
-      addressType
-      phone_number
-      email
-      street
-      city
-      state
-      country
+      nextToken
     }
     website
     taxId
     owner
     planId
-    createdAt
-    updatedAt
-    users {
+    ownedBy {
       id
       owner
       accountId
@@ -602,24 +870,15 @@ export const attachPlan = `mutation AttachPlan($input: AddPlanInput) {
       phone_number
       createdAt
       updatedAt
+      isDeleted
+    }
+    createdAt
+    updatedAt
+    users {
+      nextToken
     }
     forms {
-      id
-      owner
-      exid
-      desc
-      name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
-      createdAt
-      updatedAt
+      nextToken
     }
     plan {
       id
