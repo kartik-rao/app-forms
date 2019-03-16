@@ -22,20 +22,25 @@ class AuthStore implements IAuthStore {
         // The Auth module will emit events when user signs in, signs out, etc
         const { channel, payload, source } = capsule;
         if (channel === 'auth') {
-          switch (payload.event) {
-            case 'signIn':
-              console.log('signed in');
-              this.setAuthState('signedIn');
-              break;
-            case 'signIn_failure':
-              console.log('not signed in');
-              this.setAuthState('signIn');
-              break;
-            default:
-              break;
-          }
+            console.log("Hub event", payload);
+            switch (payload.event) {
+                case 'signIn':
+                    this.setAuthState('signedIn');
+                    Auth.currentAuthenticatedUser().then(user => {
+                        this.setAuthData(user);
+                    }).catch(e => {
+                        this.setAuthState('signIn');
+                    });
+                    break;
+                case 'signIn_failure':
+                    this.setAuthState('signIn');
+                    this.setAuthData(null);
+                    break;
+                default:
+                    break;
+            }
         }
-      }
+    }
 
     @action.bound signOut() {
         Auth.signOut().then(() => {
@@ -49,7 +54,6 @@ class AuthStore implements IAuthStore {
         // let the Hub module listen on Auth events
         Hub.listen('auth', this);
         this.setAuthState("loading");
-
         Auth.currentAuthenticatedUser().then(user => {
             this.setAuthState('signedIn');
             this.setAuthData(user);

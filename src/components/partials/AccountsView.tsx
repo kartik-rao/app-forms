@@ -3,12 +3,14 @@ import { IRootStore } from "../../stores/RootStore";
 import {observable, action} from "mobx";
 import  API, {graphqlOperation } from "@aws-amplify/api";
 import * as queries from '../../graphql/queries';
-import { Table, List } from "antd";
+import { Table, List, Spin, Empty, Row, Col } from "antd";
+import { observer } from "mobx-react";
 
 export interface IAccountsViewProps {
     store: IRootStore;
 }
 
+@observer
 export class AccountsView extends React.Component<IAccountsViewProps, any> {
     props: IAccountsViewProps;
     @observable accounts = [];
@@ -25,6 +27,7 @@ export class AccountsView extends React.Component<IAccountsViewProps, any> {
         } catch (errorResponse) {
             this.errors = errorResponse.errors;
         }
+        this.loading = false;
     }
 
     constructor(props: IAccountsViewProps) {
@@ -48,14 +51,21 @@ export class AccountsView extends React.Component<IAccountsViewProps, any> {
             key: 'planId'
         }];
 
+        let showErrors = this.props.store.debug && this.errors;
+        let showAccounts = !this.loading && this.accounts && this.accounts.length > 0;
+        let showEmpty = !this.loading && (!this.accounts || this.accounts.length == 0);
+
         return (
-            <div>
-            {this.accounts && this.accounts.length > 0 && <Table dataSource={this.accounts} columns={columns} />}
-            {this.props.store.debug && this.errors &&
-                <List dataSource={this.errors} renderItem={item => (
+            <Row>
+                <Col span={20} offset={2}>
+            {this.loading && <Spin size="large" />}
+            {showAccounts && <Table dataSource={this.accounts} columns={columns} />}
+            {showEmpty && <Empty/> }
+            {showErrors && <List dataSource={this.errors} renderItem={item => (
                     <List.Item>item.message</List.Item>
                 )}/>}
-            </div>
+            </Col>
+            </Row>
         );
     }
 }

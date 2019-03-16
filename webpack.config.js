@@ -4,7 +4,7 @@ const env = process.env.NODE_ENV;
 const tsImportPluginFactory = require('ts-import-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
@@ -38,9 +38,7 @@ module.exports = {
             { test: /\.png$|\.eot$|\.woff$|\.ttf$/, loader: "url-loader?limit=100000" },
             {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({
-                    allChunks: true, fallback: "style-loader", use: "css-loader"
-                  }),
+                use: [MiniCssExtractPlugin.loader, "css-loader"],
                 include: /src\/app.css|node_modules\/antd\/|node_modules\/@aws\-amplify\//
             },
             {
@@ -78,8 +76,8 @@ module.exports = {
     plugins: [
         new ForkTsCheckerWebpackPlugin(),
         new HtmlWebpackPlugin({template: 'public/index.html', inject: false}),
-        new ExtractTextPlugin({filename:"style.css", allChunks: true}),
-        new BundleAnalyzerPlugin()
+        new MiniCssExtractPlugin({filename:"style.css", chunkFilename: "[id].css"}),
+        // new BundleAnalyzerPlugin()
     ],
     optimization: {
         minimize: true,

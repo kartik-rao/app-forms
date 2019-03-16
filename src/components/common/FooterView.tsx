@@ -9,6 +9,6 @@ export class Footer extends React.Component<any, any> {
     }
 
     render() {
-        return <Affix offsetBottom={10}><div><h1>Footer</h1></div></Affix>
+        return <Affix><strong>forms.li</strong></Affix>
     }
 }

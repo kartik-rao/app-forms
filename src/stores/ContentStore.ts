@@ -1,5 +1,5 @@
 import {observable} from "mobx";
-import Amplify, { API, graphqlOperation } from "aws-amplify";
+// import Amplify, { API, graphqlOperation } from "aws-amplify";
 import * as queries from '../graphql/queries';
 import * as mutations from '../graphql/mutations';
 import {ListAllAccountsQuery} from "../Api.graphql";

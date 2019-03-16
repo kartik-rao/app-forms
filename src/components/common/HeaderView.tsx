@@ -1,7 +1,6 @@
 import * as React from "react";
 
-import {Affix} from "antd";
-import {AppMenu} from "./appmenu";
+import {AppMenu} from "./NavigationView";
 
 export class Header extends React.Component<any, any> {
     props: any;
@@ -11,6 +10,6 @@ export class Header extends React.Component<any, any> {
     }
 
     render() {
-        return <Affix><AppMenu store={this.props.store}/></Affix>
+        return <AppMenu store={this.props.store}/>
     }
 }

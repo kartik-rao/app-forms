@@ -1,17 +1,17 @@
 import { Col, Layout, Row } from "antd";
 import Amplify from '@aws-amplify/core';
-import { Authenticator, Greetings } from 'aws-amplify-react';
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { App } from './App';
 import { startRouter } from './Router';
 import rootStore from "./stores/RootStore";
-
+import api_config from "./aws-exports";
 
 Amplify.configure({
     oauth: {
         // Domain name
-        domain : 'dev-formsli.auth.ap-southeast-2.amazoncognito.com',
+        domain : 'dev-forms-li.auth.ap-southeast-2.amazoncognito.com',
         // Authorized scopes
         scope : ['phone', 'email', 'profile', 'openid'],
         // Callback URL
@@ -20,13 +20,11 @@ Amplify.configure({
         redirectSignOut : 'http://localhost:8085/', // or 'exp://127.0.0.1:19000/--/', 'myapp://main/'
         responseType: 'code'
     },
-    'aws_appsync_graphqlEndpoint': 'https://q6x74cjifbblvmg3dss7t3ukfi.appsync-api.ap-southeast-2.amazonaws.com/graphql',
-    'aws_appsync_region': 'ap-southeast-2',
-    'aws_appsync_authenticationType': 'AMAZON_COGNITO_USER_POOLS',
+    ...api_config,
     Auth: {
-        userPoolId: 'ap-southeast-2_SttSHpNG3',
-        userPoolWebClientId: "24h1tgst915lji221gtc94hok8",
-        identityPoolId: 'ap-southeast-2:47352019-4cbc-4dc0-84a2-3a5dbc9658da',
+        userPoolId: 'ap-southeast-2_Cnjjlmsxh',
+        userPoolWebClientId: "5uh5s9bfv5m9gk7ndt9e718da6",
+        identityPoolId: "ap-southeast-2:7915bae5-b331-4675-9a3d-95698136c1ca",
         region: 'ap-southeast-2',
         mandatorySignIn: true
     }
@@ -34,15 +32,4 @@ Amplify.configure({
 
 startRouter(rootStore);
 
-ReactDOM.render(
-  <Layout>
-    <Row justify="space-around">
-        <Col span={24}>
-          <Authenticator hide={[Greetings]}>
-            <App store={rootStore}/>
-          </Authenticator>
-        </Col>
-    </Row>
-  </Layout>,
-  document.getElementById('root')
-);
+ReactDOM.render( <App store={rootStore}/>, document.getElementById('approot'));

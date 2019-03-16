@@ -21,7 +21,7 @@ export class AppMenu extends React.Component<IAppMenuProps, any> {
         let selected = viewStore.currentView ? [viewStore.currentView.name] : ["home"];
 
         return (
-        <Menu selectedKeys={selected} mode="horizontal">
+        <Menu selectedKeys={selected} mode="horizontal" theme="light">
             <Menu.Item><strong>Forms.li</strong></Menu.Item>
             <Menu.Item key="home" onClick={(e) => viewStore.showHome()}>
                 <Icon type="home" />Home
