@@ -27,7 +27,6 @@ export class InviteUserView extends React.Component<IInviteUserViewProps & FormC
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
           if (!err) {
-            console.log('Received values of form: ', values);
             this.values = values;
           }
           this.props.onAdd(this.values);
@@ -41,7 +40,6 @@ export class InviteUserView extends React.Component<IInviteUserViewProps & FormC
     }
 
     render() {
-        console.log(this.props);
         let {getFieldDecorator} = this.props.form;
 
         return (<div>
@@ -68,9 +66,9 @@ export class InviteUserView extends React.Component<IInviteUserViewProps & FormC
                             <Input />
                         )}
                     </Form.Item>
-                    <Form.Item label="Phone Number" help="User's phone number, +Country Area Number">
+                    <Form.Item label="Phone Number" help="User's phone number, international format (E.164)">
                         {getFieldDecorator('phone_number', {
-                            rules: [{ required: true, type: "string", pattern : /^\+?[1-9]\d{1,14}$/, message: 'Please provide a valid phone number' }]
+                            rules: [{ type: "string", pattern : /^\+?[1-9]\d{1,14}$/, message: 'Please provide a valid phone number' }]
                         })(
                             <Input placeholder="+61280000008"/>
                         )}
@@ -87,7 +85,7 @@ export class InviteUserView extends React.Component<IInviteUserViewProps & FormC
                         )}
                     </Form.Item>
                     <Form.Item>
-                        <Button type="primary" htmlType="submit">Submit</Button>
+                        <Button style={{float: "right", marginRight: "10px"}} type="primary" htmlType="submit">Submit</Button>
                     </Form.Item>
                 </Form>
             </Row>

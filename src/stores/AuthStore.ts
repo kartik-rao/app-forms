@@ -1,6 +1,8 @@
 import Auth, { CognitoUser } from "@aws-amplify/auth";
+import Api from "@aws-amplify/api";
 import { Hub } from "@aws-amplify/core";
 import { action, computed, decorate, observable } from "mobx";
+import { CognitoUserSession } from "amazon-cognito-identity-js";
 
 export interface IAuthStore {
     user : any;
@@ -8,6 +10,7 @@ export interface IAuthStore {
     setAuthState: (authState: string) => void;
     setAuthData: (user: any) => void;
     signOut: () => void;
+    signUp: (data: any) => void;
     isSignedIn : boolean;
     group: string;
     tenant: string;
@@ -37,6 +40,21 @@ class AuthStore implements IAuthStore {
                 console.log(err);
             }
         });
+    }
+
+    @action async signUp(signupData: any) {
+        let session: CognitoUserSession = await Auth.currentSession();
+        let token = session.getIdToken().getJwtToken()
+
+        let response = await fetch('https://httpbin.org/post', {
+                method: 'POST',
+                headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(signupData)
+        });
+        return response.json()
     }
 
     @action.bound onHubCapsule(capsule) {

@@ -34,7 +34,8 @@
     "qrcode.react": "^0.9.3",
     "query-string": "^6.2.0",
     "react": "^16.7.0",
-    "react-dom": "^16.7.0"
+    "react-dom": "^16.7.0",
+    "react-highlight-words": "^0.16.0"
   },
   "devDependencies": {
     "@types/history": "^4.7.2",
