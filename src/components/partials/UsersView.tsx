@@ -1,13 +1,14 @@
+import { Card, Divider, Drawer, Empty, Icon, List, Row, Spin, Table, Tag } from "antd";
+import { action, observable } from "mobx";
+import { observer } from "mobx-react";
 import * as React from "react";
 import { IRootStore } from "../../stores/RootStore";
-import {observable, action} from "mobx";
-import  API, {graphqlOperation } from "@aws-amplify/api";
-import * as queries from '../../graphql/queries';
-import { Table, List, Spin, Empty, Row, Col } from "antd";
-import { observer } from "mobx-react";
+import InviteUserView from "./InviteUserView";
+
 
 export interface IUsersViewProps {
     store: IRootStore;
+    users: any[];
 }
 
 @observer
@@ -15,74 +16,76 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
     props: IUsersViewProps;
     @observable users = [];
     @observable nextToken = null;
-    @observable loading: boolean = true;
+    @observable loading: boolean = false;
     @observable errors: any[];
+    @observable showAdd: boolean = false;
 
-    @action async fetch() {
-        let allUsers;
-        try {
-            let {group, tenant} = this.props.store.authStore;
-            let args = {limit: 50, nextToken: this.nextToken};
-            let query;
-            console.log(this.props.store.authStore.tenant);
-            switch(group) {
-                case "Admin":
-                    query = queries.listAllUsers;
-                    allUsers = await API.graphql(graphqlOperation(query, args));
-                    break;
-                default:
-                    query = queries.getAccount;
-                    args["accountId"] = tenant;
-                    let account = await API.graphql(graphqlOperation(query, args));
-                    allUsers = account["users"];
-                    break;
-            }
+    @action handleAdd() {
 
-            // allUsers = await API.graphql(graphqlOperation(query, args));
-            this.nextToken = allUsers["nextToken"];
-            this.users = allUsers["items"];
-        } catch (errorResponse) {
-            this.errors = errorResponse.errors;
-        }
-        this.loading = false;
     }
 
     constructor(props: IUsersViewProps) {
         super(props);
         this.props = props;
-        this.fetch();
+        this.users = props.users;
     }
 
     render() {
+        let user = this.props.store.authStore.user;
+
         const columns = [{
-            title: 'User Name',
-            dataIndex: 'name',
-            key: 'name'
-        }, {
+            title: 'First Name',
+            dataIndex: 'given_name',
+            key: 'given_name'
+        },
+        {
+            title: 'Last Name',
+            dataIndex: 'family_name',
+            key: 'family_name'
+        },
+        {
             title: 'Email',
             dataIndex: 'email',
             key: 'email'
         }, {
-            title: 'Account',
-            dataIndex: 'accountId',
-            key: 'accountId'
-        }];
+            title: 'Group',
+            dataIndex: 'group',
+            key: 'group',
+            render: (text, record) => {
+                return <Tag>{record.group}</Tag>
+            }
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (text, record) => (
+              <span>
+                {record.id != user.id && <div><a href="javascript:;">Edit {record.name}</a>
+                <Divider type="vertical" />
+                <a href="javascript:;">Remove</a></div>}
+              </span>
+            ),
+          }];
 
         let showErrors = this.props.store.debug && this.errors;
-        let showUsers = !this.loading && this.users && this.users.length > 0;
-        let showEmpty = !this.loading && (!this.users || this.users.length == 0);
+        let showUsers = !this.showAdd && this.users && this.users.length > 0;
+        let showEmpty = !this.showAdd && (!this.users || this.users.length == 0);
 
         return (
-            <Row>
-                <Col span={20} offset={2}>
-            {this.loading && <Spin size="large" />}
-            {showUsers && <Table dataSource={this.users} columns={columns} />}
-            {showEmpty && <Empty/> }
-            {showErrors && <List dataSource={this.errors} renderItem={item => (
-                    <List.Item>{item.message}</List.Item>
-                )}/>}
-            </Col>
-            </Row>
+            // <PageHeader></PageHeader>
+            <Card title="" actions={[<Icon type="plus" onClick={() => this.showAdd = true}/>]}>
+                <Row type="flex" justify="start" align="middle">
+                    {this.loading && <Spin size="large" />}
+                    {showUsers && <Table dataSource={this.users} columns={columns} rowKey="id"/>}
+                    {showEmpty && <Empty/> }
+                    {showErrors && <List dataSource={this.errors} renderItem={item => (
+                        <List.Item>{item.message}</List.Item>
+                    )}/>}
+                    {this.showAdd && <Drawer title="Add User" placement="right" closable={true} onClose={() => this.showAdd = false} visible={this.showAdd}>
+                        <InviteUserView store={this.props.store} onAdd={this.handleAdd}/>
+                    </Drawer>}
+                </Row>
+            </Card>
         );
     }
 }

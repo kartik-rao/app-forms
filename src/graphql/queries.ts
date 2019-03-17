@@ -28,6 +28,7 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     createdAt
     updatedAt
     users {
+      items {id email given_name family_name group}
       nextToken
     }
     forms {

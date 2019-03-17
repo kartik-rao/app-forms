@@ -38,3 +38,81 @@ html, body {
     display: block;
     position: relative;
 }
+
+.content {
+    min-height: "800px"
+}
+
+.wrap {
+    display: flex;
+}
+
+.content {
+    flex: 1;
+}
+
+.extraContent {
+    min-width: 240px;
+    text-align: right;
+}
+
+.content.padding {
+    padding-left: 40px;
+}
+
+.content .description {
+    display: table;
+}
+
+.description .term {
+    display: table-cell;
+    margin-right: 8px;
+    padding-bottom: 8px;
+    white-space: nowrap;
+    line-height: 20px;
+}
+
+.description .term:after {
+    position: relative;
+    top: -0.5px;
+    margin: 0 8px 0 2px;
+    content: ":";
+}
+
+.description .detail {
+    display: table-cell;
+    padding-bottom: 8px;
+    width: 100%;
+    line-height: 20px;
+}
+
+.ant-layout-header {
+    padding: 0;
+}
+
+.ant-layout-footer {
+    /* background: #7dbcea; */
+    /*color: #fff; */
+    padding: 0;
+}
+
+.ant-layout-footer {
+    line-height: 10;
+}
+
+.ant-menu-horizontal {
+    line-height: 64px;
+}
+
+.ant-layout-sider {
+    /* background: #3ba0e9;
+  color: #fff; */
+    line-height: 120px;
+}
+
+.ant-layout-content {
+    /* background: rgba(16, 142, 233, 1);
+  color: #fff; */
+    min-height: 780px;
+    line-height: 120px;
+}

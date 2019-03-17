@@ -43,7 +43,6 @@ class AuthStore implements IAuthStore {
         // The Auth module will emit events when user signs in, signs out, etc
         const { channel, payload, source } = capsule;
         if (channel === 'auth') {
-            console.log("Hub event", payload);
             switch (payload.event) {
                 case 'signIn':
                     Auth.currentAuthenticatedUser().then((user:CognitoUser) => {
@@ -88,12 +87,10 @@ class AuthStore implements IAuthStore {
     }
 
     @action setAuthState(state: string) {
-        console.log("Auth state changed", state);
         this.authState = state;
     }
 
     @action setAuthData(user: any) {
-        console.log("Auth data changed", user);
         this.authData = user;
     }
 

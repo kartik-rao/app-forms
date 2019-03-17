@@ -24,8 +24,6 @@ export function startRouter(store: IRootStore) {
     autorun(() => {
         const path = viewStore.currentPath;
         const windowPath = window.location.pathname;
-
-        console.log("Router", path, windowPath);
         if (path == "" && windowPath.length > 0 && windowPath != "/") {
             viewStore.showView(ViewStore.Paths[windowPath].name)
             window.history.pushState(null, null, windowPath)
