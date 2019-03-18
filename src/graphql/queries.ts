@@ -11,7 +11,6 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     website
     taxId
     owner
-    planId
     ownedBy {
       id
       email
@@ -51,7 +50,6 @@ export const listAllAccounts = `query ListAllAccounts($limit: Int, $nextToken: S
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
@@ -70,7 +68,6 @@ export const getUser = `query GetUser($userId: ID!) {
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
