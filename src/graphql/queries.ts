@@ -14,16 +14,10 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     planId
     ownedBy {
       id
-      owner
-      accountId
       email
       group
       given_name
       family_name
-      phone_number
-      createdAt
-      updatedAt
-      isDeleted
     }
     createdAt
     updatedAt
@@ -32,13 +26,13 @@ export const getAccount = `query GetAccount($accountId: ID!) {
       nextToken
     }
     forms {
+      items {id }
       nextToken
     }
     plan {
       id
-      accountId
+      planType {id name}
       owner
-      planTypeId
       startDate
       endDate
       active

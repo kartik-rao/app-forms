@@ -58,7 +58,7 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
     render() {
         return <div>
             {!this.loading && <PageHeader title={this.account.name}
-                subTitle={this.account.plan ? this.account.plan.name : 'FREE'}
+                subTitle={this.account.plan ? this.account.plan.planType.name : 'FREE'}
                 extra={[ <Button key="1">Change Plan</Button> ]}
                 footer={
                     <Tabs defaultActiveKey="1">
