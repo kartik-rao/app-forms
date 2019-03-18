@@ -28,8 +28,8 @@ export class InviteUserView extends React.Component<IInviteUserViewProps & FormC
         this.props.form.validateFieldsAndScroll((err, values) => {
           if (!err) {
             this.values = values;
+            this.props.onAdd(this.values);
           }
-          this.props.onAdd(this.values);
         });
     }
 
@@ -84,7 +84,7 @@ export class InviteUserView extends React.Component<IInviteUserViewProps & FormC
                             </Select>
                         )}
                     </Form.Item>
-                    <Form.Item>
+                    <Form.Item style={{marginTop: "20px"}}>
                         <Button style={{float: "right", marginRight: "10px"}} type="primary" htmlType="submit">Submit</Button>
                     </Form.Item>
                 </Form>
