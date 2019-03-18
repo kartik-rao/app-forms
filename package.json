@@ -12,8 +12,7 @@
   "author": "Kartik Rao",
   "license": "UNLICENSED",
   "dependencies": {
-    "@adinfinity/ai-core-forms": "^1.2.0",
-    "@adinfinity/ai-lib-forms": "^1.6.2",
+    "@adinfinity/ai-core-forms": "^2.0.0",
     "@aws-amplify/analytics": "^1.2.11",
     "@aws-amplify/api": "^1.0.29",
     "@aws-amplify/auth": "^1.2.18",
