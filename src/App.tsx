@@ -2,8 +2,6 @@
 import 'airbnb-browser-shims';
 import './app.css';
 import {Layout, Row, Col} from "antd";
-import { Footer } from "./components/common/FooterView"
-import { Header } from "./components/common/HeaderView";
 import { observer } from "mobx-react";
 import * as React from "react";
 import { Authenticator, Greetings } from 'aws-amplify-react';
@@ -88,24 +86,14 @@ export class App extends React.Component <IAppProps, any> {
     }
 
     render() {
-        return <Layout className="layout">
+        return <Layout className="fl-layout">
         <Row type="flex" justify="center" align="top">
           <Col span={20}>
-            {this.props.store.authStore.authState == 'signedIn' &&
-                <Layout.Header className="header">
-                    <Header store={this.props.store}/>
-                </Layout.Header>
-            }
-            <Layout.Content className="content">
-                <Authenticator hide={[Greetings]} signUpConfig={signUpConfig}>
-                    {this.props.store.authStore.authState == 'signedIn' &&
-                        <MainView store={this.props.store}/>
-                    }
-                </Authenticator>
-            </Layout.Content>
-            <Layout.Footer className="footer">
-                <Footer store={this.props.store}></Footer>
-            </Layout.Footer>
+            <Authenticator hide={[Greetings]} signUpConfig={signUpConfig}>
+                {this.props.store.authStore.authState == 'signedIn' &&
+                    <MainView store={this.props.store}/>
+                }
+            </Authenticator>
           </Col>
         </Row>
       </Layout>

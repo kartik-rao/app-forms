@@ -7,6 +7,9 @@ import { UsersView } from "./UsersView";
 import { FormsView } from "./FormsView";
 import { AdminView } from './AdminView';
 import { AccountAdminView } from './AccountAdminView';
+import { Layout } from 'antd';
+import { Footer } from "../common/FooterView"
+import { Header } from "../common/HeaderView";
 
 export interface IMainViewProps {
     store: IRootStore
@@ -26,12 +29,22 @@ export class MainView extends React.Component<IMainViewProps, {}> {
         const isAccountAdmin = group == 'AccountAdmin';
 
         return (
-            <div style={{padding: "10px", height: "100%"}}>
-                {view == 'canvas'   && <Creator store={this.props.store}/>}
-                {view == 'accounts' && isAdmin && <AccountsView store={this.props.store}/>}
-                {view == 'forms' && <FormsView store={this.props.store}/>}
-                {view == 'admin' && isAdmin && <AdminView store={this.props.store}/>}
-                {view == 'admin' && isAccountAdmin && <AccountAdminView store={this.props.store}/>}
+            <div>
+                <Layout.Header className="fl-header">
+                    <Header store={this.props.store}/>
+                </Layout.Header>
+                <Layout.Content className="fl-content">
+                <div className="fl-main">
+                    {view == 'canvas'   && <Creator store={this.props.store}/>}
+                    {view == 'accounts' && isAdmin && <AccountsView store={this.props.store}/>}
+                    {view == 'forms' && <FormsView store={this.props.store}/>}
+                    {view == 'admin' && isAdmin && <AdminView store={this.props.store}/>}
+                    {view == 'admin' && isAccountAdmin && <AccountAdminView store={this.props.store}/>}
+                </div>
+                </Layout.Content>
+                <Layout.Footer className="fl-footer">
+                    <Footer store={this.props.store}></Footer>
+                </Layout.Footer>
             </div>
         );
     }

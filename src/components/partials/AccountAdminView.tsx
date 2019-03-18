@@ -3,7 +3,7 @@ import { IRootStore } from "../../stores/RootStore";
 import {observable, action} from "mobx";
 import  API, {graphqlOperation } from "@aws-amplify/api";
 import * as queries from '../../graphql/queries';
-import {  Button, Spin, Tabs, Row, Col, Card } from "antd";
+import {  Button, Spin, Tabs, Row, Col, List } from "antd";
 import { observer } from "mobx-react";
 import { UsersView } from "./UsersView";
 import PageHeader from "antd/lib/page-header";
@@ -43,21 +43,29 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
             let {tenant} = this.props.store.authStore;
             let args = {accountId: tenant};
             let account: any = await API.graphql(graphqlOperation(queries.getAccount, args));
-            console.log(account.data.getAccount, typeof account);
             this.account = account.data.getAccount;
+            console.log(this.account, typeof account);
         } catch (errorResponse) {
+            console.log("ERROR", errorResponse)
             this.errors = errorResponse.errors;
+        } finally {
+            this.loading = false;
         }
-        this.loading = false;
     }
 
     @action handleAdd() {
 
     }
-
     render() {
+        let showErrors = this.props.store.debug && this.errors;
         return <div>
-            {!this.loading && <PageHeader title={this.account.name}
+            {this.loading && <Row type="flex" justify="center" align="middle">
+                <Col span={4} offset={12}><Spin size="large"/></Col>
+            </Row>}
+            {showErrors && <List dataSource={this.errors} renderItem={item => (
+                    <List.Item>{item.message}</List.Item>
+            )}/>}
+            {!this.loading && this.account && <PageHeader title={this.account.name}
                 subTitle={this.account.plan ? this.account.plan.planType.name : 'FREE'}
                 extra={[ <Button key="1">Change Plan</Button> ]}
                 footer={

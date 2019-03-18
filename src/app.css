@@ -15,7 +15,7 @@
     margin: 5px;
 }
 
-.layout {
+.fl-layout {
     height: 100vh;
 }
 
@@ -82,6 +82,7 @@ html, body {
     line-height: 20px;
 }
 
+
 .ant-layout-header {
     padding: 0;
 }
@@ -107,14 +108,19 @@ html, body {
 }
 
 .ant-layout-content {
-    background:#7dbcea;
+    border: 3px solid #ffff;
+    padding: 7px;
+    /* background:#7dbcea; */
     color: #fff;
-    /* min-height: 100vh; */
-    /* height: 100%; */
     height: calc(100vh - 120px);
     line-height: 120px;
 }
 
 .ant-tabs-tabpane {
     height: 76vh;
+}
+
+.fl-main {
+    padding: "10px";
+    height: "100%"
 }

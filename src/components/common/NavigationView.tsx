@@ -22,7 +22,7 @@ export class AppMenu extends React.Component<IAppMenuProps, any> {
 
         return (
         <Menu selectedKeys={selected} mode="horizontal" theme="light">
-            <Menu.Item><strong>Forms.li</strong></Menu.Item>
+            <Menu.Item disabled={true}><h2 style={{margin: 0, fontVariant: "tabular-nums"}}>Forms.li</h2></Menu.Item>
             <Menu.Item key="home" onClick={(e) => viewStore.showHome()}>
                 <Icon type="home" />Home
             </Menu.Item>
