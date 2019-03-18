@@ -108,8 +108,9 @@ html, body {
 }
 
 .ant-layout-content {
-    border: 3px solid #ffff;
-    padding: 7px;
+    border-top: 2px solid rgb(175, 175, 175);
+    border-bottom: 2px solid #ffee;
+    /* padding: 5px; */
     /* background:#7dbcea; */
     color: #fff;
     height: calc(100vh - 120px);
@@ -117,7 +118,7 @@ html, body {
 }
 
 .ant-tabs-tabpane {
-    height: 76vh;
+    height: 74vh;
 }
 
 .fl-main {

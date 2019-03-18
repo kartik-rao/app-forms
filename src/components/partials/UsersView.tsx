@@ -1,12 +1,11 @@
-import { Input, Button, Card, Divider, Drawer, Empty, Icon, List, Row, Spin, Table, Tag, Col } from "antd";
-import Highlighter from 'react-highlight-words';
-
-import { action, observable } from "mobx";
-import { observer } from "mobx-react";
+import { Button, Col, Divider, Drawer, Row, Tag, Card, Spin } from "antd";
+import { action, computed, observable, when } from "mobx";
+import { observer, Observer } from "mobx-react";
 import * as React from "react";
 import { IRootStore } from "../../stores/RootStore";
+import { TableWrapper } from "../common/TableWrapper";
 import InviteUserView from "./InviteUserView";
-
+import Typography from "antd/lib/typography"
 
 export interface IUsersViewProps {
     store: IRootStore;
@@ -22,6 +21,7 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
     @observable errors: any[];
     @observable showAdd: boolean = false;
     @observable searchText: string;
+    @observable selectedItems : any[] = [];
     searchInput: any;
 
     constructor(props: IUsersViewProps) {
@@ -34,63 +34,39 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
         let {authStore} = this.props.store;
         values["custom:source"] = authStore.user.username;
         values["custom:tenantId"] = authStore.tenant;
-        let response = await authStore.signUp(values);
+        try {
+          let response = await authStore.signUp(values);
+          console.log("SIGNUP RESPONSE", response);
+        } catch (error) {
+          console.log("signup error", error);
+        }
+
     }
 
-    handleSearch = (selectedKeys, confirm) => {
-        confirm();
-        this.setState({ searchText: selectedKeys[0] });
+    @action.bound showAddUser(show: boolean) {
+        this.showAdd = show;
     }
 
-    handleReset = (clearFilters) => {
-        clearFilters();
-        this.setState({ searchText: '' });
+    @action.bound setSelectedItems(selectedItems) {
+        this.selectedItems = selectedItems;
+        console.log(selectedItems);
     }
 
-    getColumnSearchProps = (dataIndex, title) => ({
-        filterDropdown: ({
-          setSelectedKeys, selectedKeys, confirm, clearFilters,
-        }) => (
-          <div style={{ padding: 8 }}>
-            <Input ref={node => { this.searchInput = node; }} placeholder={`Search ${title}`} value={selectedKeys[0]}
-              onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-              onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-              style={{ width: 188, marginBottom: 8, display: 'block' }}
-            />
-            <Button type="primary"
-              onClick={() => this.handleSearch(selectedKeys, confirm)} icon="search" size="small"
-              style={{ width: 90, marginRight: 8 }} > Search </Button>
-            <Button onClick={() => this.handleReset(clearFilters)}
-              size="small" style={{ width: 90 }}
-            > Reset </Button>
-          </div>
-        ),
-        filterIcon: filtered => <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />,
-        onFilter: (value, record) => record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-        onFilterDropdownVisibleChange: (visible) => {
-          if (visible) {
-            setTimeout(() => this.searchInput.select());
-          }
-        },
-        render: (text) => (
-          <Highlighter highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }} searchWords={[this.searchText]}
-            autoEscape textToHighlight={text.toString()}/>
-        ),
-    });
+    @computed get hasSelectedItems() {
+        return this.selectedItems.length > 0;
+    }
 
     render() {
         let user = this.props.store.authStore.user;
         const columns = [{
             title: 'First Name',
             dataIndex: 'given_name',
-            key: 'given_name',
-            ...this.getColumnSearchProps('given_name', 'First Name')
+            key: 'given_name'
         },
         {
             title: 'Last Name',
             dataIndex: 'family_name',
-            key: 'family_name',
-            ...this.getColumnSearchProps('family_name', 'Last Name')
+            key: 'family_name'
         },
         {
             title: 'Email',
@@ -106,39 +82,42 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
             render: (text, record) => {
                 return <Tag>{record.group}</Tag>
             },
-            ...this.getColumnSearchProps('Group', 'Group')
         },
         {
             title: 'Actions',
             key: 'action',
             render: (text, record) => (
               <span>
-                {record.id != user.username && <div><a href="javascript:;">Edit</a>
-                <Divider type="vertical" />
-                <a href="javascript:;">Disable</a></div>}
+                {record.id != user.username && <div>
+                    <Button icon="setting">Edit</Button>
+                    <Divider type="vertical" />
+                    <Button icon="minus" type="danger">Disable</Button>
+                </div>}
               </span>
             ),
-          }];
+        }];
 
-        let showErrors = this.props.store.debug && this.errors;
-        let showUsers  = this.users && this.users.length > 0;
-        let showEmpty  = !this.users || this.users.length == 0;
-
+        //
         return (
             <Row type="flex" justify="start" align="top">
-                <Col span={20} offset={0}>
-                    <Card actions={[<Icon type="plus" onClick={()=>{this.showAdd = true}}>Add</Icon>]} style={{padding: 0}}>
+                <Col span={20} offset={2} style={{padding:"25px"}}>
                 {this.loading && <Spin size="large" />}
-                {showUsers && <Table dataSource={this.users} columns={columns} rowKey="id" size="middle" pagination={false} />}
-                {showEmpty && <Empty/> }
-                {showErrors && <List dataSource={this.errors} renderItem={(item) => (
-                    <List.Item>{item.message}</List.Item>
-                )}/>}
+                    <Card style={{padding: 0}}>
+                        <Typography style={{float: "left", marginLeft: "8px"}}>{this.hasSelectedItems ? `Selected ${this.selectedItems.length} items` : ''}</Typography>
+                        <>
+                        <React.Fragment>
+                            <Button icon="plus" type="primary" style={{float: 'right'}} onClick={()=>{this.showAddUser(true)}}>Add</Button>
+                        </React.Fragment>
+                        </>
                     </Card>
+                    <TableWrapper loading={this.loading} errors={this.errors} debug={this.props.store.debug}
+                        data={this.users} columns={columns} borderered={true} rowKey="id"
+                        pagination={false} onSelection={this.setSelectedItems}/>
+
+                    {this.showAdd && <Drawer title="Add User" placement="right" closable={true} onClose={() => this.showAdd = false} visible={this.showAdd}>
+                        <InviteUserView store={this.props.store} onAdd={this.handleAdd}/>
+                    </Drawer>}
                 </Col>
-              {this.showAdd && <Drawer title="Add User" placement="right" closable={true} onClose={() => this.showAdd = false} visible={this.showAdd}>
-                  <InviteUserView store={this.props.store} onAdd={this.handleAdd}/>
-              </Drawer>}
           </Row>
         );
     }

@@ -44,9 +44,8 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
             let args = {accountId: tenant};
             let account: any = await API.graphql(graphqlOperation(queries.getAccount, args));
             this.account = account.data.getAccount;
-            console.log(this.account, typeof account);
         } catch (errorResponse) {
-            console.log("ERROR", errorResponse)
+            console.log("ERROR", errorResponse);
             this.errors = errorResponse.errors;
         } finally {
             this.loading = false;
