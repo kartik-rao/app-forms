@@ -29,9 +29,9 @@ export class AppMenu extends React.Component<IAppMenuProps, any> {
             {authStore.user && authStore.group == 'Admin' && <Menu.Item key="accounts" onClick={(e) => viewStore.showAccounts()}>
                 <Icon type="book" />Accounts
             </Menu.Item>}
-            <Menu.Item key="users" onClick={(e) => viewStore.showUsers()}>
+            {authStore.user && authStore.group == 'Admin' && <Menu.Item key="users" onClick={(e) => viewStore.showUsers()}>
                 <Icon type="team" />Users
-            </Menu.Item>
+            </Menu.Item>}
             <Menu.Item key="forms" onClick={(e) => viewStore.showForms()}>
                 <Icon type="file-text" />Forms
             </Menu.Item>

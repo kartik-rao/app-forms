@@ -1,4 +1,4 @@
-import { Input, Button, Card, Divider, Drawer, Empty, Icon, List, Row, Spin, Table, Tag } from "antd";
+import { Input, Button, Card, Divider, Drawer, Empty, Icon, List, Row, Spin, Table, Tag, Col } from "antd";
 import Highlighter from 'react-highlight-words';
 
 import { action, observable } from "mobx";
@@ -24,7 +24,6 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
     @observable searchText: string;
     searchInput: any;
 
-
     constructor(props: IUsersViewProps) {
         super(props);
         this.props = props;
@@ -36,8 +35,6 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
         values["custom:source"] = authStore.user.username;
         values["custom:tenantId"] = authStore.tenant;
         let response = await authStore.signUp(values);
-
-        console.log(response);
     }
 
     handleSearch = (selectedKeys, confirm) => {
@@ -50,35 +47,22 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
         this.setState({ searchText: '' });
     }
 
-    getColumnSearchProps = (dataIndex) => ({
+    getColumnSearchProps = (dataIndex, title) => ({
         filterDropdown: ({
           setSelectedKeys, selectedKeys, confirm, clearFilters,
         }) => (
           <div style={{ padding: 8 }}>
-            <Input
-              ref={node => { this.searchInput = node; }}
-              placeholder={`Search ${dataIndex}`}
-              value={selectedKeys[0]}
+            <Input ref={node => { this.searchInput = node; }} placeholder={`Search ${title}`} value={selectedKeys[0]}
               onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
               onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
               style={{ width: 188, marginBottom: 8, display: 'block' }}
             />
-            <Button
-              type="primary"
-              onClick={() => this.handleSearch(selectedKeys, confirm)}
-              icon="search"
-              size="small"
-              style={{ width: 90, marginRight: 8 }}
-            >
-              Search
-            </Button>
-            <Button
-              onClick={() => this.handleReset(clearFilters)}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Reset
-            </Button>
+            <Button type="primary"
+              onClick={() => this.handleSearch(selectedKeys, confirm)} icon="search" size="small"
+              style={{ width: 90, marginRight: 8 }} > Search </Button>
+            <Button onClick={() => this.handleReset(clearFilters)}
+              size="small" style={{ width: 90 }}
+            > Reset </Button>
           </div>
         ),
         filterIcon: filtered => <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />,
@@ -89,34 +73,32 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
           }
         },
         render: (text) => (
-          <Highlighter
-            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-            searchWords={[this.searchText]}
-            autoEscape
-            textToHighlight={text.toString()}
-          />
+          <Highlighter highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }} searchWords={[this.searchText]}
+            autoEscape textToHighlight={text.toString()}/>
         ),
     });
 
     render() {
         let user = this.props.store.authStore.user;
-        console.log(user)
         const columns = [{
             title: 'First Name',
             dataIndex: 'given_name',
             key: 'given_name',
-            ...this.getColumnSearchProps('given_name')
+            ...this.getColumnSearchProps('given_name', 'First Name')
         },
         {
             title: 'Last Name',
             dataIndex: 'family_name',
             key: 'family_name',
-            ...this.getColumnSearchProps('family_name')
+            ...this.getColumnSearchProps('family_name', 'Last Name')
         },
         {
             title: 'Email',
             dataIndex: 'email',
-            key: 'email'
+            key: 'email',
+            render: (text, record) => {
+              return <a href={`mailto:${record.email}`}>{record.email}</a>
+            }
         }, {
             title: 'Group',
             dataIndex: 'group',
@@ -124,7 +106,7 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
             render: (text, record) => {
                 return <Tag>{record.group}</Tag>
             },
-            ...this.getColumnSearchProps('Group')
+            ...this.getColumnSearchProps('Group', 'Group')
         },
         {
             title: 'Actions',
@@ -143,21 +125,21 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
         let showEmpty  = !this.users || this.users.length == 0;
 
         return (
-            <Card title="">
-                <Row type="flex" justify="start" align="middle">
-                    {this.loading && <Spin size="large" />}
-                    {showUsers && <Table dataSource={this.users} columns={columns} rowKey="id" bordered title={() => {
-                        return <span style={{float:"right", marginRight: "10px"}}><Button type="primary" onClick={()=>{this.showAdd = true}}>Add</Button></span>
-                    }}/>}
-                    {showEmpty && <Empty/> }
-                    {showErrors && <List dataSource={this.errors} renderItem={item => (
-                        <List.Item>{item.message}</List.Item>
-                    )}/>}
-                    {this.showAdd && <Drawer title="Add User" placement="right" closable={true} onClose={() => this.showAdd = false} visible={this.showAdd}>
-                        <InviteUserView store={this.props.store} onAdd={this.handleAdd}/>
-                    </Drawer>}
-                </Row>
-            </Card>
+            <Row type="flex" justify="start" align="top">
+                <Col span={20} offset={0}>
+                    <Card actions={[<Icon type="plus" onClick={()=>{this.showAdd = true}}>Add</Icon>]} style={{padding: 0}}>
+                {this.loading && <Spin size="large" />}
+                {showUsers && <Table dataSource={this.users} columns={columns} rowKey="id" size="middle" pagination={false} />}
+                {showEmpty && <Empty/> }
+                {showErrors && <List dataSource={this.errors} renderItem={(item) => (
+                    <List.Item>{item.message}</List.Item>
+                )}/>}
+                    </Card>
+                </Col>
+              {this.showAdd && <Drawer title="Add User" placement="right" closable={true} onClose={() => this.showAdd = false} visible={this.showAdd}>
+                  <InviteUserView store={this.props.store} onAdd={this.handleAdd}/>
+              </Drawer>}
+          </Row>
         );
     }
 }

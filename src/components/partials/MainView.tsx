@@ -26,7 +26,7 @@ export class MainView extends React.Component<IMainViewProps, {}> {
         const isAccountAdmin = group == 'AccountAdmin';
 
         return (
-            <div style={{marginTop: "25px", padding: "10px"}}>
+            <div style={{padding: "10px", height: "100%"}}>
                 {view == 'canvas'   && <Creator store={this.props.store}/>}
                 {view == 'accounts' && isAdmin && <AccountsView store={this.props.store}/>}
                 {view == 'forms' && <FormsView store={this.props.store}/>}

@@ -15,9 +15,9 @@ export interface IAccountAdminViewProps {
 
 const Description = ({ term, children, span = 12 }) => (
     <Col span={span}>
-        <div className="description">
-        <div className="term">{term}</div>
-        <div className="detail">{children}</div>
+        <div className="fl-pageheader-description">
+        <div className="fl-pageheader-term">{term}</div>
+        <div className="fl-pageheader-detail">{children}</div>
         </div>
     </Col>
 );
@@ -61,23 +61,23 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
                 subTitle={this.account.plan ? this.account.plan.planType.name : 'FREE'}
                 extra={[ <Button key="1">Change Plan</Button> ]}
                 footer={
-                    <Tabs defaultActiveKey="1">
-                        <Tabs.TabPane tab="Basic Information" key="1"/>
-                        <Tabs.TabPane tab="Users" key="2">
+                    <Tabs defaultActiveKey="1" animated={false}>
+                        <Tabs.TabPane tab="Users" key="1" style={{paddingTop: "20px"}}>
                             <UsersView store={this.props.store} users={this.account.users.items || []}/>
                         </Tabs.TabPane>
-                        <Tabs.TabPane tab="Subscription" key="3" />
+                        <Tabs.TabPane tab="Subscription" key="2" />
                     </Tabs>
                 }>
-                <div className="wrap">
-                <Row>
-                    <Description term="Primary Contact"><a href={"mailto:"+this.account.ownedBy.email}>{this.account.ownedBy.given_name} {this.account.ownedBy.family_name}</a></Description>
-                    <Description term="ID">{this.account.id}</Description>
-                    <Description term="Created date">{moment(this.account.createdAt).format("DD MMM YYYY")}</Description>
-                    <Description term="Updated">{this.account.updatedAt ? moment(this.account.updatedAt).format("DD Mon YYYY"): ""}</Description>
-                </Row>
+                <div className="fl-pageheader-wrap">
+                    <Row>
+                        <Description term="Primary Contact"><a href={"mailto:"+this.account.ownedBy.email}>{this.account.ownedBy.given_name} {this.account.ownedBy.family_name}</a></Description>
+                        <Description term="ID">{this.account.id}</Description>
+                        <Description term="Created date">{moment(this.account.createdAt).format("DD MMM YYYY")}</Description>
+                        <Description term="Updated">{this.account.updatedAt ? moment(this.account.updatedAt).format("DD Mon YYYY"): ""}</Description>
+                    </Row>
                 </div>
-                </PageHeader>}
+                </PageHeader>
+            }
         </div>
     }
 }
