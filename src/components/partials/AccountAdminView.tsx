@@ -57,7 +57,7 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
     }
     render() {
         let showErrors = this.props.store.debug && this.errors;
-        return <div>
+        return <>
             {this.loading && <Row type="flex" justify="center" align="middle">
                 <Col span={4} offset={12}><Spin size="large"/></Col>
             </Row>}
@@ -85,6 +85,6 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
                 </div>
                 </PageHeader>
             }
-        </div>
+        </>
     }
 }

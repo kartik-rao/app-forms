@@ -102,8 +102,8 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
             <Row type="flex" justify="start" align="top">
                 <Col span={20} offset={2} style={{padding:"25px"}}>
                 {this.loading && <Spin size="large" />}
-                    <Card style={{padding: 0}}>
-                        <Typography style={{float: "left", marginLeft: "8px"}}>{this.hasSelectedItems ? `Selected ${this.selectedItems.length} items` : ''}</Typography>
+                    <Card title={"All users"} style={{padding: 0}}>
+                        <Typography style={{float: "left"}}>{this.hasSelectedItems ? `Selected ${this.selectedItems.length} of ${this.users.length}` : ''}</Typography>
                         <>
                         <React.Fragment>
                             <Button icon="plus" type="primary" style={{float: 'right'}} onClick={()=>{this.showAddUser(true)}}>Add</Button>
