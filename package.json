@@ -23,7 +23,7 @@
     "@aws-amplify/storage": "^1.0.26",
     "@aws-amplify/ui": "^1.0.17",
     "@aws-amplify/xr": "^0.1.13",
-    "antd": "^3.15.0",
+    "antd": "^3.15.1",
     "aws-amplify-react": "^2.3.2",
     "director": "^1.2.8",
     "glamor": "^2.20.40",
