@@ -1,11 +1,9 @@
+import { Button, Form, Input, Row, Select } from "antd";
+import { FormComponentProps } from 'antd/lib/form/Form';
+import { action, observable } from "mobx";
+import { observer } from "mobx-react";
 import * as React from "react";
 import { IRootStore } from "../../stores/RootStore";
-import {observable, action} from "mobx";
-import  API, {graphqlOperation } from "@aws-amplify/api";
-import * as queries from '../../graphql/queries';
-import { Table, List, Spin, Empty, Row, Col, Card,Button, Form, Select, Input } from "antd";
-import { observer } from "mobx-react";
-import {  FormComponentProps } from 'antd/lib/form/Form';
 
 export interface IInviteUserViewProps {
     store: IRootStore;
@@ -46,14 +44,14 @@ export class InviteUserView extends React.Component<IInviteUserViewProps & FormC
             <Row type="flex">
                 <Form onSubmit={this.handleSubmit}>
                     <Form.Item required={true} label="First Name" help="User's last name">
-                        {getFieldDecorator('first_name', {
+                        {getFieldDecorator('given_name', {
                             rules: [{ required: true, message: 'Please provide a first name' }]
                         })(
                             <Input />
                         )}
                     </Form.Item>
                     <Form.Item required={true} label="Last Name" help="User's last name">
-                        {getFieldDecorator('last_name', {
+                        {getFieldDecorator('family_name', {
                             rules: [{ required: true, message: 'Please provide a last name' }]
                         })(
                             <Input />
