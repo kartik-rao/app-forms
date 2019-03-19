@@ -6,6 +6,7 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     id
     name
     addresses {
+      items {name addressee addressType street city state country}
       nextToken
     }
     website
@@ -18,14 +19,9 @@ export const getAccount = `query GetAccount($accountId: ID!) {
       given_name
       family_name
       phone_number
-      createdAt
-      updatedAt
-      isDeleted
     }
     plan {
       id
-      accountId
-      owner
       planType {id name}
       startDate
       endDate
@@ -37,9 +33,11 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     createdAt
     updatedAt
     users {
+      items {id email given_name family_name group}
       nextToken
     }
     forms {
+      items {id name owner ownedBy {given_name family_name email}  desc versionId startsAt endsAt isPaused}
       nextToken
     }
   }
@@ -50,9 +48,7 @@ export const listAllAccounts = `query ListAllAccounts($limit: Int, $nextToken: S
     items {
       id
       name
-      website
-      taxId
-      owner
+      ownedBy {id email given_name family_name}
       createdAt
       updatedAt
     }
@@ -68,9 +64,6 @@ export const getUser = `query GetUser($userId: ID!) {
     account {
       id
       name
-      website
-      taxId
-      owner
       createdAt
       updatedAt
     }
@@ -370,39 +363,23 @@ export const getForm = `query GetForm($formId: String!, $versionId: ID!) {
     }
     ownedBy {
       id
-      owner
-      accountId
       email
       group
       given_name
       family_name
-      phone_number
-      createdAt
-      updatedAt
-      isDeleted
     }
     accountId
-    account {
-      id
-      name
-      website
-      taxId
-      owner
-      createdAt
-      updatedAt
-    }
     createdAt
     updatedAt
     startsAt
     endsAt
     isPaused
     versions {
+      items {id ownedBy {id email group given_name family_name} createdAt notes}
       nextToken
     }
     integrations {
-      nextToken
-    }
-    entries {
+      items {id integrationType active}
       nextToken
     }
   }
@@ -416,7 +393,8 @@ export const listAllForms = `query ListAllForms($limit: Int, $nextToken: String)
       name
       desc
       versionId
-      accountId
+      formData {id ownedBy {id email group given_name family_name} createdAt notes}
+      account {id name}
       createdAt
       updatedAt
       startsAt
@@ -443,6 +421,7 @@ export const listAllAccountForms = `query ListAllAccountForms(
       name
       desc
       versionId
+      formData {id ownedBy {id email group given_name family_name} createdAt notes}
       accountId
       createdAt
       updatedAt

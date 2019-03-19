@@ -1,7 +1,7 @@
 import { Button, Card, Empty, Icon, Input, List, Spin, Table } from "antd";
 
 import { PaginationConfig, TableSize } from "antd/lib/table";
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, toJS } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
 import Highlighter from 'react-highlight-words';
@@ -10,6 +10,7 @@ export interface ITableWrapperColumn {
     title: string;
     dataIndex?: string;
     key: string;
+    hideSearch?: boolean;
     render?: (test: string, record: any) => JSX.Element
 }
 
@@ -48,7 +49,7 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
     constructor(props: ITableWrapperProps) {
         super(props);
         props.columns.forEach((column) => {
-            if (column.key == "action") {
+            if (column.key == "action" || column.hideSearch == true) {
                 this.columns.push(column);
             } else {
                 this.columns.push({
@@ -57,7 +58,7 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
                 });
             }
         });
-
+        console.log(toJS(this.columns));
         this.data = props.data;
         this.rowKey = props.rowKey;
         this.pagination = props.pagination || false;
@@ -115,9 +116,9 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
             setTimeout(() => this.searchInput.select());
           }
         },
-        render: (text) => (
+        render: (text: string) => (
           <Highlighter highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }} searchWords={[this.searchText]}
-            autoEscape textToHighlight={text.toString()}/>
+            autoEscape textToHighlight={text ? text.toString(): ''}/>
         ),
     });
 
@@ -137,7 +138,7 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
         return <div>
             {!this.isEmpty && <Table rowSelection={rowSelection} dataSource={this.data} columns={this.columns} bordered={this.bordered}
                 rowKey={this.rowKey} size={this.size} pagination={this.pagination} />}
-            {this.isEmpty && <Empty/> }
+            {this.isEmpty && <Card><Empty/></Card> }
             {this.showErrors && <List dataSource={this.errors} renderItem={(item) => (
                 <List.Item>{item.message}</List.Item>
             )}/>}

@@ -1,10 +1,15 @@
-import * as React from "react";
-import { IRootStore } from "../../stores/RootStore";
-import {observable, action} from "mobx";
-import  API, {graphqlOperation } from "@aws-amplify/api";
-import * as queries from '../../graphql/queries';
-import { Table, List, Spin, Empty, Row, Col } from "antd";
+import API, { graphqlOperation } from "@aws-amplify/api";
+import { Button, Card, Col, Row, Spin, Drawer } from "antd";
+import Typography from "antd/lib/typography";
+import { action, computed, observable, toJS } from "mobx";
 import { observer } from "mobx-react";
+import * as React from "react";
+import * as queries from '../../graphql/queries';
+import * as mutations from '../../graphql/mutations';
+import { IRootStore } from "../../stores/RootStore";
+import { TableWrapper } from "../common/TableWrapper";
+import AddFormView from "./AddFormView";
+import moment from "moment";
 
 export interface IFormsViewProps {
     store: IRootStore;
@@ -15,17 +20,37 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
     props: IFormsViewProps;
     @observable forms = [];
     @observable nextToken = null;
-    @observable loading: boolean = true;
+    @observable loading: boolean = false;
     @observable errors: any[];
+    @observable showAdd: boolean = false;
+    @observable selectedItems : any[] = [];
 
     @action async fetch() {
-        let allForms;
+        let response;
         let {tenant} = this.props.store.authStore;
         let args = {accountId: tenant};
+        this.loading = true;
         try {
-            allForms = await API.graphql(graphqlOperation(queries.getAccount, args));
-            this.nextToken = allForms["nextToken"];
-            this.forms = allForms["items"];
+            response = await API.graphql(graphqlOperation(queries.getAccount, args));
+            let {forms} = response.data.getAccount;
+            if (forms && forms.items) {
+                this.forms = forms.items;
+                this.nextToken = forms.nextToken;
+            }
+        } catch (errorResponse) {
+            this.errors = errorResponse.errors;
+        }
+        this.loading = false;
+    }
+
+    @action.bound async handleAdd(values: any) {
+        console.log("handleAdd values", values);
+        let addFormResponse;
+        this.loading = true;
+        try {
+            addFormResponse = await API.graphql(graphqlOperation(mutations.addForm, {form:values, notes: "Form initialized"}));
+            console.log("handleAdd Response", addFormResponse);
+            this.fetch();
         } catch (errorResponse) {
             this.errors = errorResponse.errors;
         }
@@ -38,6 +63,18 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
         this.fetch();
     }
 
+    @action.bound setSelectedItems(selectedItems) {
+        this.selectedItems = selectedItems;
+    }
+
+    @action.bound showAddForm(show: boolean) {
+        this.showAdd = show;
+    }
+
+    @computed get hasSelectedItems() {
+        return this.selectedItems.length > 0;
+    }
+
     render() {
         const columns = [{
             title: 'Name',
@@ -47,27 +84,58 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
             title: 'Description',
             dataIndex: 'desc',
             key: 'desc'
-        }, {
+        },
+        {
             title: 'Owner',
-            dataIndex: 'owner',
-            key: 'owner'
+            dataIndex: 'ownedBy',
+            key: 'ownedBy',
+            render: (text, record) => {
+                console.log("Returning", `${record.ownedBy.given_name} ${record.ownedBy.family_name}`)
+                return <span>{record.ownedBy ? `${record.ownedBy.given_name} ${record.ownedBy.family_name}`: ''}</span>
+            }
+        }
+        , {
+            title: 'Starts',
+            dataIndex: 'startsAt',
+            key: 'startsAt',
+            render:(text, record) => {
+                if(text) {
+                    return <span>moment(text).toLocaleString()</span>
+                } else {
+                    return <span>FOO</span>
+                }
+            }
+        }, {
+            title: 'Ends',
+            dataIndex: 'endsAt',
+            key: 'endsAt',
+            render:(text, record) => {
+                if(text) {
+                    return <span>moment(text).toLocaleString()</span>
+                } else {
+                    return <span>BAR</span>
+                }
+            }
         }];
-
-        let showErrors = this.props.store.debug && this.errors;
-        let showForms = !this.loading && this.forms && this.forms.length > 0;
-        let showEmpty = !this.loading && (!this.forms || this.forms.length == 0);
-
         return (
-            <Row>
-                <Col span={20} offset={2}>
-            {this.loading && <Spin size="large" />}
-            {showForms && <Table dataSource={this.forms} columns={columns} />}
-            {showEmpty && <Empty/> }
-            {showErrors && <List dataSource={this.errors} renderItem={item => (
-                    <List.Item>{item.message}</List.Item>
-                )}/>}
-            </Col>
-            </Row>
+            <Row type="flex" justify="start" align="top">
+                <Col span={20} offset={2} style={{padding:"25px"}}>
+                    <Card title={"All Forms"} style={{padding: 0}}>
+                        <Typography style={{float: "left"}}>{this.hasSelectedItems ? `Selected ${this.selectedItems.length} of ${this.forms.length}` : ''}</Typography>
+                        <>
+                        <React.Fragment>
+                            <Button icon="plus" type="primary" style={{float: 'right'}} onClick={()=>{this.showAddForm(true)}}>Add</Button>
+                        </React.Fragment>
+                        </>
+                    </Card>
+                    {!this.loading && <TableWrapper loading={this.loading} errors={this.errors} debug={this.props.store.debug}
+                        data={this.forms} columns={columns} borderered={true} rowKey="id"
+                        pagination={false} onSelection={this.setSelectedItems}/>}
+                    {this.showAdd && <Drawer title="Add Form" placement="right" closable={true} onClose={() => this.showAdd = false} visible={this.showAdd}>
+                        <AddFormView store={this.props.store} onAdd={this.handleAdd}/>
+                    </Drawer>}
+                </Col>
+          </Row>
         );
     }
 }

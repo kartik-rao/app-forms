@@ -99,7 +99,6 @@ class AuthStore implements IAuthStore {
         this.setAuthState("loading");
         Auth.currentAuthenticatedUser().then(user => {
             this.handleAuthResponse(user);
-            console.log(user);
         }).catch(e => {
             this.setAuthState('signIn');
         });

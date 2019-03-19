@@ -16,13 +16,10 @@ export interface IUsersViewProps {
 export class UsersView extends React.Component<IUsersViewProps, any> {
     props: IUsersViewProps;
     @observable users = [];
-    @observable nextToken = null;
     @observable loading: boolean = false;
     @observable errors: any[];
     @observable showAdd: boolean = false;
-    @observable searchText: string;
     @observable selectedItems : any[] = [];
-    searchInput: any;
 
     constructor(props: IUsersViewProps) {
         super(props);
@@ -40,7 +37,6 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
         } catch (error) {
           console.log("signup error", error);
         }
-
     }
 
     @action.bound showAddUser(show: boolean) {
