@@ -20,8 +20,10 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
 
     @action async fetch() {
         let allForms;
+        let {tenant} = this.props.store.authStore;
+        let args = {accountId: tenant};
         try {
-            allForms = await API.graphql(graphqlOperation(queries.listAllForms, {limit: 50, nextToken: this.nextToken}));
+            allForms = await API.graphql(graphqlOperation(queries.getAccount, args));
             this.nextToken = allForms["nextToken"];
             this.forms = allForms["items"];
         } catch (errorResponse) {
@@ -42,13 +44,13 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
             dataIndex: 'name',
             key: 'name'
         }, {
+            title: 'Description',
+            dataIndex: 'desc',
+            key: 'desc'
+        }, {
             title: 'Owner',
             dataIndex: 'owner',
             key: 'owner'
-        }, {
-            title: 'Account',
-            dataIndex: 'accountId',
-            key: 'accountId'
         }];
 
         let showErrors = this.props.store.debug && this.errors;

@@ -88,7 +88,7 @@ export class App extends React.Component <IAppProps, any> {
     render() {
         return <Layout className="fl-layout">
         <Row type="flex" justify="center" align="top">
-          <Col span={20}>
+          <Col span={24}>
             <Authenticator hide={[Greetings]} signUpConfig={signUpConfig}>
                 {this.props.store.authStore.authState == 'signedIn' &&
                     <MainView store={this.props.store}/>

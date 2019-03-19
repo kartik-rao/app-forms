@@ -1,5 +1,4 @@
 import * as React from "react";
-import {FormWrapper} from "@adinfinity/ai-lib-forms";
 
 export class Canvas extends React.Component<any, any> {
     props: any;
@@ -12,7 +11,7 @@ export class Canvas extends React.Component<any, any> {
 
     render() {
         return <div><div id="canvas-preview"></div>
-            <FormWrapper formData={this.state.formData}/>
+            <h1> PREVIEW </h1>
         </div>
     }
 }

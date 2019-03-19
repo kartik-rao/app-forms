@@ -17,27 +17,30 @@ export const getAccount = `query GetAccount($accountId: ID!) {
       group
       given_name
       family_name
-    }
-    createdAt
-    updatedAt
-    users {
-      items {id email given_name family_name group}
-      nextToken
-    }
-    forms {
-      items {id }
-      nextToken
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
     }
     plan {
       id
-      planType {id name}
+      accountId
       owner
+      planType {id name}
       startDate
       endDate
       active
       lastBillDate
       createdAt
       updatedAt
+    }
+    createdAt
+    updatedAt
+    users {
+      nextToken
+    }
+    forms {
+      nextToken
     }
   }
 }
@@ -194,7 +197,6 @@ export const getPlan = `query GetPlan($planId: String!) {
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
@@ -352,10 +354,20 @@ export const listAllActivePlanTypes = `query ListAllActivePlanTypes($limit: Int,
   }
 }
 `;
-export const getForm = `query GetForm($formId: String!) {
-  getForm(formId: $formId) {
+export const getForm = `query GetForm($formId: String!, $versionId: ID!) {
+  getForm(formId: $formId, versionId: $versionId) {
     id
     owner
+    name
+    desc
+    versionId
+    formData {
+      id
+      owner
+      createdAt
+      notes
+      formData
+    }
     ownedBy {
       id
       owner
@@ -376,24 +388,20 @@ export const getForm = `query GetForm($formId: String!) {
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
-    exid
-    desc
-    name
-    tenant
-    status
-    content
-    layout
-    formLayoutOptions
-    stopSubmit
-    submitTarget
-    successRedirect
-    errorRedirect
     createdAt
     updatedAt
+    startsAt
+    endsAt
+    isPaused
+    versions {
+      nextToken
+    }
+    integrations {
+      nextToken
+    }
     entries {
       nextToken
     }
@@ -405,21 +413,15 @@ export const listAllForms = `query ListAllForms($limit: Int, $nextToken: String)
     items {
       id
       owner
-      accountId
-      exid
-      desc
       name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
+      desc
+      versionId
+      accountId
       createdAt
       updatedAt
+      startsAt
+      endsAt
+      isPaused
     }
     nextToken
   }
@@ -438,21 +440,15 @@ export const listAllAccountForms = `query ListAllAccountForms(
     items {
       id
       owner
-      accountId
-      exid
-      desc
       name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
+      desc
+      versionId
+      accountId
       createdAt
       updatedAt
+      startsAt
+      endsAt
+      isPaused
     }
     nextToken
   }
@@ -473,21 +469,15 @@ export const listAllAccountFormsActive = `query ListAllAccountFormsActive(
     items {
       id
       owner
-      accountId
-      exid
-      desc
       name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
+      desc
+      versionId
+      accountId
       createdAt
       updatedAt
+      startsAt
+      endsAt
+      isPaused
     }
     nextToken
   }
@@ -508,21 +498,15 @@ export const listAllAccountFormsByUser = `query ListAllAccountFormsByUser(
     items {
       id
       owner
-      accountId
-      exid
-      desc
       name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
+      desc
+      versionId
+      accountId
       createdAt
       updatedAt
+      startsAt
+      endsAt
+      isPaused
     }
     nextToken
   }
@@ -545,21 +529,15 @@ export const listAllAccountFormsByUserActive = `query ListAllAccountFormsByUserA
     items {
       id
       owner
-      accountId
-      exid
-      desc
       name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
+      desc
+      versionId
+      accountId
       createdAt
       updatedAt
+      startsAt
+      endsAt
+      isPaused
     }
     nextToken
   }
@@ -682,21 +660,15 @@ export const getIntegration = `query GetIntegration($integrationId: String!) {
     form {
       id
       owner
-      accountId
-      exid
-      desc
       name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
+      desc
+      versionId
+      accountId
       createdAt
       updatedAt
+      startsAt
+      endsAt
+      isPaused
     }
     active
     authType

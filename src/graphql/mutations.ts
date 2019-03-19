@@ -37,7 +37,6 @@ export const addPlan = `mutation AddPlan($input: AddPlanInput) {
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
@@ -85,7 +84,6 @@ export const addAccount = `mutation AddAccount($input: AddAccountInput) {
     website
     taxId
     owner
-    planId
     ownedBy {
       id
       owner
@@ -99,14 +97,6 @@ export const addAccount = `mutation AddAccount($input: AddAccountInput) {
       updatedAt
       isDeleted
     }
-    createdAt
-    updatedAt
-    users {
-      nextToken
-    }
-    forms {
-      nextToken
-    }
     plan {
       id
       accountId
@@ -118,6 +108,14 @@ export const addAccount = `mutation AddAccount($input: AddAccountInput) {
       lastBillDate
       createdAt
       updatedAt
+    }
+    createdAt
+    updatedAt
+    users {
+      nextToken
+    }
+    forms {
+      nextToken
     }
   }
 }
@@ -133,7 +131,6 @@ export const addUser = `mutation AddUser($input: AddUserInput) {
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
@@ -202,21 +199,15 @@ export const addIntegration = `mutation AddIntegration($input: AddIntegrationInp
     form {
       id
       owner
-      accountId
-      exid
-      desc
       name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
+      desc
+      versionId
+      accountId
       createdAt
       updatedAt
+      startsAt
+      endsAt
+      isPaused
     }
     active
     authType
@@ -231,10 +222,20 @@ export const addIntegration = `mutation AddIntegration($input: AddIntegrationInp
   }
 }
 `;
-export const addForm = `mutation AddForm($input: AddFormInput) {
-  addForm(input: $input) {
+export const addForm = `mutation AddForm($form: AddFormInput!, $notes: String!) {
+  addForm(form: $form, notes: $notes) {
     id
     owner
+    name
+    desc
+    versionId
+    formData {
+      id
+      owner
+      createdAt
+      notes
+      formData
+    }
     ownedBy {
       id
       owner
@@ -255,27 +256,46 @@ export const addForm = `mutation AddForm($input: AddFormInput) {
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
-    exid
-    desc
-    name
-    tenant
-    status
-    content
-    layout
-    formLayoutOptions
-    stopSubmit
-    submitTarget
-    successRedirect
-    errorRedirect
     createdAt
     updatedAt
+    startsAt
+    endsAt
+    isPaused
+    versions {
+      nextToken
+    }
+    integrations {
+      nextToken
+    }
     entries {
       nextToken
     }
+  }
+}
+`;
+export const addFormVersion = `mutation AddFormVersion($version: AddFormVersionInput) {
+  addFormVersion(version: $version) {
+    id
+    owner
+    ownedBy {
+      id
+      owner
+      accountId
+      email
+      group
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+    }
+    createdAt
+    notes
+    formData
   }
 }
 `;
@@ -315,7 +335,6 @@ export const updatePlan = `mutation UpdatePlan($input: UpdatePlanInput) {
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
@@ -363,7 +382,6 @@ export const updateAccount = `mutation UpdateAccount($input: UpdateAccountInput)
     website
     taxId
     owner
-    planId
     ownedBy {
       id
       owner
@@ -377,14 +395,6 @@ export const updateAccount = `mutation UpdateAccount($input: UpdateAccountInput)
       updatedAt
       isDeleted
     }
-    createdAt
-    updatedAt
-    users {
-      nextToken
-    }
-    forms {
-      nextToken
-    }
     plan {
       id
       accountId
@@ -396,6 +406,14 @@ export const updateAccount = `mutation UpdateAccount($input: UpdateAccountInput)
       lastBillDate
       createdAt
       updatedAt
+    }
+    createdAt
+    updatedAt
+    users {
+      nextToken
+    }
+    forms {
+      nextToken
     }
   }
 }
@@ -411,7 +429,6 @@ export const updateUser = `mutation UpdateUser($input: UpdateUserInput) {
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
@@ -480,21 +497,15 @@ export const updateIntegration = `mutation UpdateIntegration($input: UpdateInteg
     form {
       id
       owner
-      accountId
-      exid
-      desc
       name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
+      desc
+      versionId
+      accountId
       createdAt
       updatedAt
+      startsAt
+      endsAt
+      isPaused
     }
     active
     authType
@@ -513,6 +524,16 @@ export const updateForm = `mutation UpdateForm($input: UpdateFormInput) {
   updateForm(input: $input) {
     id
     owner
+    name
+    desc
+    versionId
+    formData {
+      id
+      owner
+      createdAt
+      notes
+      formData
+    }
     ownedBy {
       id
       owner
@@ -533,24 +554,20 @@ export const updateForm = `mutation UpdateForm($input: UpdateFormInput) {
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
-    exid
-    desc
-    name
-    tenant
-    status
-    content
-    layout
-    formLayoutOptions
-    stopSubmit
-    submitTarget
-    successRedirect
-    errorRedirect
     createdAt
     updatedAt
+    startsAt
+    endsAt
+    isPaused
+    versions {
+      nextToken
+    }
+    integrations {
+      nextToken
+    }
     entries {
       nextToken
     }
@@ -593,7 +610,6 @@ export const deletePlan = `mutation DeletePlan($id: ID!) {
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
@@ -641,7 +657,6 @@ export const deleteAccount = `mutation DeleteAccount($id: ID!) {
     website
     taxId
     owner
-    planId
     ownedBy {
       id
       owner
@@ -655,14 +670,6 @@ export const deleteAccount = `mutation DeleteAccount($id: ID!) {
       updatedAt
       isDeleted
     }
-    createdAt
-    updatedAt
-    users {
-      nextToken
-    }
-    forms {
-      nextToken
-    }
     plan {
       id
       accountId
@@ -674,6 +681,14 @@ export const deleteAccount = `mutation DeleteAccount($id: ID!) {
       lastBillDate
       createdAt
       updatedAt
+    }
+    createdAt
+    updatedAt
+    users {
+      nextToken
+    }
+    forms {
+      nextToken
     }
   }
 }
@@ -689,7 +704,6 @@ export const deleteUser = `mutation DeleteUser($id: ID!) {
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
@@ -758,21 +772,15 @@ export const deleteIntegration = `mutation DeleteIntegration($id: ID!) {
     form {
       id
       owner
-      accountId
-      exid
-      desc
       name
-      tenant
-      status
-      content
-      layout
-      formLayoutOptions
-      stopSubmit
-      submitTarget
-      successRedirect
-      errorRedirect
+      desc
+      versionId
+      accountId
       createdAt
       updatedAt
+      startsAt
+      endsAt
+      isPaused
     }
     active
     authType
@@ -791,6 +799,16 @@ export const deleteForm = `mutation DeleteForm($id: ID!) {
   deleteForm(id: $id) {
     id
     owner
+    name
+    desc
+    versionId
+    formData {
+      id
+      owner
+      createdAt
+      notes
+      formData
+    }
     ownedBy {
       id
       owner
@@ -811,24 +829,20 @@ export const deleteForm = `mutation DeleteForm($id: ID!) {
       website
       taxId
       owner
-      planId
       createdAt
       updatedAt
     }
-    exid
-    desc
-    name
-    tenant
-    status
-    content
-    layout
-    formLayoutOptions
-    stopSubmit
-    submitTarget
-    successRedirect
-    errorRedirect
     createdAt
     updatedAt
+    startsAt
+    endsAt
+    isPaused
+    versions {
+      nextToken
+    }
+    integrations {
+      nextToken
+    }
     entries {
       nextToken
     }
@@ -858,7 +872,6 @@ export const attachPlan = `mutation AttachPlan($input: AddPlanInput) {
     website
     taxId
     owner
-    planId
     ownedBy {
       id
       owner
@@ -872,14 +885,6 @@ export const attachPlan = `mutation AttachPlan($input: AddPlanInput) {
       updatedAt
       isDeleted
     }
-    createdAt
-    updatedAt
-    users {
-      nextToken
-    }
-    forms {
-      nextToken
-    }
     plan {
       id
       accountId
@@ -891,6 +896,14 @@ export const attachPlan = `mutation AttachPlan($input: AddPlanInput) {
       lastBillDate
       createdAt
       updatedAt
+    }
+    createdAt
+    updatedAt
+    users {
+      nextToken
+    }
+    forms {
+      nextToken
     }
   }
 }
