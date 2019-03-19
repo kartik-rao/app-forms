@@ -27,9 +27,8 @@ export class MainView extends React.Component<IMainViewProps, {}> {
         const {group} = this.props.store.authStore;
         const isAdmin = group == 'Admin';
         const isAccountAdmin = group == 'AccountAdmin';
-
-        return (
-            <div>
+        if(this.props.store.authStore.isSignedIn) {
+            return <div>
                 <Layout.Header className="fl-header">
                     <Header store={this.props.store}/>
                 </Layout.Header>
@@ -46,6 +45,9 @@ export class MainView extends React.Component<IMainViewProps, {}> {
                     <Footer store={this.props.store}></Footer>
                 </Layout.Footer>
             </div>
-        );
+        } else {
+            return <></>
+        }
+
     }
 };

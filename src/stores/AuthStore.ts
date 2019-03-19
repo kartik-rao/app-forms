@@ -43,18 +43,15 @@ class AuthStore implements IAuthStore {
     }
 
     @action async signUp(signupData: any) {
-        let session: CognitoUserSession = await Auth.currentSession();
-        let token = session.getIdToken().getJwtToken()
-
-        let response = await fetch('https://3c1ti9681k.execute-api.ap-southeast-2.amazonaws.com/dev/invite', {
-                method: 'POST',
-                headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(signupData)
+        let signUpResponse = await Auth.signUp({
+            username : signupData.email,
+            password : "Apassword.1",
+            attributes: {
+                ...signupData
+            }
         });
-        return response.json()
+        await Auth.forgotPassword(signUpResponse.userSub)
+        return signUpResponse;
     }
 
     @action.bound onHubCapsule(capsule) {

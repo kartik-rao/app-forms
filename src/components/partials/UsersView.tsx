@@ -30,13 +30,16 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
     @action.bound async handleAdd(values: any) {
         let {authStore} = this.props.store;
         values["custom:source"] = authStore.user.username;
-        values["custom:tenantId"] = authStore.tenant;
         try {
+            this.loading = true;
           let response = await authStore.signUp(values);
           console.log("SIGNUP RESPONSE", response);
         } catch (error) {
+
           console.log("signup error", error);
         }
+        this.loading = false;
+        this.showAdd = false;
     }
 
     @action.bound showAddUser(show: boolean) {

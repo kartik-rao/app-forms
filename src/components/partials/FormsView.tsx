@@ -87,38 +87,28 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
         },
         {
             title: 'Owner',
-            dataIndex: 'ownedBy',
             key: 'ownedBy',
-            render: (text, record) => {
-                console.log("Returning", `${record.ownedBy.given_name} ${record.ownedBy.family_name}`)
-                return <span>{record.ownedBy ? `${record.ownedBy.given_name} ${record.ownedBy.family_name}`: ''}</span>
-            }
+            render: (text, record) => {return <>{record.ownedBy.given_name} {record.ownedBy.family_name}</>}
+
         }
         , {
             title: 'Starts',
             dataIndex: 'startsAt',
             key: 'startsAt',
             render:(text, record) => {
-                if(text) {
-                    return <span>moment(text).toLocaleString()</span>
-                } else {
-                    return <span>FOO</span>
-                }
+                return <span>{text ? moment(text).toLocaleString() : ''}</span>
             }
         }, {
             title: 'Ends',
             dataIndex: 'endsAt',
             key: 'endsAt',
             render:(text, record) => {
-                if(text) {
-                    return <span>moment(text).toLocaleString()</span>
-                } else {
-                    return <span>BAR</span>
-                }
+                return <span>{text ? moment(text).toLocaleString() : ''}</span>
             }
         }];
+        console.log(toJS(this.forms));
         return (
-            <Row type="flex" justify="start" align="top">
+            <Row >
                 <Col span={20} offset={2} style={{padding:"25px"}}>
                     <Card title={"All Forms"} style={{padding: 0}}>
                         <Typography style={{float: "left"}}>{this.hasSelectedItems ? `Selected ${this.selectedItems.length} of ${this.forms.length}` : ''}</Typography>

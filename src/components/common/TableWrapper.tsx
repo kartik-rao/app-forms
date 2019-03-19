@@ -11,7 +11,7 @@ export interface ITableWrapperColumn {
     dataIndex?: string;
     key: string;
     hideSearch?: boolean;
-    render?: (test: string, record: any) => JSX.Element
+    render?: (text: string, record: any) => React.ReactNode
 }
 
 export interface ITableWrapperProps {
@@ -30,7 +30,7 @@ export interface ITableWrapperProps {
 
 @observer
 export class TableWrapper extends React.Component<ITableWrapperProps, any> {
-    columns: any[] = [];
+    columns: ITableWrapperColumn[] = [];
     size: TableSize;
     bordered: boolean;
     rowKey: string;
@@ -58,7 +58,6 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
                 });
             }
         });
-        console.log(toJS(this.columns));
         this.data = props.data;
         this.rowKey = props.rowKey;
         this.pagination = props.pagination || false;
@@ -116,10 +115,10 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
             setTimeout(() => this.searchInput.select());
           }
         },
-        render: (text: string) => (
-          <Highlighter highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }} searchWords={[this.searchText]}
-            autoEscape textToHighlight={text ? text.toString(): ''}/>
-        ),
+        // render: (text: string) => (
+        //   <Highlighter highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }} searchWords={[this.searchText]}
+        //     autoEscape textToHighlight={text ? text.toString(): ''}/>
+        // ),
     });
 
     @computed get showErrors() {
@@ -135,9 +134,16 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
             selectedRowKeys : this.selectedRowKeys,
             onChange : this.onSelectChange
         }
+        console.log(this.columns);
         return <div>
-            {!this.isEmpty && <Table rowSelection={rowSelection} dataSource={this.data} columns={this.columns} bordered={this.bordered}
-                rowKey={this.rowKey} size={this.size} pagination={this.pagination} />}
+            {!this.isEmpty && <Table rowSelection={rowSelection} dataSource={this.data} bordered={this.bordered}
+                rowKey={this.rowKey} size={this.size} pagination={this.pagination}>
+                    {this.columns.map((col) => {
+                        return <Table.Column title={col.title}
+                            dataIndex={col.dataIndex} key={col.key} render={col.render} >
+                        </Table.Column>}
+                    )}
+                </Table>}
             {this.isEmpty && <Card><Empty/></Card> }
             {this.showErrors && <List dataSource={this.errors} renderItem={(item) => (
                 <List.Item>{item.message}</List.Item>
