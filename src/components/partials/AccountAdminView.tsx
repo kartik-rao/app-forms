@@ -38,7 +38,7 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
     }
 
     @action async fetch() {
-        this.loading = true;
+        this.props.store.editorStore.showLoading();
         try{
             let {tenant} = this.props.store.authStore;
             let args = {accountId: tenant};
@@ -48,23 +48,18 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
             console.log("ERROR", errorResponse);
             this.errors = errorResponse.errors;
         } finally {
-            this.loading = false;
+            this.props.store.editorStore.hideLoading();
         }
     }
 
-    @action handleAdd() {
-
-    }
     render() {
+        let {isLoading} = this.props.store.editorStore;
         let showErrors = this.props.store.debug && this.errors;
         return <>
-            {this.loading && <Row type="flex" justify="center" align="middle">
-                <Col span={4} offset={12}><Spin size="large"/></Col>
-            </Row>}
             {showErrors && <List dataSource={this.errors} renderItem={item => (
                     <List.Item>{item.message}</List.Item>
             )}/>}
-            {!this.loading && this.account && <PageHeader title={this.account.name}
+            {!isLoading && this.account && <PageHeader title={this.account.name}
                 subTitle={this.account.plan ? this.account.plan.planType.name : 'FREE'}
                 extra={[ <Button key="1">Change Plan</Button> ]}
                 footer={
@@ -79,7 +74,7 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
                     <Row>
                         <Description term="Primary Contact"><a href={"mailto:"+this.account.ownedBy.email}>{this.account.ownedBy.given_name} {this.account.ownedBy.family_name}</a></Description>
                         <Description term="ID">{this.account.id}</Description>
-                        <Description term="Created date">{moment(this.account.createdAt).format("DD MMM YYYY")}</Description>
+                        <Description term="Created">{moment(this.account.createdAt).format("Do MMMM YYYY")}</Description>
                         <Description term="Updated">{this.account.updatedAt ? moment(this.account.updatedAt).format("DD Mon YYYY"): ""}</Description>
                     </Row>
                 </div>

@@ -1,11 +1,12 @@
 import { Button, Col, Divider, Drawer, Row, Tag, Card, Spin } from "antd";
-import { action, computed, observable, when } from "mobx";
+import { action, computed, observable, toJS } from "mobx";
 import { observer, Observer } from "mobx-react";
 import * as React from "react";
 import { IRootStore } from "../../stores/RootStore";
 import { TableWrapper } from "../common/TableWrapper";
 import InviteUserView from "./InviteUserView";
 import Typography from "antd/lib/typography"
+import moment from "moment";
 
 export interface IUsersViewProps {
     store: IRootStore;
@@ -16,7 +17,6 @@ export interface IUsersViewProps {
 export class UsersView extends React.Component<IUsersViewProps, any> {
     props: IUsersViewProps;
     @observable users = [];
-    @observable loading: boolean = false;
     @observable errors: any[];
     @observable showAdd: boolean = false;
     @observable selectedItems : any[] = [];
@@ -28,17 +28,18 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
     }
 
     @action.bound async handleAdd(values: any) {
-        let {authStore} = this.props.store;
+        let {authStore, editorStore} = this.props.store;
         values["custom:source"] = authStore.user.username;
+        editorStore.showLoading();
         try {
-            this.loading = true;
           let response = await authStore.signUp(values);
           console.log("SIGNUP RESPONSE", response);
         } catch (error) {
-
-          console.log("signup error", error);
+            this.errors = error;
+            console.log("signup error", error);
+        } finally {
+            editorStore.hideLoading();
         }
-        this.loading = false;
         this.showAdd = false;
     }
 
@@ -78,29 +79,51 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
             title: 'Group',
             dataIndex: 'group',
             key: 'group',
+            filters: [{
+                text: 'AccountAdmin',
+                value: 'AccountAdmin',
+              }, {
+                text: 'Editor',
+                value: 'Editor',
+            }, {
+                text: 'Viewer',
+                value: 'Viewer',
+            }],
             render: (text, record) => {
                 return <Tag>{record.group}</Tag>
             },
+        },
+        {
+            title: 'Created',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            defaultSortOrder: 'descend',
+            render: (text, record) => {
+                return <span>{moment(text).format("Do MMMM YYYY hh:mm A")}</span>
+            },
+            sorter: (a, b) => {;
+                return moment(a["createdAt"]).diff(moment(b["createdAt"]))
+            },
+            sortDirections: ['descend', 'ascend']
         },
         {
             title: 'Actions',
             key: 'action',
             render: (text, record) => (
               <span>
-                {record.id != user.username && <div>
+                {record.id != user.username && <div style={{textAlign: "center"}}>
                     <Button icon="setting">Edit</Button>
                     <Divider type="vertical" />
-                    <Button icon="minus" type="danger">Disable</Button>
+                    <Button type="danger">Disable</Button>
                 </div>}
               </span>
-            ),
+            )
         }];
 
-        //
         return (
-            <Row type="flex" justify="start" align="top">
+            <Row>
                 <Col span={20} offset={2} style={{padding:"25px"}}>
-                {this.loading && <Spin size="large" />}
+                {/* {this.loading && <Spin size="large" />} */}
                     <Card title={"All users"} style={{padding: 0}}>
                         <Typography style={{float: "left"}}>{this.hasSelectedItems ? `Selected ${this.selectedItems.length} of ${this.users.length}` : ''}</Typography>
                         <>
@@ -109,9 +132,9 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
                         </React.Fragment>
                         </>
                     </Card>
-                    <TableWrapper loading={this.loading} errors={this.errors} debug={this.props.store.debug}
+                    {<TableWrapper errors={this.errors} debug={this.props.store.debug}
                         data={this.users} columns={columns} borderered={true} rowKey="id"
-                        pagination={false} onSelection={this.setSelectedItems}/>
+                        pagination={false} onSelection={this.setSelectedItems}/>}
 
                     {this.showAdd && <Drawer title="Add User" placement="right" closable={true} onClose={() => this.showAdd = false} visible={this.showAdd}>
                         <InviteUserView store={this.props.store} onAdd={this.handleAdd}/>

@@ -1,5 +1,5 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
-import { Button, Card, Col, Row, Spin, Drawer } from "antd";
+import { Button, Card, Col, Row, Drawer, Divider } from "antd";
 import Typography from "antd/lib/typography";
 import { action, computed, observable, toJS } from "mobx";
 import { observer } from "mobx-react";
@@ -20,16 +20,16 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
     props: IFormsViewProps;
     @observable forms = [];
     @observable nextToken = null;
-    @observable loading: boolean = false;
     @observable errors: any[];
     @observable showAdd: boolean = false;
     @observable selectedItems : any[] = [];
 
     @action async fetch() {
         let response;
-        let {tenant} = this.props.store.authStore;
+        let {authStore, editorStore} = this.props.store;
+        let {tenant} = authStore;
         let args = {accountId: tenant};
-        this.loading = true;
+        editorStore.showLoading();
         try {
             response = await API.graphql(graphqlOperation(queries.getAccount, args));
             let {forms} = response.data.getAccount;
@@ -40,13 +40,14 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
         } catch (errorResponse) {
             this.errors = errorResponse.errors;
         }
-        this.loading = false;
+        editorStore.hideLoading();
     }
 
     @action.bound async handleAdd(values: any) {
         console.log("handleAdd values", values);
         let addFormResponse;
-        this.loading = true;
+        let {editorStore} = this.props.store;
+        editorStore.showLoading();
         try {
             addFormResponse = await API.graphql(graphqlOperation(mutations.addForm, {form:values, notes: "Form initialized"}));
             console.log("handleAdd Response", addFormResponse);
@@ -54,7 +55,7 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
         } catch (errorResponse) {
             this.errors = errorResponse.errors;
         }
-        this.loading = false;
+        editorStore.hideLoading();
     }
 
     constructor(props: IFormsViewProps) {
@@ -88,27 +89,54 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
         {
             title: 'Owner',
             key: 'ownedBy',
-            render: (text, record) => {return <>{record.ownedBy.given_name} {record.ownedBy.family_name}</>}
-
+            render: (text, record) => {return <a href={"mailto:`${record.ownedBy.email}`"}>{record.ownedBy.email}</a>}
         }
         , {
+            title: 'Created',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            defaultSortOrder: 'descend',
+            sorter: (a, b) => {;
+                return moment(a["createdAt"]).diff(moment(b["createdAt"]))
+            },
+            sortDirections: ['descend', 'ascend'],
+            render:(text, record) => {
+                return <span>{moment(text).format("Do MMMM YYYY hh:mm A")}</span>
+            }
+        },
+        {
             title: 'Starts',
             dataIndex: 'startsAt',
             key: 'startsAt',
             render:(text, record) => {
-                return <span>{text ? moment(text).toLocaleString() : ''}</span>
+                return <span>{text ? moment(text).format("Do MMMM YYYY hh:mm A") : ''}</span>
             }
         }, {
             title: 'Ends',
             dataIndex: 'endsAt',
             key: 'endsAt',
             render:(text, record) => {
-                return <span>{text ? moment(text).toLocaleString() : ''}</span>
+                return <span>{text ? moment(text).format("Do MMMM YYYY hh:mm A") : ''}</span>
             }
-        }];
-        console.log(toJS(this.forms));
+        },  {
+                title: 'Actions',
+                key: 'action',
+                render: (text, record) => (
+                <span>
+                    <div style={{textAlign: "center"}}>
+                        <Button icon="setting">Edit</Button>
+                        <Divider type="vertical" />
+                        <Button icon="copy">Clone</Button>
+                        <Divider type="vertical" />
+                        <Button type="danger" icon="pause">Pause</Button>
+                    </div>
+                </span>
+                )
+            }
+        ];
+        let {isLoading} = this.props.store.editorStore;
         return (
-            <Row >
+            <Row style={{height: '100%', marginTop: '50px'}}>
                 <Col span={20} offset={2} style={{padding:"25px"}}>
                     <Card title={"All Forms"} style={{padding: 0}}>
                         <Typography style={{float: "left"}}>{this.hasSelectedItems ? `Selected ${this.selectedItems.length} of ${this.forms.length}` : ''}</Typography>
@@ -118,7 +146,7 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
                         </React.Fragment>
                         </>
                     </Card>
-                    {!this.loading && <TableWrapper loading={this.loading} errors={this.errors} debug={this.props.store.debug}
+                    {!isLoading&& <TableWrapper errors={this.errors} debug={this.props.store.debug}
                         data={this.forms} columns={columns} borderered={true} rowKey="id"
                         pagination={false} onSelection={this.setSelectedItems}/>}
                     {this.showAdd && <Drawer title="Add Form" placement="right" closable={true} onClose={() => this.showAdd = false} visible={this.showAdd}>

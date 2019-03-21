@@ -33,11 +33,11 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     createdAt
     updatedAt
     users {
-      items {id email given_name family_name group}
+      items {id email given_name family_name group createdAt}
       nextToken
     }
     forms {
-      items {id name owner ownedBy {given_name family_name email}  desc versionId startsAt endsAt isPaused}
+      items {id name owner ownedBy {given_name family_name email}  createdAt desc versionId startsAt endsAt isPaused}
       nextToken
     }
   }

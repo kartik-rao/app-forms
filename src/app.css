@@ -82,6 +82,14 @@ html, body {
     line-height: 20px;
 }
 
+.fl-main {
+    height: 100%;
+
+}
+
+.fl-content {
+    background-color: #fff;
+}
 
 .ant-layout-header {
     padding: 0;
@@ -118,9 +126,5 @@ html, body {
 }
 
 .ant-page-header {
-    height: 100%
-}
-
-.fl-main {
     height: 100%
 }

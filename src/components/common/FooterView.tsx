@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Affix, Menu, Icon} from "antd";
+import {Menu, Icon} from "antd";
 
 export class Footer extends React.Component<any, any> {
     props: any;
@@ -9,11 +9,9 @@ export class Footer extends React.Component<any, any> {
     }
 
     render() {
-        let {viewStore, authStore} = this.props.store;
-        let selected = viewStore.currentView ? [viewStore.currentView.name] : ["home"];
-
+        let {viewStore} = this.props.store;
         return (
-        <Menu selectedKeys={selected} mode="horizontal" theme="light">
+        <Menu selectedKeys={null} mode="horizontal" theme="light">
             <Menu.Item key="privacy" style={{float: 'right'}}>
                 <Icon type="lock" />Privacy
             </Menu.Item>

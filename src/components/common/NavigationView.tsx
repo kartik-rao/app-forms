@@ -1,4 +1,4 @@
-import { Button, Icon, Menu } from 'antd';
+import { Button, Icon, Menu, Spin } from 'antd';
 import * as React from "react";
 import { IRootStore } from '../../stores/RootStore';
 import { observer } from 'mobx-react';
@@ -17,7 +17,7 @@ export class AppMenu extends React.Component<IAppMenuProps, any> {
     }
 
     render() {
-        let {viewStore, authStore} = this.props.store;
+        let {viewStore, authStore, editorStore} = this.props.store;
         let selected = viewStore.currentView ? [viewStore.currentView.name] : ["home"];
 
         return (
@@ -37,6 +37,9 @@ export class AppMenu extends React.Component<IAppMenuProps, any> {
             </Menu.Item>
             <Menu.Item key="admin" onClick={(e) => viewStore.showAdmin()}>
                 <Icon type="setting" />Admin
+            </Menu.Item>
+            <Menu.Item disabled={true}>
+                {editorStore.isLoading == true && <span><span style={{marginRight: '8px'}}>Loading</span><Spin size="small"/></span>}
             </Menu.Item>
             <Menu.SubMenu title={authStore.user ? authStore.user.attributes.email : ""} style={{float:"right"}}>
                 <Menu.Item key="profile">

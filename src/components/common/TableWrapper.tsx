@@ -24,7 +24,6 @@ export interface ITableWrapperProps {
     actions?: React.ReactFragment;
     debug?: boolean;
     errors: any[];
-    loading?: boolean;
     onSelection?: any;
 }
 
@@ -39,7 +38,6 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
     actions: React.ReactFragment;
 
     @observable data: any[];
-    @observable loading: boolean;
     @observable searchText: string;
     @observable searchInput: any;
     @observable selectedRowKeys: any[] = [];
@@ -52,6 +50,7 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
             if (column.key == "action" || column.hideSearch == true) {
                 this.columns.push(column);
             } else {
+
                 this.columns.push({
                     ...column,
                     ...this.getColumnSearchProps(column.dataIndex, column.title)
@@ -66,7 +65,6 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
         this.actions = props.actions;
         this.debug = props.debug || false;
         this.errors = props.errors || [];
-        this.loading = props.loading || false;
     }
 
     @action onSelectChange = (selectedRowKeys: any[]) => {
@@ -91,9 +89,7 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
     }
 
     getColumnSearchProps = (dataIndex: string, title: string) => ({
-        filterDropdown: ({
-          setSelectedKeys, selectedKeys, confirm, clearFilters,
-        }) => (
+        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
           <div style={{ padding: 8 }}>
             <Input ref={node => { this.searchInput = node; }} placeholder={`Search ${title}`} value={selectedKeys[0]}
               onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
@@ -114,11 +110,7 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
           if (visible) {
             setTimeout(() => this.searchInput.select());
           }
-        },
-        // render: (text: string) => (
-        //   <Highlighter highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }} searchWords={[this.searchText]}
-        //     autoEscape textToHighlight={text ? text.toString(): ''}/>
-        // ),
+        }
     });
 
     @computed get showErrors() {
@@ -134,16 +126,9 @@ export class TableWrapper extends React.Component<ITableWrapperProps, any> {
             selectedRowKeys : this.selectedRowKeys,
             onChange : this.onSelectChange
         }
-        console.log(this.columns);
         return <div>
             {!this.isEmpty && <Table rowSelection={rowSelection} dataSource={this.data} bordered={this.bordered}
-                rowKey={this.rowKey} size={this.size} pagination={this.pagination}>
-                    {this.columns.map((col) => {
-                        return <Table.Column title={col.title}
-                            dataIndex={col.dataIndex} key={col.key} render={col.render} >
-                        </Table.Column>}
-                    )}
-                </Table>}
+                rowKey={this.rowKey} size={this.size} pagination={this.pagination} columns={this.columns}/>}
             {this.isEmpty && <Card><Empty/></Card> }
             {this.showErrors && <List dataSource={this.errors} renderItem={(item) => (
                 <List.Item>{item.message}</List.Item>
