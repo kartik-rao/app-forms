@@ -244,35 +244,13 @@ export const addForm = `mutation AddForm($form: AddFormInput!, $notes: String!) 
       group
       given_name
       family_name
-      phone_number
-      createdAt
-      updatedAt
-      isDeleted
     }
     accountId
-    account {
-      id
-      name
-      website
-      taxId
-      owner
-      createdAt
-      updatedAt
-    }
     createdAt
     updatedAt
     startsAt
     endsAt
     isPaused
-    versions {
-      nextToken
-    }
-    integrations {
-      nextToken
-    }
-    entries {
-      nextToken
-    }
   }
 }
 `;
@@ -282,16 +260,10 @@ export const addFormVersion = `mutation AddFormVersion($version: AddFormVersionI
     owner
     ownedBy {
       id
-      owner
-      accountId
       email
       group
       given_name
       family_name
-      phone_number
-      createdAt
-      updatedAt
-      isDeleted
     }
     createdAt
     notes

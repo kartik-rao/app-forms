@@ -48,7 +48,6 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
         let addFormResponse;
         let {editorStore} = this.props.store;
         editorStore.showLoading();
-        values.formData = values.formData ? values.formData : {};
         try {
             addFormResponse = await API.graphql(graphqlOperation(mutations.addForm, {form:values, notes: "Form initialized"}));
             console.log("handleAdd Response", addFormResponse);

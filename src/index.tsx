@@ -6,6 +6,7 @@ import { App } from './App';
 import api_config from "./aws-exports";
 import { startRouter } from './Router';
 import rootStore from "./stores/RootStore";
+import Auth from "@aws-amplify/auth";
 
 Sentry.init({
  dsn: "https://765d27482b8b45928f4b12bcaa2f7e32@sentry.io/28557"
@@ -24,6 +25,17 @@ Amplify.configure({
         responseType: 'code'
     },
     ...api_config,
+    graphql_headers: async () => {
+        try {
+          const token = (await Auth.currentSession()).getIdToken().getJwtToken();
+          return { Authorization: token }
+        }
+        catch (e) {
+          console.error(e);
+          return {};
+          // Potentially you can retrieve it from local storage
+        }
+    },
     Auth: {
         userPoolId: 'ap-southeast-2_Cnjjlmsxh',
         userPoolWebClientId: "5uh5s9bfv5m9gk7ndt9e718da6",
