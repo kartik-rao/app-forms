@@ -44,17 +44,24 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
     }
 
     @action.bound async handleAdd(values: any) {
-        console.log("handleAdd values", values);
+        console.log("FormsView.handleAdd values", values);
         let addFormResponse;
         let {editorStore} = this.props.store;
         editorStore.showLoading();
+        values.formData = values.formData ? values.formData : {};
         try {
             addFormResponse = await API.graphql(graphqlOperation(mutations.addForm, {form:values, notes: "Form initialized"}));
             console.log("handleAdd Response", addFormResponse);
-            this.fetch();
+            if (addFormResponse.errors) {
+                this.errors = addFormResponse.errors;
+            } else {
+                this.fetch();
+            }
         } catch (errorResponse) {
             this.errors = errorResponse.errors;
         }
+        console.log(this.errors)
+        this.showAdd = false;
         editorStore.hideLoading();
     }
 

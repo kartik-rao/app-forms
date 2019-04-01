@@ -37,7 +37,7 @@ export const getAccount = `query GetAccount($accountId: ID!) {
       nextToken
     }
     forms {
-      items {id name owner ownedBy {given_name family_name email}  createdAt desc versionId startsAt endsAt isPaused}
+      items {id name createdAt desc versionId startsAt endsAt isPaused owner ownedBy {given_name family_name email}}
       nextToken
     }
   }

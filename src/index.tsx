@@ -1,12 +1,15 @@
-import { Col, Layout, Row } from "antd";
 import Amplify from '@aws-amplify/core';
-
+import * as Sentry from '@sentry/browser';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { App } from './App';
+import api_config from "./aws-exports";
 import { startRouter } from './Router';
 import rootStore from "./stores/RootStore";
-import api_config from "./aws-exports";
+
+Sentry.init({
+ dsn: "https://765d27482b8b45928f4b12bcaa2f7e32@sentry.io/28557"
+});
 
 Amplify.configure({
     oauth: {

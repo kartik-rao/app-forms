@@ -52,6 +52,10 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
         }
     }
 
+    @action.bound updateView() {
+        this.fetch();
+    }
+
     render() {
         let {isLoading} = this.props.store.editorStore;
         let showErrors = this.props.store.debug && this.errors;
@@ -65,7 +69,7 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
                 footer={
                     <Tabs defaultActiveKey="1" animated={false}>
                         <Tabs.TabPane tab="Users" key="1" style={{paddingTop: "20px"}}>
-                            <UsersView store={this.props.store} users={this.account.users.items || []}/>
+                            <UsersView store={this.props.store} onUpdate={this.updateView} users={this.account.users.items || []}/>
                         </Tabs.TabPane>
                         <Tabs.TabPane tab="Subscription" key="2" />
                     </Tabs>

@@ -10,6 +10,7 @@ import moment from "moment";
 
 export interface IUsersViewProps {
     store: IRootStore;
+    onUpdate?: () => void;
     users: any[];
 }
 
@@ -32,8 +33,8 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
         values["custom:source"] = authStore.user.username;
         editorStore.showLoading();
         try {
-          let response = await authStore.signUp(values);
-          console.log("SIGNUP RESPONSE", response);
+          await authStore.signUp(values);
+          this.props.onUpdate ? this.props.onUpdate() : void(0);
         } catch (error) {
             this.errors = error;
             console.log("signup error", error);
@@ -90,7 +91,8 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
                 value: 'Viewer',
             }],
             render: (text, record) => {
-                return <Tag>{record.group}</Tag>
+                let color = record.group == 'AccountAdmin' ? 'red' : (record.group == 'Editor' ? 'orange' : 'green')
+                return <Tag color={color}>{record.group}</Tag>
             },
         },
         {
@@ -111,11 +113,9 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
             key: 'action',
             render: (text, record) => (
               <span>
-                {record.id != user.username && <div style={{textAlign: "center"}}>
+                <div style={{textAlign: "center"}}>
                     <Button icon="setting">Edit</Button>
-                    <Divider type="vertical" />
-                    <Button type="danger">Disable</Button>
-                </div>}
+                </div>
               </span>
             )
         }];

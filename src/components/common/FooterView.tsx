@@ -9,7 +9,6 @@ export class Footer extends React.Component<any, any> {
     }
 
     render() {
-        let {viewStore} = this.props.store;
         return (
         <Menu selectedKeys={null} mode="horizontal" theme="light">
             <Menu.Item key="privacy" style={{float: 'right'}}>
