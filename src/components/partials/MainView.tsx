@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import * as React from 'react';
 import { IRootStore } from '../../stores/RootStore';
-import { Creator } from "../creator/creator";
+import { CanvasView } from "../creator/CanvasView";
 import { AccountsView } from "./AccountsView";
 import { UsersView } from "./UsersView";
 import { FormsView } from "./FormsView";
@@ -34,7 +34,7 @@ export class MainView extends React.Component<IMainViewProps, {}> {
                 </Layout.Header>
                 <Layout.Content className="fl-content">
                 <div className="fl-main">
-                    {view == 'canvas'   && <Creator store={this.props.store}/>}
+                    {view == 'canvas'   && <CanvasView store={this.props.store}/>}
                     {view == 'accounts' && isAdmin && <AccountsView store={this.props.store}/>}
                     {view == 'forms' && <FormsView store={this.props.store}/>}
                     {view == 'admin' && isAdmin && <AdminView store={this.props.store}/>}

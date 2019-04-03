@@ -1,5 +1,6 @@
 import * as React from "react";
 import {Menu} from "antd";
+import {Draggable} from "react-beautiful-dnd";
 
 export class Toolbar extends React.Component<any, any> {
     props: any;
@@ -17,11 +18,11 @@ export class Toolbar extends React.Component<any, any> {
         <Menu.Item>Form Controls</Menu.Item>
             <Menu.SubMenu key="Layout" title="Layout">
                 <Menu.Item key={1} onClick={() => this.handleClick({context:'page'})}>Page</Menu.Item>
-                <Menu.Item key={2}>Column</Menu.Item>
-                <Menu.Item key={3}>Section</Menu.Item>
+                <Draggable><Menu.Item key={2}>Column</Menu.Item></Draggable>
+                <Draggable><Menu.Item key={3}>Section</Menu.Item></Draggable>
             </Menu.SubMenu>
             <Menu.SubMenu key="Basic" title="Basic">
-                <Menu.Item key={1}>Input</Menu.Item>
+                <Draggable><Menu.Item key={1}>Input</Menu.Item></Draggable>
                 <Menu.Item key={2}>Select</Menu.Item>
                 <Menu.Item key={3}>Radio Group</Menu.Item>
                 <Menu.Item key={4}>Textarea</Menu.Item>

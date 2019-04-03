@@ -35,6 +35,9 @@ export class AppMenu extends React.Component<IAppMenuProps, any> {
             <Menu.Item key="forms" onClick={(e) => viewStore.showForms()}>
                 <Icon type="file-text" />Forms
             </Menu.Item>
+            <Menu.Item key="canvas" onClick={(e) => viewStore.showCanvas()}>
+                <Icon type="layout" />Canvas
+            </Menu.Item>
             <Menu.Item key="admin" onClick={(e) => viewStore.showAdmin()}>
                 <Icon type="setting" />Admin
             </Menu.Item>
