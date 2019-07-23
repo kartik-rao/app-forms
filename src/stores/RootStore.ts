@@ -1,9 +1,11 @@
 import { EditorStore } from "@kartikrao/lib-forms";
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, configure } from "mobx";
 import AuthStore, { IAuthStore } from "./AuthStore";
 import { ContentStore } from "./ContentStore";
 import { simpleFetch } from './fetch';
 import ViewStore from "./ViewStore";
+
+configure({enforceActions: "never"});
 
 export interface IRootStore {
     isLoading: boolean;

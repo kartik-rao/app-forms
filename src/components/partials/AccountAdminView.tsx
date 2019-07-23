@@ -26,9 +26,7 @@ const Description = ({ term, children, span = 12 }) => (
 export class AccountAdminView extends React.Component<IAccountAdminViewProps, any> {
 
     props: IAccountAdminViewProps;
-    @observable showAdd: boolean = false;
     @observable account: any;
-    @observable loading: boolean = true;
     @observable errors: any[];
 
     constructor(props: IAccountAdminViewProps) {
@@ -39,6 +37,7 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
 
     @action async fetch() {
         this.props.store.showLoading();
+
         try{
             let {tenant} = this.props.store.authStore;
             let args = {accountId: tenant};
@@ -47,9 +46,8 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
         } catch (errorResponse) {
             console.log("ERROR", errorResponse);
             this.errors = errorResponse.errors;
-        } finally {
-            this.props.store.hideLoading();
         }
+        this.props.store.hideLoading();
     }
 
     @action.bound updateView() {
