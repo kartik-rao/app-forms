@@ -1,12 +1,16 @@
-import AuthStore, {IAuthStore} from "./AuthStore";
-import EditorStore, {IEditorStore} from "./EditorStore";
-import ViewStore from "./ViewStore";
-import { simpleFetch } from './fetch';
+import { EditorStore } from "@kartikrao/lib-forms";
+import { action, computed, observable } from "mobx";
+import AuthStore, { IAuthStore } from "./AuthStore";
 import { ContentStore } from "./ContentStore";
+import { simpleFetch } from './fetch';
+import ViewStore from "./ViewStore";
 
 export interface IRootStore {
+    isLoading: boolean;
+    showLoading: () => void;
+    hideLoading: () => void;
     authStore: IAuthStore;
-    editorStore: IEditorStore;
+    editorStore: EditorStore;
     viewStore: ViewStore;
     debug: boolean;
 }
@@ -18,11 +22,30 @@ class RootStore {
     contentStore: ContentStore;
     debug: boolean = location.href.indexOf('localhost') > -1;
 
+    @observable loading: boolean;
+
+    @computed get isLoading  () : boolean {
+        return this.loading;
+    }
+
+    @action showLoading() {
+        this.loading = true;
+    }
+
+    @action hideLoading() {
+        this.loading = false;
+    }
+
     constructor() {
+        this.initialize();
+    }
+
+    @action initialize() {
         this.authStore = new AuthStore();
-        this.editorStore = new EditorStore();
+        this.editorStore = new EditorStore(null);
         this.viewStore = new ViewStore(simpleFetch);
         this.contentStore = new ContentStore();
+        this.hideLoading();
     }
 }
 

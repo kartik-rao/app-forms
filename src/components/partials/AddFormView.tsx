@@ -87,4 +87,4 @@ export class AddFormView extends React.Component<IAddFormViewProps & FormCompone
     }
 }
 
-export default Form.create<IAddFormViewProps>()(AddFormView);
+export default Form.create<IAddFormViewProps & FormComponentProps>()(AddFormView);

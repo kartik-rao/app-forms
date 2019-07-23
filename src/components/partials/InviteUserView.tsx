@@ -91,4 +91,4 @@ export class InviteUserView extends React.Component<IInviteUserViewProps & FormC
     }
 }
 
-export default Form.create<IInviteUserViewProps>()(InviteUserView);
+export default Form.create<IInviteUserViewProps & FormComponentProps>()(InviteUserView);

@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react';
 import * as React from 'react';
 import { IRootStore } from '../../stores/RootStore';
-import { CanvasView } from "../creator/CanvasView";
 import { AccountsView } from "./AccountsView";
 import { UsersView } from "./UsersView";
 import { FormsView } from "./FormsView";
@@ -10,6 +9,7 @@ import { AccountAdminView } from './AccountAdminView';
 import { Layout } from 'antd';
 import { Footer } from "../common/FooterView"
 import { Header } from "../common/HeaderView";
+import {Canvas} from "@kartikrao/lib-forms/lib/components/canvas/Canvas";
 
 export interface IMainViewProps {
     store: IRootStore
@@ -34,9 +34,10 @@ export class MainView extends React.Component<IMainViewProps, {}> {
                 </Layout.Header>
                 <Layout.Content className="fl-content">
                 <div className="fl-main">
-                    {view == 'canvas'   && <CanvasView store={this.props.store}/>}
+                    {view == 'canvas'   && <Canvas store={this.props.store.editorStore}/>}
                     {view == 'accounts' && isAdmin && <AccountsView store={this.props.store}/>}
                     {view == 'forms' && <FormsView store={this.props.store}/>}
+                    {/* {view == 'users' && <UsersView store={this.props.store}/>} */}
                     {view == 'admin' && isAdmin && <AdminView store={this.props.store}/>}
                     {view == 'admin' && isAccountAdmin && <AccountAdminView store={this.props.store}/>}
                 </div>

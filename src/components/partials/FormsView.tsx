@@ -26,10 +26,11 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
 
     @action async fetch() {
         let response;
-        let {authStore, editorStore} = this.props.store;
+        let {store} = this.props;
+        let {authStore} = this.props.store;
         let {tenant} = authStore;
         let args = {accountId: tenant};
-        editorStore.showLoading();
+        store.showLoading();
         try {
             response = await API.graphql(graphqlOperation(queries.getAccount, args));
             let {forms} = response.data.getAccount;
@@ -40,14 +41,14 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
         } catch (errorResponse) {
             this.errors = errorResponse.errors;
         }
-        editorStore.hideLoading();
+        store.hideLoading();
     }
 
     @action.bound async handleAdd(values: any) {
         console.log("FormsView.handleAdd values", values);
         let addFormResponse;
-        let {editorStore} = this.props.store;
-        editorStore.showLoading();
+        let {store} = this.props;
+        store.showLoading();
         try {
             addFormResponse = await API.graphql(graphqlOperation(mutations.addForm, {form:values, notes: "Form initialized"}));
             console.log("handleAdd Response", addFormResponse);
@@ -61,7 +62,7 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
         }
         console.log(this.errors)
         this.showAdd = false;
-        editorStore.hideLoading();
+        store.hideLoading();
     }
 
     constructor(props: IFormsViewProps) {
@@ -140,7 +141,7 @@ export class FormsView extends React.Component<IFormsViewProps, any> {
                 )
             }
         ];
-        let {isLoading} = this.props.store.editorStore;
+        let {isLoading} = this.props.store;
         return (
             <Row style={{height: '100%', marginTop: '50px'}}>
                 <Col span={20} offset={2} style={{padding:"25px"}}>

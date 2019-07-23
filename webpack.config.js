@@ -1,32 +1,34 @@
 var path = require('path');
+const webpack = require('webpack');
+const tsImportPluginFactory = require('ts-import-plugin');
+const tsImportPlugin = tsImportPluginFactory({ libraryName:"antd", style: 'css', libraryDirectory: 'es' })
 const env = process.env.NODE_ENV;
 
-const tsImportPluginFactory = require('ts-import-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { CheckerPlugin } = require('awesome-typescript-loader');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = {
     mode: env,
-    entry: {main: path.join(__dirname, 'src/index.tsx'), style: path.join(__dirname, 'src/app.css')},
+    entry: {
+        main: path.join(__dirname, 'src/index.tsx'),
+        style: path.join(__dirname, 'src/app.css')
+    },
     target: 'web',
     module: {
         rules: [
             {
-                test: /\.ts(x?)$/,
-                use: { loader: 'ts-loader',
+                test: /\.(jsx|tsx|js|ts)$/,
+                use: {
+                    loader: 'awesome-typescript-loader',
                     options : {
-                        transpileOnly: true,
+                        useCache: true,
                         reportFiles: [
                             'src/**/*.{ts,tsx}'
                         ],
                         getCustomTransformers: () => ({
-                            before: [ tsImportPluginFactory( {
-                                libraryName: 'antd',
-                                libraryDirectory: 'node_modules',
-                                style: true
-                              }) ]
+                            before: [ tsImportPlugin ]
                         }),
                         compilerOptions: {
                             module: 'es2015'
@@ -46,7 +48,7 @@ module.exports = {
             }
         ],
     },
-    devtool: 'eval-source-map',
+    devtool: 'source-map',
     resolve: {
         extensions: ['.ts', '.js', '.jsx', '.tsx', '.css'],
     },
@@ -59,7 +61,9 @@ module.exports = {
     externals: {
         "react": "React",
         "react-dom": "ReactDOM",
-        "antd" : "antd"
+        "antd" : "antd",
+        "moment" : "moment",
+        "moment-timezone": "moment"
     },
     watchOptions: {
         ignored: /node_modules/
@@ -74,13 +78,14 @@ module.exports = {
         }
     },
     plugins: [
-        new ForkTsCheckerWebpackPlugin(),
-        new HtmlWebpackPlugin({template: 'public/index.html', inject: false}),
+        new CheckerPlugin(),
+        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en-au/),
+        new HtmlWebpackPlugin({template: 'public/index.html', inject: false, hash: true, title: 'app-forms'}),
         new MiniCssExtractPlugin({filename:"style.css", chunkFilename: "[id].css"}),
         // new BundleAnalyzerPlugin()
     ],
     optimization: {
-        minimize: true,
+        minimize: false,
         splitChunks: { chunks: "initial", name: "vendor" }
     }
 };

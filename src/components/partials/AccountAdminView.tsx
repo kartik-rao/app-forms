@@ -38,7 +38,7 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
     }
 
     @action async fetch() {
-        this.props.store.editorStore.showLoading();
+        this.props.store.showLoading();
         try{
             let {tenant} = this.props.store.authStore;
             let args = {accountId: tenant};
@@ -48,7 +48,7 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
             console.log("ERROR", errorResponse);
             this.errors = errorResponse.errors;
         } finally {
-            this.props.store.editorStore.hideLoading();
+            this.props.store.hideLoading();
         }
     }
 
@@ -57,7 +57,7 @@ export class AccountAdminView extends React.Component<IAccountAdminViewProps, an
     }
 
     render() {
-        let {isLoading} = this.props.store.editorStore;
+        let {isLoading} = this.props.store;
         let showErrors = this.props.store.debug && this.errors;
         return <>
             {showErrors && <List dataSource={this.errors} renderItem={item => (

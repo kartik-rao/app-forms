@@ -17,7 +17,8 @@ export class AppMenu extends React.Component<IAppMenuProps, any> {
     }
 
     render() {
-        let {viewStore, authStore, editorStore} = this.props.store;
+        let {store} = this.props;
+        let {viewStore, authStore} = store;
         let selected = viewStore.currentView ? [viewStore.currentView.name] : ["home"];
 
         return (
@@ -42,7 +43,7 @@ export class AppMenu extends React.Component<IAppMenuProps, any> {
                 <Icon type="setting" />Admin
             </Menu.Item>
             <Menu.Item disabled={true}>
-                {editorStore.isLoading == true && <span><span style={{marginRight: '8px'}}>Loading</span><Spin size="small"/></span>}
+                {store.isLoading == true && <span><span style={{marginRight: '8px'}}>Loading</span><Spin size="small"/></span>}
             </Menu.Item>
             <Menu.SubMenu title={authStore.user ? authStore.user.attributes.email : ""} style={{float:"right"}}>
                 <Menu.Item key="profile">

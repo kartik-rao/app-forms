@@ -29,9 +29,10 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
     }
 
     @action.bound async handleAdd(values: any) {
-        let {authStore, editorStore} = this.props.store;
+        let {store} = this.props;
+        let {authStore} = store;
         values["custom:source"] = authStore.user.username;
-        editorStore.showLoading();
+        store.showLoading();
         try {
           await authStore.signUp(values);
           this.props.onUpdate ? this.props.onUpdate() : void(0);
@@ -39,7 +40,7 @@ export class UsersView extends React.Component<IUsersViewProps, any> {
             this.errors = error;
             console.log("signup error", error);
         } finally {
-            editorStore.hideLoading();
+            store.hideLoading();
         }
         this.showAdd = false;
     }
