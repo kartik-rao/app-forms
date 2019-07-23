@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/browser';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { App } from './App';
-import api_config from "./aws-exports";
+// import api_config from "./aws-exports";
 import { startRouter } from './Router';
 import rootStore from "./stores/RootStore";
 import Auth from "@aws-amplify/auth";
@@ -13,6 +13,9 @@ Sentry.init({
 });
 
 Amplify.configure({
+    'aws_appsync_graphqlEndpoint': 'https://v233t5tzhre2zhzqbmpdwqjzpa.appsync-api.ap-southeast-2.amazonaws.com/graphql',
+    'aws_appsync_region': 'ap-southeast-2',
+    'aws_appsync_authenticationType': 'AMAZON_COGNITO_USER_POOLS',
     oauth: {
         // Domain name
         domain : 'dev-forms-li.auth.ap-southeast-2.amazoncognito.com',
@@ -24,7 +27,6 @@ Amplify.configure({
         redirectSignOut : 'http://localhost:8085/', // or 'exp://127.0.0.1:19000/--/', 'myapp://main/'
         responseType: 'code'
     },
-    ...api_config,
     graphql_headers: async () => {
         try {
           const token = (await Auth.currentSession()).getIdToken().getJwtToken();
