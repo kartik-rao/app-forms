@@ -7,7 +7,6 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     name
     addresses {
       items {name addressee addressType street city state country}
-      nextToken
     }
     website
     taxId
@@ -34,28 +33,23 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     updatedAt
     users {
       items {id email given_name family_name group createdAt}
-      nextToken
     }
     forms {
       items {id name createdAt desc versionId startsAt endsAt isPaused owner ownedBy {given_name family_name email}}
-      nextToken
     }
   }
 }
 `;
-export const listAllAccounts = `query ListAllAccounts($limit: Int, $nextToken: String) {
-  listAllAccounts(limit: $limit, nextToken: $nextToken) {
-    items {
+export const listAccounts = `query {
+  listAccounts {
       id
       name
       ownedBy {id email given_name family_name}
       createdAt
       updatedAt
-    }
-    nextToken
   }
-}
-`;
+}`;
+
 export const getUser = `query GetUser($userId: ID!) {
   getUser(userId: $userId) {
     id
@@ -78,8 +72,8 @@ export const getUser = `query GetUser($userId: ID!) {
   }
 }
 `;
-export const listAllUsers = `query ListAllUsers($limit: Int, $nextToken: String) {
-  listAllUsers(limit: $limit, nextToken: $nextToken) {
+export const listUsers = `query ListUsers() {
+  listUsers() {
     items {
       id
       owner
@@ -93,19 +87,14 @@ export const listAllUsers = `query ListAllUsers($limit: Int, $nextToken: String)
       updatedAt
       isDeleted
     }
-    nextToken
   }
-}
-`;
-export const listAllAccountUsers = `query ListAllAccountUsers(
+}`;
+
+export const listAccountUsers = `query ListAccountUsers(
   $accountId: String!
-  $limit: Int
-  $nextToken: String
 ) {
-  listAllAccountUsers(
+  listAccountUsers(
     accountId: $accountId
-    limit: $limit
-    nextToken: $nextToken
   ) {
     items {
       id
@@ -120,19 +109,14 @@ export const listAllAccountUsers = `query ListAllAccountUsers(
       updatedAt
       isDeleted
     }
-    nextToken
   }
-}
-`;
-export const listAllAccountUsersActive = `query ListAllAccountUsersActive(
+}`;
+
+export const listAccountUsersActive = `query ListAccountUsersActive(
   $accountId: String!
-  $limit: Int
-  $nextToken: String
 ) {
-  listAllAccountUsersActive(
+  listAccountUsersActive(
     accountId: $accountId
-    limit: $limit
-    nextToken: $nextToken
   ) {
     items {
       id
@@ -147,21 +131,20 @@ export const listAllAccountUsersActive = `query ListAllAccountUsersActive(
       updatedAt
       isDeleted
     }
-    nextToken
   }
 }
 `;
 export const listAccountUsersInGroup = `query ListAccountUsersInGroup(
   $accountId: String!
   $group: String!
-  $limit: Int
-  $nextToken: String
+
+
 ) {
   listAccountUsersInGroup(
     accountId: $accountId
     group: $group
-    limit: $limit
-    nextToken: $nextToken
+
+
   ) {
     items {
       id
@@ -176,7 +159,6 @@ export const listAccountUsersInGroup = `query ListAccountUsersInGroup(
       updatedAt
       isDeleted
     }
-    nextToken
   }
 }
 `;
@@ -227,8 +209,8 @@ export const getPlan = `query GetPlan($planId: String!) {
   }
 }
 `;
-export const listAllPlans = `query ListAllPlans($limit: Int, $nextToken: String) {
-  listAllPlans(limit: $limit, nextToken: $nextToken) {
+export const listPlans = `query ListPlans() {
+  listPlans() {
     items {
       id
       accountId
@@ -241,19 +223,18 @@ export const listAllPlans = `query ListAllPlans($limit: Int, $nextToken: String)
       createdAt
       updatedAt
     }
-    nextToken
   }
 }
 `;
-export const listAllAccountPlans = `query ListAllAccountPlans(
+export const listAccountPlans = `query ListAccountPlans(
   $accountId: String!
-  $limit: Int
-  $nextToken: String
+
+
 ) {
-  listAllAccountPlans(
+  listAccountPlans(
     accountId: $accountId
-    limit: $limit
-    nextToken: $nextToken
+
+
   ) {
     items {
       id
@@ -267,7 +248,6 @@ export const listAllAccountPlans = `query ListAllAccountPlans(
       createdAt
       updatedAt
     }
-    nextToken
   }
 }
 `;
@@ -285,7 +265,6 @@ export const getActiveAccountPlan = `query GetActiveAccountPlan($accountId: Stri
       createdAt
       updatedAt
     }
-    nextToken
   }
 }
 `;
@@ -315,40 +294,20 @@ export const getPlanType = `query GetPlanType($planTypeId: String!) {
   }
 }
 `;
-export const listAllPlanTypes = `query ListAllPlanTypes($limit: Int, $nextToken: String) {
-  listAllPlanTypes(limit: $limit, nextToken: $nextToken) {
-    items {
-      id
-      owner
-      name
-      cost
-      active
-      billingTerm
-      createdAt
-      updatedAt
-    }
-    nextToken
+export const listPlanTypes = `query {
+  listPlanTypes {
+    id
+    name
+    cost
+    active
+    billingTerm
+    createdAt
+    updatedAt
   }
-}
-`;
-export const listAllActivePlanTypes = `query ListAllActivePlanTypes($limit: Int, $nextToken: String) {
-  listAllActivePlanTypes(limit: $limit, nextToken: $nextToken) {
-    items {
-      id
-      owner
-      name
-      cost
-      active
-      billingTerm
-      createdAt
-      updatedAt
-    }
-    nextToken
-  }
-}
-`;
-export const getForm = `query GetForm($formId: String!, $versionId: ID!) {
-  getForm(formId: $formId, versionId: $versionId) {
+}`;
+
+export const getForm = `query GetForm($formId: String!) {
+  getForm(formId: $formId) {
     id
     owner
     name
@@ -376,17 +335,15 @@ export const getForm = `query GetForm($formId: String!, $versionId: ID!) {
     isPaused
     versions {
       items {id ownedBy {id email group given_name family_name} createdAt notes}
-      nextToken
     }
     integrations {
       items {id integrationType active}
-      nextToken
     }
   }
-}
-`;
-export const listAllForms = `query ListAllForms($limit: Int, $nextToken: String) {
-  listAllForms(limit: $limit, nextToken: $nextToken) {
+}`;
+
+export const listForms = `query ListForms() {
+  listForms() {
     items {
       id
       owner
@@ -401,19 +358,18 @@ export const listAllForms = `query ListAllForms($limit: Int, $nextToken: String)
       endsAt
       isPaused
     }
-    nextToken
   }
 }
 `;
-export const listAllAccountForms = `query ListAllAccountForms(
+export const listAccountForms = `query ListAccountForms(
   $accountId: String!
-  $limit: Int
-  $nextToken: String
+
+
 ) {
-  listAllAccountForms(
+  listAccountForms(
     accountId: $accountId
-    limit: $limit
-    nextToken: $nextToken
+
+
   ) {
     items {
       id
@@ -429,21 +385,20 @@ export const listAllAccountForms = `query ListAllAccountForms(
       endsAt
       isPaused
     }
-    nextToken
   }
 }
 `;
-export const listAllAccountFormsActive = `query ListAllAccountFormsActive(
+export const listAccountFormsActive = `query ListAccountFormsActive(
   $accountId: String!
   $active: String!
-  $limit: Int
-  $nextToken: String
+
+
 ) {
-  listAllAccountFormsActive(
+  listAccountFormsActive(
     accountId: $accountId
     active: $active
-    limit: $limit
-    nextToken: $nextToken
+
+
   ) {
     items {
       id
@@ -458,21 +413,20 @@ export const listAllAccountFormsActive = `query ListAllAccountFormsActive(
       endsAt
       isPaused
     }
-    nextToken
   }
 }
 `;
-export const listAllAccountFormsByUser = `query ListAllAccountFormsByUser(
+export const listAccountFormsByUser = `query ListAccountFormsByUser(
   $accountId: String!
   $userId: String!
-  $limit: Int
-  $nextToken: String
+
+
 ) {
-  listAllAccountFormsByUser(
+  listAccountFormsByUser(
     accountId: $accountId
     userId: $userId
-    limit: $limit
-    nextToken: $nextToken
+
+
   ) {
     items {
       id
@@ -487,23 +441,22 @@ export const listAllAccountFormsByUser = `query ListAllAccountFormsByUser(
       endsAt
       isPaused
     }
-    nextToken
   }
 }
 `;
-export const listAllAccountFormsByUserActive = `query ListAllAccountFormsByUserActive(
+export const listAccountFormsByUserActive = `query ListAccountFormsByUserActive(
   $accountId: String!
   $userId: String!
   $active: String!
-  $limit: Int
-  $nextToken: String
+
+
 ) {
-  listAllAccountFormsByUserActive(
+  listAccountFormsByUserActive(
     accountId: $accountId
     userId: $userId
     active: $active
-    limit: $limit
-    nextToken: $nextToken
+
+
   ) {
     items {
       id
@@ -518,7 +471,6 @@ export const listAllAccountFormsByUserActive = `query ListAllAccountFormsByUserA
       endsAt
       isPaused
     }
-    nextToken
   }
 }
 `;
@@ -557,8 +509,8 @@ export const getIntegrationType = `query GetIntegrationType($integrationTypeId: 
   }
 }
 `;
-export const listAllIntegrationTypes = `query ListAllIntegrationTypes($limit: Int, $nextToken: String) {
-  listAllIntegrationTypes(limit: $limit, nextToken: $nextToken) {
+export const listIntegrationTypes = `query ListIntegrationTypes() {
+  listIntegrationTypes() {
     items {
       id
       owner
@@ -568,19 +520,18 @@ export const listAllIntegrationTypes = `query ListAllIntegrationTypes($limit: In
       createdAt
       updatedAt
     }
-    nextToken
   }
 }
 `;
-export const listAllIntegrationTypesByPlanType = `query ListAllIntegrationTypesByPlanType(
+export const listIntegrationTypesByPlanType = `query ListIntegrationTypesByPlanType(
   $planTypeId: String!
-  $limit: Int
-  $nextToken: String
+
+
 ) {
-  listAllIntegrationTypesByPlanType(
+  listIntegrationTypesByPlanType(
     planTypeId: $planTypeId
-    limit: $limit
-    nextToken: $nextToken
+
+
   ) {
     items {
       id
@@ -591,21 +542,20 @@ export const listAllIntegrationTypesByPlanType = `query ListAllIntegrationTypesB
       createdAt
       updatedAt
     }
-    nextToken
   }
 }
 `;
-export const listAllIntegrationTypesByPlanTypeActive = `query ListAllIntegrationTypesByPlanTypeActive(
+export const listIntegrationTypesByPlanTypeActive = `query ListIntegrationTypesByPlanTypeActive(
   $planTypeId: String!
   $active: String!
-  $limit: Int
-  $nextToken: String
+
+
 ) {
-  listAllIntegrationTypesByPlanTypeActive(
+  listIntegrationTypesByPlanTypeActive(
     planTypeId: $planTypeId
     active: $active
-    limit: $limit
-    nextToken: $nextToken
+
+
   ) {
     items {
       id
@@ -616,7 +566,6 @@ export const listAllIntegrationTypesByPlanTypeActive = `query ListAllIntegration
       createdAt
       updatedAt
     }
-    nextToken
   }
 }
 `;
@@ -662,8 +611,8 @@ export const getIntegration = `query GetIntegration($integrationId: String!) {
   }
 }
 `;
-export const listAllIntegrations = `query ListAllIntegrations($limit: Int, $nextToken: String) {
-  listAllIntegrations(limit: $limit, nextToken: $nextToken) {
+export const listIntegrations = `query ListIntegrations() {
+  listIntegrations() {
     items {
       id
       integrationTypeId
@@ -681,19 +630,18 @@ export const listAllIntegrations = `query ListAllIntegrations($limit: Int, $next
       createdAt
       updatedAt
     }
-    nextToken
   }
 }
 `;
-export const listAllAccountIntegrations = `query ListAllAccountIntegrations(
+export const listAccountIntegrations = `query ListAccountIntegrations(
   $accountId: String!
-  $limit: Int
-  $nextToken: String
+
+
 ) {
-  listAllAccountIntegrations(
+  listAccountIntegrations(
     accountId: $accountId
-    limit: $limit
-    nextToken: $nextToken
+
+
   ) {
     items {
       id
@@ -712,21 +660,20 @@ export const listAllAccountIntegrations = `query ListAllAccountIntegrations(
       createdAt
       updatedAt
     }
-    nextToken
   }
 }
 `;
-export const listAllAccountFormIntegrations = `query ListAllAccountFormIntegrations(
+export const listAccountFormIntegrations = `query ListAccountFormIntegrations(
   $accountId: String!
   $formId: String!
-  $limit: Int
-  $nextToken: String
+
+
 ) {
-  listAllAccountFormIntegrations(
+  listAccountFormIntegrations(
     accountId: $accountId
     formId: $formId
-    limit: $limit
-    nextToken: $nextToken
+
+
   ) {
     items {
       id
@@ -745,23 +692,22 @@ export const listAllAccountFormIntegrations = `query ListAllAccountFormIntegrati
       createdAt
       updatedAt
     }
-    nextToken
   }
 }
 `;
-export const listAllAccountFormIntegrationsActive = `query ListAllAccountFormIntegrationsActive(
+export const listAccountFormIntegrationsActive = `query ListAccountFormIntegrationsActive(
   $accountId: String!
   $formId: String!
   $active: String!
-  $limit: Int
-  $nextToken: String
+
+
 ) {
-  listAllAccountFormIntegrationsActive(
+  listAccountFormIntegrationsActive(
     accountId: $accountId
     formId: $formId
     active: $active
-    limit: $limit
-    nextToken: $nextToken
+
+
   ) {
     items {
       id
@@ -780,7 +726,6 @@ export const listAllAccountFormIntegrationsActive = `query ListAllAccountFormInt
       createdAt
       updatedAt
     }
-    nextToken
   }
 }
 `;
@@ -793,27 +738,25 @@ export const getFormEntry = `query GetFormEntry($formEntryId: String!) {
   }
 }
 `;
-export const listAllFormEntries = `query ListAllFormEntries($formId: String!) {
-  listAllFormEntries(formId: $formId) {
+export const listFormEntries = `query ListFormEntries($formId: String!) {
+  listFormEntries(formId: $formId) {
     items {
       id
       type
       meta
       createdAt
     }
-    nextToken
   }
 }
 `;
-export const listAllFormEntriesByTime = `query ListAllFormEntriesByTime($formId: String!, $timestampPrefix: String!) {
-  listAllFormEntriesByTime(formId: $formId, timestampPrefix: $timestampPrefix) {
+export const listFormEntriesByTime = `query ListFormEntriesByTime($formId: String!, $timestampPrefix: String!) {
+  listFormEntriesByTime(formId: $formId, timestampPrefix: $timestampPrefix) {
     items {
       id
       type
       meta
       createdAt
     }
-    nextToken
   }
 }
 `;

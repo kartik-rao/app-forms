@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/browser';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { App } from './App';
-// import api_config from "./aws-exports";
+
 import { startRouter } from './Router';
 import rootStore from "./stores/RootStore";
 import Auth from "@aws-amplify/auth";
@@ -13,12 +13,12 @@ Sentry.init({
 });
 
 Amplify.configure({
-    'aws_appsync_graphqlEndpoint': 'https://v233t5tzhre2zhzqbmpdwqjzpa.appsync-api.ap-southeast-2.amazonaws.com/graphql',
-    'aws_appsync_region': 'ap-southeast-2',
+    'aws_appsync_graphqlEndpoint': 'https://ugn2kqey75aolcnah6vtnbuydi.appsync-api.ap-northeast-1.amazonaws.com/graphql',
+    'aws_appsync_region': 'ap-northeast-1',
     'aws_appsync_authenticationType': 'AMAZON_COGNITO_USER_POOLS',
     oauth: {
         // Domain name
-        domain : 'dev-forms-li.auth.ap-southeast-2.amazoncognito.com',
+        domain : 'dev-auth-formsli.auth.ap-northeast-1.amazoncognito.com',
         // Authorized scopes
         scope : ['phone', 'email', 'profile', 'openid'],
         // Callback URL
@@ -39,10 +39,10 @@ Amplify.configure({
         }
     },
     Auth: {
-        userPoolId: 'ap-southeast-2_Cnjjlmsxh',
-        userPoolWebClientId: "5uh5s9bfv5m9gk7ndt9e718da6",
-        identityPoolId: "ap-southeast-2:7915bae5-b331-4675-9a3d-95698136c1ca",
-        region: 'ap-southeast-2',
+        userPoolId: 'ap-northeast-1_Q798Nsl33',
+        userPoolWebClientId: "7pvdgcaflsg9juob60mosafi9d",
+        identityPoolId: "ap-northeast-1:5be23074-d96a-4e55-be17-3fe13545156a",
+        region: 'ap-northeast-1',
         mandatorySignIn: true
     }
 });

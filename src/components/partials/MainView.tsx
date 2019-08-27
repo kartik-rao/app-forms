@@ -33,14 +33,14 @@ export class MainView extends React.Component<IMainViewProps, {}> {
                     <Header store={this.props.store}/>
                 </Layout.Header>
                 <Layout.Content className="fl-content">
-                <div className="fl-main">
-                    {view == 'canvas'   && <Canvas store={this.props.store.editorStore}/>}
-                    {view == 'accounts' && isAdmin && <AccountsView store={this.props.store}/>}
-                    {view == 'forms' && <FormsView store={this.props.store}/>}
-                    {/* {view == 'users' && <UsersView store={this.props.store}/>} */}
-                    {view == 'admin' && isAdmin && <AdminView store={this.props.store}/>}
-                    {view == 'admin' && isAccountAdmin && <AccountAdminView store={this.props.store}/>}
-                </div>
+                    <div className="fl-main">
+                        {view == 'canvas'   && <Canvas store={this.props.store.editorStore}/>}
+                        {view == 'accounts' && isAdmin && <AccountsView store={this.props.store}/>}
+                        {view == 'forms' && <FormsView store={this.props.store}/>}
+                        {/* {view == 'users' && <UsersView store={this.props.store}/>} */}
+                        {view == 'admin' && isAdmin && <AdminView store={this.props.store}/>}
+                        {view == 'admin' && isAccountAdmin && <AccountAdminView store={this.props.store}/>}
+                    </div>
                 </Layout.Content>
                 <Layout.Footer className="fl-footer">
                     <Footer store={this.props.store}></Footer>
