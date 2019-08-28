@@ -1,19 +1,20 @@
 var path = require('path');
+
 const webpack = require('webpack');
 const tsImportPluginFactory = require('ts-import-plugin');
-const tsImportPlugin = tsImportPluginFactory({ libraryName:"antd", style: 'css', libraryDirectory: 'es' })
-const env = process.env.NODE_ENV;
-
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+const env = process.env.NODE_ENV || 'development';
+const isDevelopment = env == 'development';
+
 module.exports = {
     mode: env,
     entry: {
-        main: path.join(__dirname, 'src/index.tsx'),
-        style: path.join(__dirname, 'src/app.css')
+        main: path.join(__dirname, 'src/index.tsx')
     },
     target: 'web',
     module: {
@@ -28,10 +29,14 @@ module.exports = {
                             'src/**/*.{ts,tsx}'
                         ],
                         getCustomTransformers: () => ({
-                            before: [ tsImportPlugin ]
+                            before: [ tsImportPluginFactory( {
+                                libraryDirectory: 'es',
+                                style: 'css'
+                              }) ]
                         }),
                         compilerOptions: {
-                            module: 'es2015'
+                            module: 'es2015',
+                            declaration: false
                         }
                     }
                 },
@@ -51,10 +56,14 @@ module.exports = {
     devtool: 'source-map',
     resolve: {
         extensions: ['.ts', '.js', '.jsx', '.tsx', '.css'],
+        alias: {
+            mobx: __dirname + "/node_modules/mobx/lib/mobx.es6.js"
+        }
     },
     output: {
-        filename: '[name].js',
-        path: path.join(__dirname, 'dist/'),
+        filename: '[name].js', /* Independent Entry Bundle */
+        chunkFilename: '[name].chunk.js', /* Code splitting generated bundles */
+        path: path.join(__dirname, 'dist'),
         libraryTarget: 'window',
         library: ''
     },
@@ -78,14 +87,41 @@ module.exports = {
         }
     },
     plugins: [
-        new CheckerPlugin(),
+        new CleanWebpackPlugin(),
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en-au/),
-        new HtmlWebpackPlugin({template: 'public/index.html', inject: false, hash: true, title: 'app-forms'}),
-        new MiniCssExtractPlugin({filename:"style.css", chunkFilename: "[id].css"}),
-        // new BundleAnalyzerPlugin()
+        new CheckerPlugin(),
+        new MiniCssExtractPlugin({
+            filename: '[name].css',
+            chunkFilename: '[name].[id].chunk.css',
+            allChunks: true
+        }),
+        new HtmlWebpackPlugin({template: 'public/index.html', hash: true, title: 'app-forms'})
+        //, new BundleAnalyzerPlugin()
     ],
     optimization: {
-        minimize: false,
-        splitChunks: { chunks: "initial", name: "vendor" }
+        runtimeChunk: isDevelopment,
+        minimize: !isDevelopment,
+        splitChunks: {
+            cacheGroups: {
+                default: false,
+                vendors: false,
+                // vendor chunk
+                vendor: {
+                    // sync + async chunks
+                    chunks: 'all',
+                    // import file path containing node_modules
+                    test: /node_modules/,
+                    priority: 20
+                },
+                common: {
+                    name: 'common',
+                    minChunks: 2,
+                    chunks: 'async',
+                    priority: 10,
+                    reuseExistingChunk: true,
+                    enforce: true
+                }
+            }
+        }
     }
 };
