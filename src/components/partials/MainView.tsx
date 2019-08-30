@@ -19,11 +19,8 @@ export const MainView: React.FC<any> = () => {
 
     const localStore = useLocalStore(() => ({
         isAdmin: store.auth.group == "Admin",
-        isAccountAdmin: store.auth.group == "AccountAdmin",
-        viewName: store.view.currentView.name
+        isAccountAdmin: store.auth.group == "AccountAdmin"
     }));
-
-    console.log("MainView", store.view.currentView);
 
     return useObserver(() => {
         return <div>
@@ -33,12 +30,12 @@ export const MainView: React.FC<any> = () => {
         <Layout.Content className="fl-content">
             <div className="fl-main">
                 <React.Suspense fallback="Loading...">
-                    {localStore.viewName == 'canvas' && <Canvas />}
-                    {localStore.viewName == 'forms'  && <FormsView />}
-                    {/* {localStore.viewName == 'users'  && <UsersView />} */}
-                    {localStore.viewName == 'admin'  && localStore.isAdmin && <AdminView />}
-                    {localStore.viewName == 'accounts' && localStore.isAdmin && <AccountsView />}
-                    {localStore.viewName == 'admin' && localStore.isAccountAdmin && <AccountAdminView/>}
+                    {store.view.currentView.name == 'canvas' && <Canvas />}
+                    {store.view.currentView.name == 'forms'  && <FormsView />}
+                    {/* {store.view.currentView.name == 'users'  && <UsersView />} */}
+                    {store.view.currentView.name == 'admin'  && localStore.isAdmin && <AdminView />}
+                    {store.view.currentView.name == 'accounts' && localStore.isAdmin && <AccountsView />}
+                    {store.view.currentView.name == 'admin' && localStore.isAccountAdmin && <AccountAdminView/>}
                 </React.Suspense>
             </div>
         </Layout.Content>

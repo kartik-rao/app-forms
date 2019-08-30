@@ -4,7 +4,9 @@ import {Views} from "../RouteNames";
 
 export const createViewStore = () => {
     const store = {
-        currentView: null as string,
+        currentView: {
+            name: ''
+        } as any,
         loading: false,
         debug: location.href.indexOf('localhost') > -1,
         get isLoading() {
@@ -23,6 +25,7 @@ export const createViewStore = () => {
             return Views[this.currentView.name].path;
         },
         showView: function(name: string) {
+            console.log(`ViewStore.showView - view [${name}]`)
             if (name && Views[name]) {
                 this.currentView = Views[name]
             } else {

@@ -74,12 +74,17 @@ export const App : React.FC<IAppProps> = (props: IAppProps) => {
     const store = createAppStore();
     startRouter(store);
     console.log("App");
+
     return useObserver(() => {
         return <AppStoreProvider store={store}><Layout className="fl-layout">
             <Row type="flex" justify="center" align="top">
             <Col span={24}>
                 <AppStoreProvider>
-                    <Authenticator hide={[Greetings]} signUpConfig={signUpConfig}>
+                    <Authenticator signUpConfig={signUpConfig}
+                        authState="signIn"
+                        authData={store.auth.user}
+                        onStateChange={(authState) => store.auth.setAuthState(authState)}
+                        hide={[Greetings]}>
                         {store.auth.isSignedIn && <MainView />}
                     </Authenticator>
                 </AppStoreProvider>

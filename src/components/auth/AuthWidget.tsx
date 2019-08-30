@@ -3,7 +3,7 @@ import { useObserver } from 'mobx-react';
 import * as React from 'react';
 import { appStoreContext } from '../../stores/AppStoreProvider';
 
-export const AuthWidget: React.FC<any> = () => {
+export const AuthWidget: React.FC<any> = ({children}) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
     return useObserver(() => {
@@ -35,6 +35,7 @@ export const AuthWidget: React.FC<any> = () => {
         <VerifyContact/>
         <ForgotPassword/>
         <TOTPSetup/>
+        {children}
     </Authenticator>
     })
 }

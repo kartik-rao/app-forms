@@ -1,7 +1,7 @@
 import Auth, { CognitoUser } from "@aws-amplify/auth";
 import { Hub } from "@aws-amplify/core";
 import { CognitoUserSession } from "amazon-cognito-identity-js";
-import { observable } from "mobx";
+import { observable, toJS } from "mobx";
 
 export const createAuthStore = () => {
     const store = {
@@ -39,33 +39,6 @@ export const createAuthStore = () => {
             });
             return response.json();
         },
-        onHubCapsule : function(capsule) {
-            // The Auth module will emit events when user signs in, signs out, etc
-            const { channel, payload, source } = capsule;
-            if (channel === 'auth') {
-                switch (payload.event) {
-                    case 'signIn':
-                        Auth.currentAuthenticatedUser().then((user:CognitoUser) => {
-                            this.handleAuthResponse(user);
-                        }).catch(e => {
-                            this.authError = e.message;
-                            this.setAuthState('signIn');
-                        });
-                        break;
-                    case 'signIn_failure':
-                        this.setAuthState('signIn');
-                        this.setAuthData(null);
-                        this.authError = payload.data.message;
-                        break;
-                    case 'signUp_failure':
-                        this.setAuthData(null);
-                        this.setAuthState('signIn');
-                        this.authError = payload.data.message;
-                    default:
-                        break;
-                }
-            }
-        },
         signOut: function () {
             Auth.signOut().then(() => {
                 this.setAuthState('signIn');
@@ -73,17 +46,6 @@ export const createAuthStore = () => {
                 console.log(e);
             });
         },
-        initialize: function() {
-            // let the Hub module listen on Auth events
-            Hub.listen('auth', this);
-            this.setAuthState("loading");
-            Auth.currentAuthenticatedUser().then(user => {
-                this.handleAuthResponse(user);
-            }).catch(e => {
-                this.setAuthState('signIn');
-            });
-        },
-
         setAuthState: function (authState: string) {
             this.authState = authState;
         },
@@ -118,6 +80,42 @@ export const createAuthStore = () => {
             }
         }
     }
-    return observable(store);
+    // let the Hub module listen on Auth events
+    let _store = observable(store);
+    Hub.listen('auth', (capsule) => {
+        // The Auth module will emit events when user signs in, signs out, etc
+        console.log("Hub.listen > auth", capsule);
+        const { channel, payload } = capsule;
+        if (channel === 'auth') {
+            switch (payload.event) {
+                case 'signIn':
+                    Auth.currentAuthenticatedUser().then((user:CognitoUser) => {
+                        _store.handleAuthResponse(user);
+                    }).catch(e => {
+                        _store.authError = e.message;
+                        _store.setAuthState('signIn');
+                    });
+                    break;
+                case 'signIn_failure':
+                    _store.setAuthState('signIn');
+                    _store.setAuthData(null);
+                    _store.authError = payload.data.message;
+                    break;
+                case 'signUp_failure':
+                    _store.setAuthData(null);
+                    _store.setAuthState('signIn');
+                    _store.authError = payload.data.message;
+                default:
+                    break;
+            }
+        }
+        console.log(JSON.stringify(toJS(_store.authData)));
+    });
+    Auth.currentAuthenticatedUser().then(user => {
+        _store.handleAuthResponse(user);
+    }).catch(e => {
+        _store.setAuthState('signIn');
+    });
+    return _store;
 }
 export type AuthStoreType = ReturnType<typeof createAuthStore>;
