@@ -1,23 +1,17 @@
-import { observable, action } from 'mobx';
-import createHistory from 'history/createBrowserHistory';
+import * as history from "history";
+import { observable } from 'mobx';
 
-export interface IRouterStore {
-    location: any;
-    match: any;
-    history: any;
-    setRoute: (location: any, match: any, history: any) => void;
+export const createRouterStore = () => {
+    const store = {
+        location: {},
+        match: {},
+        history: history.createBrowserHistory(),
+        setRoute: function (location, match, history) {
+            this.location = location;
+            this.match = match;
+            this.history = history;
+        }
+    };
+    return observable(store);
 }
-
-class RouterStore implements IRouterStore {
-  @observable location = {};
-  @observable match = {};
-  @observable history = createHistory();
-
-  @action setRoute(location, match, history) {
-    this.location = location;
-    this.match = match;
-    this.history = history;
-  }
-}
-
-export default new RouterStore();
+export type RouterStoreType = ReturnType<typeof createRouterStore>;

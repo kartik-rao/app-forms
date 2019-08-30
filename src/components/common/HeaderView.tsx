@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import {AppMenu} from "./NavigationView";
+import {NavigationView} from "./NavigationView";
 
 export class Header extends React.Component<any, any> {
     props: any;
@@ -10,6 +10,7 @@ export class Header extends React.Component<any, any> {
     }
 
     render() {
-        return <AppMenu store={this.props.store}/>
+        console.log("HeaderView");
+        return <NavigationView />
     }
 }

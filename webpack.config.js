@@ -2,7 +2,6 @@ var path = require('path');
 
 const webpack = require('webpack');
 const tsImportPluginFactory = require('ts-import-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -87,7 +86,6 @@ module.exports = {
         }
     },
     plugins: [
-        new CleanWebpackPlugin(),
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en-au/),
         new CheckerPlugin(),
         new MiniCssExtractPlugin({

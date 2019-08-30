@@ -1,17 +1,12 @@
-import * as React from "react";
-import { IRootStore } from "../../stores/RootStore";
-import {observable, action} from "mobx";
-import  API, {graphqlOperation } from "@aws-amplify/api";
-import * as queries from '../../graphql/queries';
-import {  Button, Spin, Tabs, Row, Col, List } from "antd";
-import { observer } from "mobx-react";
-import { UsersView } from "./UsersView";
+import API, { graphqlOperation } from "@aws-amplify/api";
+import { Button, Col, List, Row, Tabs } from "antd";
 import PageHeader from "antd/lib/page-header";
+import { useLocalStore, useObserver } from "mobx-react";
 import * as moment from "moment";
-
-export interface IAccountAdminViewProps {
-    store: IRootStore;
-}
+import * as React from "react";
+import * as queries from '../../graphql/queries';
+import { appStoreContext } from "../../stores/AppStoreProvider";
+import { UsersView } from "./UsersView";
 
 const Description = ({ term, children, span = 12 }) => (
     <Col span={span}>
@@ -22,66 +17,68 @@ const Description = ({ term, children, span = 12 }) => (
     </Col>
 );
 
-@observer
-export class AccountAdminView extends React.Component<IAccountAdminViewProps, any> {
+export const AccoountAdminView : React.FC<any> = () => {
+    const store = React.useContext(appStoreContext);
+    if(!store) throw new Error("Store is null");
 
-    props: IAccountAdminViewProps;
-    @observable account: any;
-    @observable errors: any[];
-
-    constructor(props: IAccountAdminViewProps) {
-        super(props);
-        this.props = props;
-        this.fetch();
-    }
-
-    @action async fetch() {
-        this.props.store.showLoading();
-
-        try{
-            let {tenant} = this.props.store.authStore;
-            let args = {accountId: tenant};
-            let account: any = await API.graphql(graphqlOperation(queries.getAccount, args));
-            this.account = account.data.getAccount;
-        } catch (errorResponse) {
-            console.log("ERROR", errorResponse);
-            this.errors = errorResponse.errors;
-        }
-        this.props.store.hideLoading();
-    }
-
-    @action.bound updateView() {
-        this.fetch();
-    }
-
-    render() {
-        let {isLoading} = this.props.store;
-        let showErrors = this.props.store.debug && this.errors;
-        return <>
-            {showErrors && <List dataSource={this.errors} renderItem={item => (
-                    <List.Item>{item.message}</List.Item>
-            )}/>}
-            {!isLoading && this.account && <PageHeader title={this.account.name}
-                subTitle={this.account.plan ? this.account.plan.planType.name : 'FREE'}
-                extra={[ <Button key="1">Change Plan</Button> ]}
-                footer={
-                    <Tabs defaultActiveKey="1" animated={false}>
-                        <Tabs.TabPane tab="Users" key="1" style={{paddingTop: "20px"}}>
-                            <UsersView store={this.props.store} onUpdate={this.updateView} users={this.account.users.items || []}/>
-                        </Tabs.TabPane>
-                        <Tabs.TabPane tab="Subscription" key="2" />
-                    </Tabs>
-                }>
-                <div className="fl-pageheader-wrap">
-                    <Row>
-                        <Description term="Primary Contact"><a href={"mailto:"+this.account.ownedBy.email}>{this.account.ownedBy.given_name} {this.account.ownedBy.family_name}</a></Description>
-                        <Description term="ID">{this.account.id}</Description>
-                        <Description term="Created">{moment(this.account.createdAt).format("Do MMMM YYYY")}</Description>
-                        <Description term="Updated">{this.account.updatedAt ? moment(this.account.updatedAt).format("DD Mon YYYY"): ""}</Description>
-                    </Row>
-                </div>
-                </PageHeader>
+    const localStore = useLocalStore(() => ({
+        account: {} as any,
+        errors: [] as any[],
+        fetch : async function() {
+            store.view.showLoading();
+            try{
+                let args = {accountId: store.auth.tenant};
+                let account: any = await API.graphql(graphqlOperation(queries.getAccount, args));
+                this.account = account.data.getAccount;
+            } catch (errorResponse) {
+                console.log("ERROR", errorResponse);
+                this.errors = errorResponse.errors;
             }
-        </>
-    }
+            store.view.hideLoading();
+        },
+        updateView: function () {
+            this.fetch();
+        },
+        get showErrors() {
+            return store.view.debug && this.errors && this.errors.length > 0;
+        },
+        get createdAt() {
+            return this.account ? moment(this.account.createdAt).format("Do MMMM YYYY") : "";
+        },
+        get updatedAt() {
+            return this.account && this.account.updatedAt ? moment(this.account.updatedAt).format("Do MMMM YYYY") : "";
+        },
+        get mailTo() {
+            return `mailto:${this.account.ownedBy.email}`;
+        }
+    }));
+
+    return useObserver(() => {
+        return <>
+        {localStore.showErrors && <List dataSource={localStore.errors} renderItem={item => (
+            <List.Item>{item.message}</List.Item>
+        )}/>}
+        {!store.view.isLoading && localStore.account && <PageHeader title={localStore.account.name}
+            subTitle={localStore.account.plan ? localStore.account.plan.planType.name : 'FREE'}
+            extra={[ <Button key="1">Change Plan</Button> ]}
+            footer={
+                <Tabs defaultActiveKey="1" animated={false}>
+                    <Tabs.TabPane tab="Users" key="1" style={{paddingTop: "20px"}}>
+                        <UsersView onUpdate={localStore.updateView} users={localStore.account.users || []}/>
+                    </Tabs.TabPane>
+                    <Tabs.TabPane tab="Subscription" key="2" />
+                </Tabs>
+            }>
+            <div className="fl-pageheader-wrap">
+                <Row>
+                    <Description term="Primary Contact"><a href={localStore.mailTo}></a>{localStore.account.ownedBy.given_name} {localStore.account.ownedBy.family_name}</Description>
+                    <Description term="ID">{localStore.account.id}</Description>
+                    <Description term="Created">{localStore.createdAt}</Description>
+                    <Description term="Updated">{localStore.updatedAt}</Description>
+                </Row>
+            </div>
+            </PageHeader>
+        }
+    </>
+    })
 }

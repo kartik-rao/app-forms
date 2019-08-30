@@ -1,55 +1,40 @@
+import { Authenticator, ConfirmSignIn, ConfirmSignUp, ForgotPassword, Greetings, RequireNewPassword, SignIn, SignUp, TOTPSetup, VerifyContact } from "aws-amplify-react";
+import { useObserver } from 'mobx-react';
 import * as React from 'react';
-import {IRootStore} from '../../stores/RootStore';
-import { observer } from 'mobx-react';
+import { appStoreContext } from '../../stores/AppStoreProvider';
 
-import {Authenticator, Greetings, SignIn, ConfirmSignIn, RequireNewPassword, SignUp,
-    ConfirmSignUp, VerifyContact, ForgotPassword, TOTPSetup} from "aws-amplify-react";
+export const AuthWidget: React.FC<any> = () => {
+    const store = React.useContext(appStoreContext);
+    if(!store) throw new Error("Store is null");
+    return useObserver(() => {
+        return <Authenticator
+        // Optionally hard-code an initial state
+        authState="signIn"
+        // Pass in an already authenticated CognitoUser or FederatedUser object
+        authData={store.auth.user}
+        // Fired when Authentication State changes
+        onStateChange={(authState) => store.auth.setAuthState(authState)}
 
-export interface IAuthProps {
-    store: IRootStore;
+        hide={
+            [
+                Greetings
+            ]
+        }
+        // or hide all the default components
+        // hideDefault={true}
+        // Pass in an aws-exports configuration
+        // amplifyConfig={myAWSExports}
+        // Pass in a message map for error strings
+        // errorMessage={myMessageMap}
+        >
+        <SignIn />
+        <ConfirmSignIn/>
+        <RequireNewPassword/>
+        <SignUp/>
+        <ConfirmSignUp/>
+        <VerifyContact/>
+        <ForgotPassword/>
+        <TOTPSetup/>
+    </Authenticator>
+    })
 }
-
-@observer
-export class Auth extends React.Component<IAuthProps, any> {
-    store: IRootStore
-    constructor(props: IAuthProps) {
-        super(props);
-    }
-
-    render() {
-        let {authStore} = this.props.store;
-        return (
-            <Authenticator
-                // Optionally hard-code an initial state
-                authState="signIn"
-                // Pass in an already authenticated CognitoUser or FederatedUser object
-                authData={authStore.user}
-                // Fired when Authentication State changes
-                onStateChange={(authState) => authStore.setAuthState(authState)}
-
-                hide={
-                    [
-                        Greetings
-                    ]
-                }
-                // or hide all the default components
-                // hideDefault={true}
-                // Pass in an aws-exports configuration
-                // amplifyConfig={myAWSExports}
-                // Pass in a message map for error strings
-                // errorMessage={myMessageMap}
-            >
-                <SignIn />
-                <ConfirmSignIn/>
-                <RequireNewPassword/>
-                <SignUp/>
-                <ConfirmSignUp/>
-                <VerifyContact/>
-                <ForgotPassword/>
-                <TOTPSetup/>
-            </Authenticator>
-        )
-    }
-}
-
-export default Auth
