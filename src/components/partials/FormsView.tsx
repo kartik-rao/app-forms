@@ -1,5 +1,5 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
-import { Button, Card, Col, Divider, Drawer, Row } from "antd";
+import { Button, Card, Col, Divider, Drawer, Row, Skeleton } from "antd";
 import Typography from "antd/lib/typography";
 import { useLocalStore, useObserver } from "mobx-react";
 import moment from "moment";
@@ -19,21 +19,7 @@ export const FormsView : React.FC<any> = () => {
         errors: [] as any[],
         showAdd: false,
         selectedItems: [] as any[],
-        fetch: async function() {
-            let response;
-            let args = {accountId: store.auth.tenant};
-            store.view.showLoading();
-            try {
-                response = await API.graphql(graphqlOperation(queries.getAccount, args));
-                let {forms} = response.data.getAccount;
-                if (forms) {
-                    this.forms = forms;
-                }
-            } catch (errorResponse) {
-                this.errors = errorResponse.errors;
-            }
-            store.view.hideLoading();
-        },
+        loading: true,
         handleAdd: async function (values: any) {
             console.log("FormsView.handleAdd values", values);
             let addFormResponse;
@@ -121,26 +107,44 @@ export const FormsView : React.FC<any> = () => {
             )
         }
     ];
-
+    React.useEffect(() => {
+        async function fetch () {
+            localStore.loading = true;
+            try {
+                let response = await API.graphql(graphqlOperation(queries.listForms));
+                localStore.forms = response.data.listForms;
+            } catch (errorResponse) {
+                console.error(errorResponse);
+                localStore.errors = errorResponse.errors;
+            }
+            if (!localStore.forms) {
+                localStore.forms = [];
+            }
+            localStore.loading = false;
+        }
+        fetch();
+    }, [])
     return  useObserver(() => {
-        return <Row style={{height: '100%', marginTop: '50px'}}>
-            <Col span={20} offset={2} style={{padding:"25px"}}>
-                <Card title={"All Forms"} style={{padding: 0}}>
-                    <Typography style={{float: "left"}}>{localStore.hasSelectedItems ? `Selected ${localStore.selectedItems.length} of ${localStore.forms.length}` : ''}</Typography>
-                    <>
-                    <React.Fragment>
-                        <Button icon="plus" type="primary" style={{float: 'right'}} onClick={()=>{localStore.showAddForm(true)}}>Add</Button>
-                    </React.Fragment>
-                    </>
-                </Card>
-                {!store.view.isLoading && <TableWrapper errors={localStore.errors} debug={store.view.debug}
-                    data={localStore.forms} columns={columns} bordered={true} rowKey="id"
-                    pagination={false} onSelection={localStore.setSelectedItems}/>}
-                {localStore.showAdd && <Drawer title="Add Form" placement="right" closable={true} onClose={() => localStore.showAdd = false} visible={localStore.showAdd}>
-                    <AddFormView onAdd={localStore.handleAdd}/>
-                </Drawer>}
-            </Col>
-      </Row>
+        return <Row>
+        <Col span={20} offset={2} style={{padding:"25px"}}>
+            {
+                localStore.loading ? <Skeleton active />:
+                <>
+                    <Card title={"All forms"} style={{padding: 0}}>
+                        <Typography style={{float: "left"}}>{localStore.hasSelectedItems ? `Selected ${localStore.selectedItems.length} of ${localStore.forms.length}` : ''}</Typography>
+                        <>
+                        {/* <React.Fragment>
+                            <Button icon="plus" type="primary" style={{float: 'right'}} onClick={()=>{localStore.showAddUser(true)}}>Add</Button>
+                        </React.Fragment> */}
+                        </>
+                    </Card>
+                    {<TableWrapper errors={localStore.errors} debug={store.view.debug}
+                        data={localStore.forms} columns={columns} bordered={true} rowKey="id"
+                        pagination={false} onSelection={localStore.setSelectedItems}/>}
+                </>
+            }
+        </Col>
+  </Row>
     });
 }
 

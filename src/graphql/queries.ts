@@ -338,22 +338,20 @@ export const getForm = `query GetForm($formId: String!) {
   }
 }`;
 
-export const listForms = `query ListForms() {
-  listForms() {
-    items {
+export const listForms = `query  {
+  listForms {
       id
-      owner
+      ownedBy {email given_name family_name}
       name
-      desc
+      description
       versionId
-      formData {id ownedBy {id email group given_name family_name} createdAt notes}
       account {id name}
       createdAt
       updatedAt
-      startsAt
-      endsAt
+      startsDate
+      endsDate
       isPaused
-    }
+      isDeleted
   }
 }
 `;
