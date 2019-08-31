@@ -1,6 +1,6 @@
 import Auth, { CognitoUser } from "@aws-amplify/auth";
 import { Hub } from "@aws-amplify/core";
-import { CognitoUserSession } from "amazon-cognito-identity-js";
+import { CognitoUserSession, CognitoUserAttribute } from "amazon-cognito-identity-js";
 import { observable, toJS } from "mobx";
 
 export const createAuthStore = () => {
@@ -10,11 +10,11 @@ export const createAuthStore = () => {
         authError: "",
         attributes: {},
         handleAuthResponse: function(user: CognitoUser) {
-            user.getUserAttributes((err, attributes=[]) => {
+            user.getUserAttributes((err, attributes: CognitoUserAttribute[]=[]) => {
                 if(!err) {
                     let attrs = {}
                     attributes.forEach((attr) => {
-                        attrs[attr["Name"]] = attr["Value"];
+                        attrs[attr.getName()] = attr.getValue();
                     })
                     this.setUserAttributes(attrs);
                     this.setAuthState('signedIn');
@@ -78,13 +78,18 @@ export const createAuthStore = () => {
             } else {
                 return null;
             }
+        },
+        get isAdmin() {
+            return this.attributes && this.attributes["custom:group"] == "Admin";
+        },
+        get isAccountAdmin() {
+            return this.attributes && this.attributes["custom:group"] == "AccountAdmin";
         }
     }
     // let the Hub module listen on Auth events
     let _store = observable(store);
     Hub.listen('auth', (capsule) => {
         // The Auth module will emit events when user signs in, signs out, etc
-        console.log("Hub.listen > auth", capsule);
         const { channel, payload } = capsule;
         if (channel === 'auth') {
             switch (payload.event) {
@@ -109,7 +114,6 @@ export const createAuthStore = () => {
                     break;
             }
         }
-        console.log(JSON.stringify(toJS(_store.authData)));
     });
     Auth.currentAuthenticatedUser().then(user => {
         _store.handleAuthResponse(user);

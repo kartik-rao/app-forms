@@ -4,7 +4,7 @@ import { PlanTypesView } from "./PlanTypesView";
 
 export const AdminView : React.FC<any> = () => {
     return <div>
-        <PlanTypesView store={this.props.store} />
+        <PlanTypesView  />
         <Card title="Integration Types"></Card>
     </div>
 }

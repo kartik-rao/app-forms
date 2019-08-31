@@ -10,7 +10,6 @@ export class Header extends React.Component<any, any> {
     }
 
     render() {
-        console.log("HeaderView");
         return <NavigationView />
     }
 }

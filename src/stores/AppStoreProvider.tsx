@@ -8,7 +8,7 @@ export interface AppStoreProviderProps {
 }
 
 export const AppStoreProvider: React.FC<AppStoreProviderProps> = ({store, children}) => {
-    console.log("AppStoreProvider");
+
     if(!store) {
       store = createAppStore();
     }

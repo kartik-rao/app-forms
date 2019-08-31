@@ -64,7 +64,7 @@ export const AccoountAdminView : React.FC<any> = () => {
             footer={
                 <Tabs defaultActiveKey="1" animated={false}>
                     <Tabs.TabPane tab="Users" key="1" style={{paddingTop: "20px"}}>
-                        <UsersView onUpdate={localStore.updateView} users={localStore.account.users || []}/>
+                        {/* <UsersView onUpdate={localStore.updateView} users={localStore.account.users || []}/> */}
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Subscription" key="2" />
                 </Tabs>

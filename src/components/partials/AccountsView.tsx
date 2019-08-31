@@ -1,40 +1,30 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
-import { Col, Empty, List, Row, Spin, Table } from "antd";
-import { useLocalStore } from "mobx-react";
+import { Card, Col, Row, Typography, Skeleton } from "antd";
+import { useLocalStore, useObserver } from "mobx-react";
 import * as React from "react";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
+import { Loading } from "../common/Loading";
+import { TableWrapper } from "../common/TableWrapper";
 
 export const AccountsView : React.FC<any> = () => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
     const localStore = useLocalStore(() => ({
-        accounts: [],
-        loading: false,
-        errors: [],
+        accounts: [] as any[],
+        loading: true,
+        errors: [] as any[],
+        selectedItems : [] as any[],
         get showErrors() {
             return store.view.debug && this.errors;
         },
-        get showAccounts() {
-            return !this.loading && this.accounts && this.accounts.length > 0;
+        setSelectedItems(selectedItems) {
+            this.selectedItems = selectedItems;
+            console.log(selectedItems);
         },
-        get showEmpty() {
-            return !this.loading && (!this.accounts || this.accounts.length == 0);
-        },
-        fetch : async function () {
-            this.loading = true;
-            try {
-                let allAccounts = await API.graphql(graphqlOperation(queries.listAccounts));
-                this.accounts = allAccounts['data']['listAccounts'];
-            } catch (errorResponse) {
-                console.error(errorResponse);
-                this.errors = errorResponse.errors;
-            }
-            if (!this.accounts) {
-                this.accounts = [];
-            }
-            this.loading = false;
+        get hasSelectedItems() {
+            return this.selectedItems.length > 0;
         }
     }));
 
@@ -48,18 +38,53 @@ export const AccountsView : React.FC<any> = () => {
         key: 'owner'
     }, {
         title: 'Plan',
-        dataIndex: 'planId',
-        key: 'planId'
+        dataIndex: 'plan.planType.name',
+        key: 'plan'
+    },
+    {
+        title: 'Users',
+        dataIndex: 'numUsers',
+        key: 'numUsers'
+    },
+    {
+        title: 'Forms',
+        dataIndex: 'numForms',
+        key: 'numForms'
     }];
 
-    return <Row>
-        <Col span={20} offset={2}>
-            {localStore.loading && <Spin size="large" />}
-            {localStore.showAccounts && <Table dataSource={this.accounts} columns={columns} rowKey="id"/>}
-            {localStore.showEmpty && <Empty/> }
-            {localStore.showErrors && <List dataSource={localStore.errors} renderItem={item => (
-                <List.Item>{item.message}</List.Item>
-            )}/>}
+    React.useEffect(() => {
+        let fetch  = async () => {
+            localStore.loading = true;
+            try {
+                let allAccounts = await API.graphql(graphqlOperation(queries.listAccounts));
+                localStore.accounts = allAccounts['data']['listAccounts'];
+            } catch (errorResponse) {
+                console.error(errorResponse);
+                localStore.errors = errorResponse.errors;
+            }
+            if (!localStore.accounts) {
+                localStore.accounts = [];
+            }
+            localStore.loading = false;
+        }
+        fetch();
+    }, []);
+
+    return useObserver(() => {
+        return <Row>
+        <Col span={20} offset={2}  style={{padding:"25px"}}>
+            {
+                localStore.loading ? <Skeleton active /> :
+                <>
+                    <Card title={"All accounts"} style={{padding: 0}}>
+                        <Typography style={{float: "left"}}>{localStore.hasSelectedItems ? `Selected ${localStore.selectedItems.length} of ${localStore.accounts.length}` : ''}</Typography>
+                    </Card>
+                    {<TableWrapper errors={localStore.errors} debug={store.view.debug}
+                        data={localStore.accounts} columns={columns} bordered={true} rowKey="id"
+                        pagination={false} onSelection={localStore.setSelectedItems}/>}
+                </>
+            }
         </Col>
     </Row>
+    });
 }

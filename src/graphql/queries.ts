@@ -10,11 +10,10 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     }
     website
     taxId
-    owner
     ownedBy {
       id
       email
-      group
+      userGroup
       given_name
       family_name
       phone_number
@@ -32,14 +31,13 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     createdAt
     updatedAt
     users {
-      items {id email given_name family_name group createdAt}
+      items {id email given_name family_name userGroup createdAt}
     }
-    forms {
-      items {id name createdAt desc versionId startsAt endsAt isPaused owner ownedBy {given_name family_name email}}
-    }
+    numUsers
+    numForms
   }
-}
-`;
+}`;
+
 export const listAccounts = `query {
   listAccounts {
       id
@@ -47,6 +45,9 @@ export const listAccounts = `query {
       ownedBy {id email given_name family_name}
       createdAt
       updatedAt
+      numUsers
+      numForms
+      plan {planType {name cost} }
   }
 }`;
 
@@ -70,25 +71,20 @@ export const getUser = `query GetUser($userId: ID!) {
     updatedAt
     isDeleted
   }
-}
-`;
-export const listUsers = `query ListUsers() {
-  listUsers() {
-    items {
-      id
-      owner
-      accountId
-      email
-      group
-      given_name
-      family_name
-      phone_number
-      createdAt
-      updatedAt
-      isDeleted
-    }
-  }
 }`;
+
+export const listUsers = `query {listUsers
+  {	id
+    account {id name}
+    email
+    userGroup
+    given_name
+    family_name
+    phone_number
+    createdAt
+    updatedAt
+    isDeleted
+}}`;
 
 export const listAccountUsers = `query ListAccountUsers(
   $accountId: String!

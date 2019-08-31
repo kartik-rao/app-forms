@@ -134,7 +134,7 @@ export const FormsView : React.FC<any> = () => {
                     </>
                 </Card>
                 {!store.view.isLoading && <TableWrapper errors={localStore.errors} debug={store.view.debug}
-                    data={localStore.forms} columns={columns} borderered={true} rowKey="id"
+                    data={localStore.forms} columns={columns} bordered={true} rowKey="id"
                     pagination={false} onSelection={localStore.setSelectedItems}/>}
                 {localStore.showAdd && <Drawer title="Add Form" placement="right" closable={true} onClose={() => localStore.showAdd = false} visible={localStore.showAdd}>
                     <AddFormView onAdd={localStore.handleAdd}/>

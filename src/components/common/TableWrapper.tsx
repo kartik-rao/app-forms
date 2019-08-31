@@ -1,10 +1,9 @@
-import { Button, Card, Empty, Icon, Input, List, Spin, Table } from "antd";
-
+import { Button, Card, Empty, Icon, Input, List, Table } from "antd";
 import { PaginationConfig, TableSize } from "antd/lib/table";
-import { action, computed, observable, toJS } from "mobx";
-import { observer } from "mobx-react";
+import { useLocalStore } from "mobx-react";
+import { useObserver } from "mobx-react-lite";
 import * as React from "react";
-import Highlighter from 'react-highlight-words';
+import { appStoreContext } from "../../stores/AppStoreProvider";
 
 export interface ITableWrapperColumn {
     title: string;
@@ -17,7 +16,7 @@ export interface ITableWrapperColumn {
 export interface ITableWrapperProps {
     columns: ITableWrapperColumn[]
     data: any[]
-    borderered?: boolean;
+    bordered?: boolean;
     pagination?: PaginationConfig | false;
     size?: TableSize;
     rowKey: string;
@@ -27,112 +26,97 @@ export interface ITableWrapperProps {
     onSelection?: any;
 }
 
-@observer
-export class TableWrapper extends React.Component<ITableWrapperProps, any> {
-    columns: ITableWrapperColumn[] = [];
-    size: TableSize;
-    bordered: boolean;
-    rowKey: string;
-    pagination: PaginationConfig | false;
-    debug: boolean = false;
-    actions: React.ReactFragment;
+export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapperProps) => {
+    const store = React.useContext(appStoreContext);
+    if(!store) throw new Error("Store is null");
 
-    @observable data: any[];
-    @observable searchText: string;
-    @observable searchInput: any;
-    @observable selectedRowKeys: any[] = [];
-    @observable searchKeys: any[];
-    @observable errors: any[];
-
-    constructor(props: ITableWrapperProps) {
-        super(props);
-        props.columns.forEach((column) => {
-            if (column.key == "action" || column.hideSearch == true) {
-                this.columns.push(column);
-            } else {
-
-                this.columns.push({
-                    ...column,
-                    ...this.getColumnSearchProps(column.dataIndex, column.title)
-                });
+    const local = useLocalStore(() => ({
+        data : props.data as any[],
+        rowKey : props.rowKey as string,
+        pagination : props.pagination || false as PaginationConfig | false,
+        bordered : props.bordered || false,
+        size : props.size || 'middle',
+        actions : props.actions,
+        debug : props.debug || false,
+        errors : props.errors || [],
+        onSelection : props.onSelection,
+        searchText: null as string,
+        searchInput: null as any,
+        selectedRowKeys: [] as any[],
+        searchKeys: null as any[],
+        get columns() {
+            let cols = [] as ITableWrapperColumn[];
+            props.columns.forEach((column) => {
+                if (column.key == "action" || column.hideSearch == true) {
+                    cols.push(column);
+                } else {
+                    cols.push({
+                        ...column,
+                        ...this.getColumnSearchProps(column.dataIndex, column.title)
+                    });
+                }
+            });
+            return cols
+        },
+        getColumnSearchProps : function (dataIndex: string, title: string) {
+            return {
+                filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
+                    <div style={{ padding: 8 }}>
+                        <Input ref={node => { this.searchInput = node; }} placeholder={`Search ${title}`} value={selectedKeys[0]}
+                        onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                        onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+                        style={{ width: 188, marginBottom: 8, display: 'block' }}
+                        />
+                        <Button type="primary"
+                        onClick={() => this.handleSearch(selectedKeys, confirm)} icon="search" size="small"
+                        style={{ width: 90, marginRight: 8 }} > Search </Button>
+                        <Button onClick={() => this.handleReset(clearFilters)}
+                        size="small" style={{ width: 90 }}
+                        > Reset </Button>
+                    </div>
+                    ),
+                filterIcon: filtered => <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />,
+                onFilter: (value, record) => record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+                onFilterDropdownVisibleChange: (visible) => {
+                if (visible) {
+                    setTimeout(() => this.searchInput.select());
+                }
+                }
             }
-        });
-        this.data = props.data;
-        this.rowKey = props.rowKey;
-        this.pagination = props.pagination || false;
-        this.bordered = props.borderered || false;
-        this.size = props.size || 'middle'
-        this.actions = props.actions;
-        this.debug = props.debug || false;
-        this.errors = props.errors || [];
-    }
-
-    @action onSelectChange = (selectedRowKeys: any[]) => {
-        this.selectedRowKeys = selectedRowKeys;
-        if (this.props.onSelection) {
-            this.props.onSelection(selectedRowKeys);
+        },
+        onSelectChange : function (selectedRowKeys: any[]) {
+            this.selectedRowKeys = selectedRowKeys;
+            if (props.onSelection) {
+                props.onSelection(selectedRowKeys);
+            }
+        },
+        handleSearch : function (selectedKeys: any[], confirm: any) {
+            confirm();
+            this.searchText = selectedKeys[0]
+        },
+        handleReset : function (clearFilters) {
+            clearFilters();
+            this.searchText = '';
+        },
+        get hasSelected() : boolean {
+            return this.selectedRowKeys.length > 0;
+        },
+        get showErrors() {
+            return this.debug && this.errors && this.errors.length > 0;
+        },
+        get isEmpty() {
+            return !this.data || this.data.length == 0;
         }
-    }
-
-    @action handleSearch = (selectedKeys: any[], confirm: any) => {
-        confirm();
-        this.searchText = selectedKeys[0]
-    }
-
-    @action handleReset = (clearFilters) => {
-        clearFilters();
-        this.searchText = '';
-    }
-
-    @computed get hasSelected() : boolean {
-        return this.selectedRowKeys.length > 0;
-    }
-
-    getColumnSearchProps = (dataIndex: string, title: string) => ({
-        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
-          <div style={{ padding: 8 }}>
-            <Input ref={node => { this.searchInput = node; }} placeholder={`Search ${title}`} value={selectedKeys[0]}
-              onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-              onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-              style={{ width: 188, marginBottom: 8, display: 'block' }}
-            />
-            <Button type="primary"
-              onClick={() => this.handleSearch(selectedKeys, confirm)} icon="search" size="small"
-              style={{ width: 90, marginRight: 8 }} > Search </Button>
-            <Button onClick={() => this.handleReset(clearFilters)}
-              size="small" style={{ width: 90 }}
-            > Reset </Button>
-          </div>
-        ),
-        filterIcon: filtered => <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />,
-        onFilter: (value, record) => record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-        onFilterDropdownVisibleChange: (visible) => {
-          if (visible) {
-            setTimeout(() => this.searchInput.select());
-          }
-        }
-    });
-
-    @computed get showErrors() {
-        return this.debug && this.errors && this.errors.length > 0;
-    }
-
-    @computed get isEmpty() {
-        return !this.data || this.data.length == 0;
-    }
-
-    render() {
-        const rowSelection = {
-            selectedRowKeys : this.selectedRowKeys,
-            onChange : this.onSelectChange
-        }
+    }));
+    return useObserver(() => {
         return <div>
-            {!this.isEmpty && <Table rowSelection={rowSelection} dataSource={this.data} bordered={this.bordered}
-                rowKey={this.rowKey} size={this.size} pagination={this.pagination} columns={this.columns}/>}
-            {this.isEmpty && <Card><Empty/></Card> }
-            {this.showErrors && <List dataSource={this.errors} renderItem={(item) => (
-                <List.Item>{item.message}</List.Item>
-            )}/>}
-        </div>
-    }
+        {!local.isEmpty && <Table rowSelection={{selectedRowKeys : local.selectedRowKeys, onChange : local.onSelectChange }}
+            dataSource={local.data} bordered={local.bordered} rowKey={local.rowKey} size={local.size}
+            pagination={local.pagination} columns={local.columns}/>}
+        {local.isEmpty && <Card><Empty/></Card> }
+        {local.showErrors && <List dataSource={local.errors} renderItem={(item) => (
+            <List.Item>{item.message}</List.Item>
+        )}/>}
+    </div>
+    })
 }
