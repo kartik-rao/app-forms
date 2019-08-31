@@ -348,8 +348,8 @@ export const listForms = `query  {
       account {id name}
       createdAt
       updatedAt
-      startsDate
-      endsDate
+      startDate
+      endDate
       isPaused
       isDeleted
   }

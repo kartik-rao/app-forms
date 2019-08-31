@@ -108,7 +108,7 @@ export const FormsView : React.FC<any> = () => {
         }
     ];
     React.useEffect(() => {
-        async function fetch () {
+        let fetch = async function () {
             localStore.loading = true;
             try {
                 let response = await API.graphql(graphqlOperation(queries.listForms));
