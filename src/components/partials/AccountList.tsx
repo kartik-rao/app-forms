@@ -45,7 +45,7 @@ const AccountList: React.FC<FormComponentProps> = (props) => {
             <Form.Item required={false} label="">
                 {props.form.getFieldDecorator('_context')(
                     <Select
-                        size="large"
+                        size="small"
                         showSearch
                         style={{ width: 280 }}
                         placeholder="Account Context"

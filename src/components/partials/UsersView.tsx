@@ -1,15 +1,14 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
-import gql from 'graphql-tag';
-import { Button, Card, Col, Drawer, Row, Tag, Skeleton } from "antd";
+import { Button, Card, Col, Drawer, Row, Skeleton, Tag } from "antd";
 import Typography from "antd/lib/typography";
 import { useLocalStore, useObserver } from "mobx-react";
 import moment from "moment";
 import * as React from "react";
+import { StringFilterExpression, UserFilterInput } from "../../Amplify";
+import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
 import InviteUserView from "./InviteUserView";
-import * as queries from '../../graphql/queries';
-import { Loading } from "../common/Loading";
 
 export interface IUsersViewProps {
     onUpdate?: () => void;
@@ -128,7 +127,11 @@ export const UsersView: React.FC<IUsersViewProps> = (props: IUsersViewProps) => 
             try {
                 if (store.auth.isAdmin) {
                     console.log("Admin Query")
-                    let response = await API.graphql(graphqlOperation(queries.listUsers))
+                    let filter : UserFilterInput;
+                    if (store.auth.context) {
+                        filter = {criteria:[{"accountId":{expression: StringFilterExpression.eq, value: [store.auth.context]}}]}
+                    }
+                    let response = await API.graphql(graphqlOperation(queries.listUsers, {filter : filter}));
                     localStore.users = response['data']['listUsers']
                 } else {
                     console.log("AccountAdmin Query")
@@ -145,7 +148,7 @@ export const UsersView: React.FC<IUsersViewProps> = (props: IUsersViewProps) => 
             localStore.loading = false;
         }
         fetch();
-    }, [])
+    }, [store.auth.context])
 
     return useObserver(() => {
         return <Row>
