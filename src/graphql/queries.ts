@@ -268,30 +268,15 @@ export const getForm = `query GetForm($formId: String!) {
     ownedBy {
       id
       ownerId
-      accountId
       email
       userGroup
       given_name
       family_name
-      phone_number
-      createdAt
-      updatedAt
-      isDeleted
-      numForms
     }
     accountId
     account {
       id
       name
-      website
-      taxId
-      ownerId
-      planId
-      createdAt
-      updatedAt
-      active
-      numForms
-      numUsers
     }
     createdAt
     updatedAt
@@ -299,38 +284,6 @@ export const getForm = `query GetForm($formId: String!) {
     endDate
     isPaused
     isDeleted
-    versions {
-      id
-      formId
-      ownerId
-      createdAt
-      notes
-      formData
-    }
-    integrations {
-      id
-      integrationTypeId
-      ownerId
-      accountId
-      formId
-      active
-      authType
-      auth
-      target
-      method
-      lastExecuted
-      lastExecutionResult
-      lastExecutionResultMessage
-      createdAt
-      updatedAt
-      isDeleted
-    }
-    entries {
-      id
-      formId
-      data
-      createdAt
-    }
   }
 }
 `;

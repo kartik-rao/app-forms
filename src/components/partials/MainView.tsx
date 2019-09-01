@@ -8,8 +8,8 @@ import { Loading } from "../common/Loading";
 import { appStoreContext } from '../../stores/AppStoreProvider';
 import { toJS } from 'mobx';
 import AccountList from './AccountList';
+import { CanvasView } from './CanvasView';
 
-const Canvas = React.lazy(() => import(/* webpackChunkName: "app-canvas" */ "@kartikrao/lib-forms/lib/components/canvas/Canvas").then((module) => {return {default: module.Canvas}}));
 const AccountsView = React.lazy(() => import(/* webpackChunkName: "app-accounts" */ "./AccountsView").then((module) => {return {default: module.AccountsView}}));
 const FormsView = React.lazy(() => import(/* webpackChunkName: "app-forms" */ "./FormsView").then((module) => {return {default: module.FormsView}}));
 const AdminView = React.lazy(() => import(/* webpackChunkName: "app-admin" */ "./AdminView").then((module) => {return {default: module.AdminView}}));
@@ -28,7 +28,7 @@ export const MainView: React.FC<any> = () => {
         <Layout.Content className="fl-content">
             <div className="fl-main">
                 <React.Suspense fallback={<Loading />}>
-                    {store.view.currentView.name == 'canvas' && <Canvas />}
+                    {store.view.currentView.name == 'canvas' && <CanvasView mode="create"/>}
                     {store.view.currentView.name == 'forms'  && <FormsView />}
                     {store.view.currentView.name == 'users'  && <UsersView />}
                     {store.view.currentView.name == 'admin'  && store.auth.isAdmin && <AdminView />}
