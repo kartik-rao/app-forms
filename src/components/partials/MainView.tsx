@@ -7,6 +7,7 @@ import { Loading } from "../common/Loading";
 
 import { appStoreContext } from '../../stores/AppStoreProvider';
 import { toJS } from 'mobx';
+import AccountList from './AccountList';
 
 const Canvas = React.lazy(() => import(/* webpackChunkName: "app-canvas" */ "@kartikrao/lib-forms/lib/components/canvas/Canvas").then((module) => {return {default: module.Canvas}}));
 const AccountsView = React.lazy(() => import(/* webpackChunkName: "app-accounts" */ "./AccountsView").then((module) => {return {default: module.AccountsView}}));
@@ -33,7 +34,6 @@ export const MainView: React.FC<any> = () => {
                     {store.view.currentView.name == 'admin'  && store.auth.isAdmin && <AdminView />}
                     {store.view.currentView.name == 'admin'  && store.auth.isAccountAdmin && <AccountAdminView/>}
                     {store.view.currentView.name == 'accounts' && store.auth.isAdmin && <AccountsView />}
-
                 </React.Suspense>
             </div>
         </Layout.Content>

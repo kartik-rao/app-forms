@@ -1,8 +1,9 @@
-import { Button, Icon, Menu, Spin } from 'antd';
+import { Icon, Menu, Spin, Button } from 'antd';
+import { useObserver } from 'mobx-react';
 import * as React from "react";
-import { observer, useObserver } from 'mobx-react';
+import { Views } from "../../RouteNames";
 import { appStoreContext } from '../../stores/AppStoreProvider';
-import {Views} from "../../RouteNames";
+import AccountList from '../partials/AccountList';
 
 export const NavigationView: React.FC<any> = () => {
     const store = React.useContext(appStoreContext);
@@ -10,7 +11,7 @@ export const NavigationView: React.FC<any> = () => {
 
     let selected = store.view.currentView ? [store.view.currentView.name] : ["home"];
     return useObserver(() => {
-        return <Menu selectedKeys={selected} mode="horizontal" theme="light">
+        return <><Menu selectedKeys={selected} mode="horizontal" theme="light">
         <Menu.Item disabled={true}><h2 style={{margin: 0, fontVariant: "tabular-nums"}}>Forms.li</h2></Menu.Item>
         <Menu.Item key="home" onClick={(e) => store.view.currentView = ""}>
             <Icon type="home" />Home
@@ -33,6 +34,10 @@ export const NavigationView: React.FC<any> = () => {
         <Menu.Item disabled={true}>
             {store.view.isLoading == true && <span><span style={{marginRight: '8px'}}>Loading</span><Spin size="small"/></span>}
         </Menu.Item>
+        {store.auth.isAdmin && <Menu.Item style={{float: "right"}} disabled={true}>
+            {/* <Button>Account</Button> */}
+            <div style={{marginTop: '12px'}}><AccountList/></div>
+        </Menu.Item>}
         <Menu.SubMenu title={store.auth.user && store.auth.user.attributes ? store.auth.user.attributes.email : ""} style={{float:"right"}}>
             <Menu.Item key="profile">
                 <a onClick={(e) => store.view.showView(Views.profile.name)}><Icon type="user"/> Profile</a>
@@ -42,6 +47,7 @@ export const NavigationView: React.FC<any> = () => {
             </Menu.Item>
         </Menu.SubMenu>
     </Menu>
+</>
     })
 }
 

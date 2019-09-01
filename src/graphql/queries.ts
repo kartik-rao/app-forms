@@ -6,76 +6,102 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     id
     name
     addresses {
-      items {name addressee addressType street city state country}
+      id
+      name
+      addressee
+      addressType
+      phone_number
+      email
+      street
+      city
+      state
+      country
     }
     website
     taxId
+    ownerId
     ownedBy {
       id
+      ownerId
+      accountId
       email
       userGroup
       given_name
       family_name
       phone_number
+      createdAt
+      updatedAt
+      isDeleted
+      numForms
     }
     plan {
       id
-      planType {id name}
+      accountId
+      ownerId
+      planTypeId
       startDate
       endDate
       active
       lastBillDate
       createdAt
       updatedAt
+      isDeleted
     }
+    planId
     createdAt
     updatedAt
-    users {
-      items {id email given_name family_name userGroup createdAt}
-    }
-    numUsers
+    active
     numForms
-  }
-}`;
-
-export const listAccounts = `query {
-  listAccounts {
+    numUsers
+    users {
       id
-      name
-      ownedBy {id email given_name family_name}
+      ownerId
+      accountId
+      email
+      userGroup
+      given_name
+      family_name
+      phone_number
       createdAt
       updatedAt
-      numUsers
+      isDeleted
       numForms
-      plan {planType {name cost} }
+    }
+    forms {
+      id
+      ownerId
+      name
+      description
+      versionId
+      accountId
+      createdAt
+      updatedAt
+      startDate
+      endDate
+      isPaused
+      isDeleted
+    }
   }
-}`;
-
+}
+`;
 export const getUser = `query GetUser($userId: ID!) {
   getUser(userId: $userId) {
     id
-    owner
+    ownerId
     accountId
     account {
       id
       name
+      website
+      taxId
+      ownerId
+      planId
       createdAt
       updatedAt
+      active
+      numForms
+      numUsers
     }
-    email
-    group
-    given_name
-    family_name
-    phone_number
-    createdAt
-    updatedAt
-    isDeleted
-  }
-}`;
-
-export const listUsers = `query {listUsers
-  {	id
-    account {id name}
     email
     userGroup
     given_name
@@ -84,77 +110,7 @@ export const listUsers = `query {listUsers
     createdAt
     updatedAt
     isDeleted
-}}`;
-
-export const listAccountUsers = `query ListAccountUsers(
-  $accountId: String!
-) {
-  listAccountUsers(
-    accountId: $accountId
-  ) {
-    items {
-      id
-      owner
-      accountId
-      email
-      group
-      given_name
-      family_name
-      phone_number
-      createdAt
-      updatedAt
-      isDeleted
-    }
-  }
-}`;
-
-export const listAccountUsersActive = `query ListAccountUsersActive(
-  $accountId: String!
-) {
-  listAccountUsersActive(
-    accountId: $accountId
-  ) {
-    items {
-      id
-      owner
-      accountId
-      email
-      group
-      given_name
-      family_name
-      phone_number
-      createdAt
-      updatedAt
-      isDeleted
-    }
-  }
-}
-`;
-export const listAccountUsersInGroup = `query ListAccountUsersInGroup(
-  $accountId: String!
-  $group: String!
-
-
-) {
-  listAccountUsersInGroup(
-    accountId: $accountId
-    group: $group
-
-
-  ) {
-    items {
-      id
-      owner
-      accountId
-      email
-      group
-      given_name
-      family_name
-      phone_number
-      createdAt
-      updatedAt
-      isDeleted
-    }
+    numForms
   }
 }
 `;
@@ -167,23 +123,28 @@ export const getPlan = `query GetPlan($planId: String!) {
       name
       website
       taxId
-      owner
+      ownerId
+      planId
       createdAt
       updatedAt
+      active
+      numForms
+      numUsers
     }
-    owner
+    ownerId
     ownedBy {
       id
-      owner
+      ownerId
       accountId
       email
-      group
+      userGroup
       given_name
       family_name
       phone_number
       createdAt
       updatedAt
       isDeleted
+      numForms
     }
     planTypeId
     startDate
@@ -194,92 +155,90 @@ export const getPlan = `query GetPlan($planId: String!) {
     updatedAt
     planType {
       id
-      owner
+      ownerId
       name
       cost
       active
       billingTerm
       createdAt
       updatedAt
+      isDeleted
     }
-  }
-}
-`;
-export const listPlans = `query ListPlans() {
-  listPlans() {
-    items {
-      id
-      accountId
-      owner
-      planTypeId
-      startDate
-      endDate
-      active
-      lastBillDate
-      createdAt
-      updatedAt
-    }
-  }
-}
-`;
-export const listAccountPlans = `query ListAccountPlans(
-  $accountId: String!
-
-
-) {
-  listAccountPlans(
-    accountId: $accountId
-
-
-  ) {
-    items {
-      id
-      accountId
-      owner
-      planTypeId
-      startDate
-      endDate
-      active
-      lastBillDate
-      createdAt
-      updatedAt
-    }
+    isDeleted
   }
 }
 `;
 export const getActiveAccountPlan = `query GetActiveAccountPlan($accountId: String!) {
   getActiveAccountPlan(accountId: $accountId) {
-    items {
+    id
+    accountId
+    account {
       id
-      accountId
-      owner
-      planTypeId
-      startDate
-      endDate
-      active
-      lastBillDate
+      name
+      website
+      taxId
+      ownerId
+      planId
       createdAt
       updatedAt
+      active
+      numForms
+      numUsers
     }
-  }
-}
-`;
-export const getPlanType = `query GetPlanType($planTypeId: String!) {
-  getPlanType(planTypeId: $planTypeId) {
-    id
-    owner
+    ownerId
     ownedBy {
       id
-      owner
+      ownerId
       accountId
       email
-      group
+      userGroup
       given_name
       family_name
       phone_number
       createdAt
       updatedAt
       isDeleted
+      numForms
+    }
+    planTypeId
+    startDate
+    endDate
+    active
+    lastBillDate
+    createdAt
+    updatedAt
+    planType {
+      id
+      ownerId
+      name
+      cost
+      active
+      billingTerm
+      createdAt
+      updatedAt
+      isDeleted
+    }
+    isDeleted
+  }
+}
+`;
+export const getPlanType = `query GetPlanType($planTypeId: String!) {
+  getPlanType(planTypeId: $planTypeId) {
+    id
+    ownerId
+    ownedBy {
+      id
+      ownerId
+      accountId
+      email
+      userGroup
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+      numForms
     }
     name
     cost
@@ -287,183 +246,90 @@ export const getPlanType = `query GetPlanType($planTypeId: String!) {
     billingTerm
     createdAt
     updatedAt
+    isDeleted
   }
 }
 `;
-export const listPlanTypes = `query {
-  listPlanTypes {
-    id
-    name
-    cost
-    active
-    billingTerm
-    createdAt
-    updatedAt
-  }
-}`;
-
 export const getForm = `query GetForm($formId: String!) {
   getForm(formId: $formId) {
     id
-    owner
+    ownerId
     name
-    desc
+    description
     versionId
     formData {
       id
-      owner
+      formId
+      ownerId
       createdAt
       notes
       formData
     }
     ownedBy {
       id
+      ownerId
+      accountId
       email
-      group
+      userGroup
       given_name
       family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+      numForms
     }
     accountId
+    account {
+      id
+      name
+      website
+      taxId
+      ownerId
+      planId
+      createdAt
+      updatedAt
+      active
+      numForms
+      numUsers
+    }
     createdAt
     updatedAt
-    startsAt
-    endsAt
+    startDate
+    endDate
     isPaused
+    isDeleted
     versions {
-      items {id ownedBy {id email group given_name family_name} createdAt notes}
+      id
+      formId
+      ownerId
+      createdAt
+      notes
+      formData
     }
     integrations {
-      items {id integrationType active}
-    }
-  }
-}`;
-
-export const listForms = `query  {
-  listForms {
       id
-      ownedBy {email given_name family_name}
-      name
-      description
-      versionId
-      account {id name}
+      integrationTypeId
+      ownerId
+      accountId
+      formId
+      active
+      authType
+      auth
+      target
+      method
+      lastExecuted
+      lastExecutionResult
+      lastExecutionResultMessage
       createdAt
       updatedAt
-      startDate
-      endDate
-      isPaused
       isDeleted
-  }
-}
-`;
-export const listAccountForms = `query ListAccountForms(
-  $accountId: String!
-
-
-) {
-  listAccountForms(
-    accountId: $accountId
-
-
-  ) {
-    items {
-      id
-      owner
-      name
-      desc
-      versionId
-      formData {id ownedBy {id email group given_name family_name} createdAt notes}
-      accountId
-      createdAt
-      updatedAt
-      startsAt
-      endsAt
-      isPaused
     }
-  }
-}
-`;
-export const listAccountFormsActive = `query ListAccountFormsActive(
-  $accountId: String!
-  $active: String!
-
-
-) {
-  listAccountFormsActive(
-    accountId: $accountId
-    active: $active
-
-
-  ) {
-    items {
+    entries {
       id
-      owner
-      name
-      desc
-      versionId
-      accountId
+      formId
+      data
       createdAt
-      updatedAt
-      startsAt
-      endsAt
-      isPaused
-    }
-  }
-}
-`;
-export const listAccountFormsByUser = `query ListAccountFormsByUser(
-  $accountId: String!
-  $userId: String!
-
-
-) {
-  listAccountFormsByUser(
-    accountId: $accountId
-    userId: $userId
-
-
-  ) {
-    items {
-      id
-      owner
-      name
-      desc
-      versionId
-      accountId
-      createdAt
-      updatedAt
-      startsAt
-      endsAt
-      isPaused
-    }
-  }
-}
-`;
-export const listAccountFormsByUserActive = `query ListAccountFormsByUserActive(
-  $accountId: String!
-  $userId: String!
-  $active: String!
-
-
-) {
-  listAccountFormsByUserActive(
-    accountId: $accountId
-    userId: $userId
-    active: $active
-
-
-  ) {
-    items {
-      id
-      owner
-      name
-      desc
-      versionId
-      accountId
-      createdAt
-      updatedAt
-      startsAt
-      endsAt
-      isPaused
     }
   }
 }
@@ -471,95 +337,37 @@ export const listAccountFormsByUserActive = `query ListAccountFormsByUserActive(
 export const getIntegrationType = `query GetIntegrationType($integrationTypeId: String!) {
   getIntegrationType(integrationTypeId: $integrationTypeId) {
     id
-    owner
+    ownerId
     ownedBy {
       id
-      owner
+      ownerId
       accountId
       email
-      group
+      userGroup
       given_name
       family_name
       phone_number
       createdAt
       updatedAt
       isDeleted
+      numForms
     }
     planTypeId
     planType {
       id
-      owner
+      ownerId
       name
       cost
       active
       billingTerm
       createdAt
       updatedAt
+      isDeleted
     }
     name
     active
     createdAt
     updatedAt
-  }
-}
-`;
-export const listIntegrationTypes = `query ListIntegrationTypes() {
-  listIntegrationTypes() {
-    items {
-      id
-      owner
-      planTypeId
-      name
-      active
-      createdAt
-      updatedAt
-    }
-  }
-}
-`;
-export const listIntegrationTypesByPlanType = `query ListIntegrationTypesByPlanType(
-  $planTypeId: String!
-
-
-) {
-  listIntegrationTypesByPlanType(
-    planTypeId: $planTypeId
-
-
-  ) {
-    items {
-      id
-      owner
-      planTypeId
-      name
-      active
-      createdAt
-      updatedAt
-    }
-  }
-}
-`;
-export const listIntegrationTypesByPlanTypeActive = `query ListIntegrationTypesByPlanTypeActive(
-  $planTypeId: String!
-  $active: String!
-
-
-) {
-  listIntegrationTypesByPlanTypeActive(
-    planTypeId: $planTypeId
-    active: $active
-
-
-  ) {
-    items {
-      id
-      owner
-      planTypeId
-      name
-      active
-      createdAt
-      updatedAt
-    }
   }
 }
 `;
@@ -569,28 +377,29 @@ export const getIntegration = `query GetIntegration($integrationId: String!) {
     integrationTypeId
     integrationType {
       id
-      owner
+      ownerId
       planTypeId
       name
       active
       createdAt
       updatedAt
     }
-    owner
+    ownerId
     accountId
     formId
     form {
       id
-      owner
+      ownerId
       name
-      desc
+      description
       versionId
       accountId
       createdAt
       updatedAt
-      startsAt
-      endsAt
+      startDate
+      endDate
       isPaused
+      isDeleted
     }
     active
     authType
@@ -602,155 +411,450 @@ export const getIntegration = `query GetIntegration($integrationId: String!) {
     lastExecutionResultMessage
     createdAt
     updatedAt
-  }
-}
-`;
-export const listIntegrations = `query ListIntegrations() {
-  listIntegrations() {
-    items {
-      id
-      integrationTypeId
-      owner
-      accountId
-      formId
-      active
-      authType
-      auth
-      target
-      method
-      lastExecuted
-      lastExecutionResult
-      lastExecutionResultMessage
-      createdAt
-      updatedAt
-    }
-  }
-}
-`;
-export const listAccountIntegrations = `query ListAccountIntegrations(
-  $accountId: String!
-
-
-) {
-  listAccountIntegrations(
-    accountId: $accountId
-
-
-  ) {
-    items {
-      id
-      integrationTypeId
-      owner
-      accountId
-      formId
-      active
-      authType
-      auth
-      target
-      method
-      lastExecuted
-      lastExecutionResult
-      lastExecutionResultMessage
-      createdAt
-      updatedAt
-    }
-  }
-}
-`;
-export const listAccountFormIntegrations = `query ListAccountFormIntegrations(
-  $accountId: String!
-  $formId: String!
-
-
-) {
-  listAccountFormIntegrations(
-    accountId: $accountId
-    formId: $formId
-
-
-  ) {
-    items {
-      id
-      integrationTypeId
-      owner
-      accountId
-      formId
-      active
-      authType
-      auth
-      target
-      method
-      lastExecuted
-      lastExecutionResult
-      lastExecutionResultMessage
-      createdAt
-      updatedAt
-    }
-  }
-}
-`;
-export const listAccountFormIntegrationsActive = `query ListAccountFormIntegrationsActive(
-  $accountId: String!
-  $formId: String!
-  $active: String!
-
-
-) {
-  listAccountFormIntegrationsActive(
-    accountId: $accountId
-    formId: $formId
-    active: $active
-
-
-  ) {
-    items {
-      id
-      integrationTypeId
-      owner
-      accountId
-      formId
-      active
-      authType
-      auth
-      target
-      method
-      lastExecuted
-      lastExecutionResult
-      lastExecutionResultMessage
-      createdAt
-      updatedAt
-    }
+    isDeleted
   }
 }
 `;
 export const getFormEntry = `query GetFormEntry($formEntryId: String!) {
   getFormEntry(formEntryId: $formEntryId) {
     id
-    type
-    meta
+    formId
+    form {
+      id
+      ownerId
+      name
+      description
+      versionId
+      accountId
+      createdAt
+      updatedAt
+      startDate
+      endDate
+      isPaused
+      isDeleted
+    }
+    data
     createdAt
   }
 }
 `;
-export const listFormEntries = `query ListFormEntries($formId: String!) {
-  listFormEntries(formId: $formId) {
-    items {
+export const listAccounts = `query ListAccounts($offsetLimit: OffsetLimit, $filter: AccountFilterInput) {
+  listAccounts(offsetLimit: $offsetLimit, filter: $filter) {
+    id
+    name
+    addresses {
       id
-      type
-      meta
+      name
+      addressee
+      addressType
+      phone_number
+      email
+      street
+      city
+      state
+      country
+    }
+    website
+    taxId
+    ownerId
+    ownedBy {
+      id
+      ownerId
+      accountId
+      email
+      userGroup
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+      numForms
+    }
+    plan {
+      id
+      accountId
+      ownerId
+      planTypeId
+      startDate
+      endDate
+      active
+      lastBillDate
+      createdAt
+      updatedAt
+      isDeleted
+    }
+    planId
+    createdAt
+    updatedAt
+    active
+    numForms
+    numUsers
+    users {
+      id
+      ownerId
+      accountId
+      email
+      userGroup
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+      numForms
+    }
+    forms {
+      id
+      ownerId
+      name
+      description
+      versionId
+      accountId
+      createdAt
+      updatedAt
+      startDate
+      endDate
+      isPaused
+      isDeleted
+    }
+  }
+}
+`;
+export const listUsers = `query ListUsers($offsetLimit: OffsetLimit, $filter: UserFilterInput) {
+  listUsers(offsetLimit: $offsetLimit, filter: $filter) {
+    id
+    ownerId
+    accountId
+    account {
+      id
+      name
+      website
+      taxId
+      ownerId
+      planId
+      createdAt
+      updatedAt
+      active
+      numForms
+      numUsers
+    }
+    email
+    userGroup
+    given_name
+    family_name
+    phone_number
+    createdAt
+    updatedAt
+    isDeleted
+    numForms
+  }
+}
+`;
+export const listPlans = `query ListPlans($offsetLimit: OffsetLimit, $filter: PlanFilterInput) {
+  listPlans(offsetLimit: $offsetLimit, filter: $filter) {
+    id
+    accountId
+    account {
+      id
+      name
+      website
+      taxId
+      ownerId
+      planId
+      createdAt
+      updatedAt
+      active
+      numForms
+      numUsers
+    }
+    ownerId
+    ownedBy {
+      id
+      ownerId
+      accountId
+      email
+      userGroup
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+      numForms
+    }
+    planTypeId
+    startDate
+    endDate
+    active
+    lastBillDate
+    createdAt
+    updatedAt
+    planType {
+      id
+      ownerId
+      name
+      cost
+      active
+      billingTerm
+      createdAt
+      updatedAt
+      isDeleted
+    }
+    isDeleted
+  }
+}
+`;
+export const listPlanTypes = `query ListPlanTypes($offsetLimit: OffsetLimit, $filter: PlanTypeFilterInput) {
+  listPlanTypes(offsetLimit: $offsetLimit, filter: $filter) {
+    id
+    ownerId
+    ownedBy {
+      id
+      ownerId
+      accountId
+      email
+      userGroup
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+      numForms
+    }
+    name
+    cost
+    active
+    billingTerm
+    createdAt
+    updatedAt
+    isDeleted
+  }
+}
+`;
+export const listForms = `query ListForms($offsetLimit: OffsetLimit, $filter: FormFilterInput) {
+  listForms(offsetLimit: $offsetLimit, filter: $filter) {
+    id
+    ownerId
+    name
+    description
+    versionId
+    formData {
+      id
+      formId
+      ownerId
+      createdAt
+      notes
+      formData
+    }
+    ownedBy {
+      id
+      ownerId
+      accountId
+      email
+      userGroup
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+      numForms
+    }
+    accountId
+    account {
+      id
+      name
+      website
+      taxId
+      ownerId
+      planId
+      createdAt
+      updatedAt
+      active
+      numForms
+      numUsers
+    }
+    createdAt
+    updatedAt
+    startDate
+    endDate
+    isPaused
+    isDeleted
+    versions {
+      id
+      formId
+      ownerId
+      createdAt
+      notes
+      formData
+    }
+    integrations {
+      id
+      integrationTypeId
+      ownerId
+      accountId
+      formId
+      active
+      authType
+      auth
+      target
+      method
+      lastExecuted
+      lastExecutionResult
+      lastExecutionResultMessage
+      createdAt
+      updatedAt
+      isDeleted
+    }
+    entries {
+      id
+      formId
+      data
       createdAt
     }
   }
 }
 `;
-export const listFormEntriesByTime = `query ListFormEntriesByTime($formId: String!, $timestampPrefix: String!) {
-  listFormEntriesByTime(formId: $formId, timestampPrefix: $timestampPrefix) {
-    items {
+export const listIntegrationTypes = `query ListIntegrationTypes(
+  $offsetLimit: OffsetLimit
+  $filter: IntegrationTypeFilterInput
+) {
+  listIntegrationTypes(offsetLimit: $offsetLimit, filter: $filter) {
+    id
+    ownerId
+    ownedBy {
       id
-      type
-      meta
+      ownerId
+      accountId
+      email
+      userGroup
+      given_name
+      family_name
+      phone_number
       createdAt
+      updatedAt
+      isDeleted
+      numForms
     }
+    planTypeId
+    planType {
+      id
+      ownerId
+      name
+      cost
+      active
+      billingTerm
+      createdAt
+      updatedAt
+      isDeleted
+    }
+    name
+    active
+    createdAt
+    updatedAt
+  }
+}
+`;
+export const listIntegrations = `query ListIntegrations(
+  $offsetLimit: OffsetLimit
+  $filter: IntegrationFilterInput
+) {
+  listIntegrations(offsetLimit: $offsetLimit, filter: $filter) {
+    id
+    integrationTypeId
+    integrationType {
+      id
+      ownerId
+      planTypeId
+      name
+      active
+      createdAt
+      updatedAt
+    }
+    ownerId
+    accountId
+    formId
+    form {
+      id
+      ownerId
+      name
+      description
+      versionId
+      accountId
+      createdAt
+      updatedAt
+      startDate
+      endDate
+      isPaused
+      isDeleted
+    }
+    active
+    authType
+    auth
+    target
+    method
+    lastExecuted
+    lastExecutionResult
+    lastExecutionResultMessage
+    createdAt
+    updatedAt
+    isDeleted
+  }
+}
+`;
+export const listFormEntries = `query ListFormEntries($offsetLimit: OffsetLimit, $formId: String!) {
+  listFormEntries(offsetLimit: $offsetLimit, formId: $formId) {
+    id
+    formId
+    form {
+      id
+      ownerId
+      name
+      description
+      versionId
+      accountId
+      createdAt
+      updatedAt
+      startDate
+      endDate
+      isPaused
+      isDeleted
+    }
+    data
+    createdAt
+  }
+}
+`;
+export const listFormEntriesByTime = `query ListFormEntriesByTime(
+  $offsetLimit: OffsetLimit
+  $formId: String!
+  $timestampPrefix: String!
+) {
+  listFormEntriesByTime(
+    offsetLimit: $offsetLimit
+    formId: $formId
+    timestampPrefix: $timestampPrefix
+  ) {
+    id
+    formId
+    form {
+      id
+      ownerId
+      name
+      description
+      versionId
+      accountId
+      createdAt
+      updatedAt
+      startDate
+      endDate
+      isPaused
+      isDeleted
+    }
+    data
+    createdAt
   }
 }
 `;

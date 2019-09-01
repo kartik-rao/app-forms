@@ -1,0 +1,28 @@
+{
+  "providers": {
+    "awscloudformation": {
+      "AuthRoleName": "app-forms-dev-20190901201446-authRole",
+      "UnauthRoleArn": "arn:aws:iam::286358943194:role/app-forms-dev-20190901201446-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::286358943194:role/app-forms-dev-20190901201446-authRole",
+      "Region": "ap-northeast-1",
+      "DeploymentBucketName": "app-forms-dev-20190901201446-deployment",
+      "UnauthRoleName": "app-forms-dev-20190901201446-unauthRole",
+      "StackName": "app-forms-dev-20190901201446",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:286358943194:stack/app-forms-dev-20190901201446/53c2b120-cca1-11e9-a0c2-06f0cb7c88bc"
+    }
+  },
+  "api": {
+    "formsli-api-dev": {
+      "service": "AppSync",
+      "output": {
+        "securityType": "AMAZON_COGNITO_USER_POOLS",
+        "GraphQLAPIIdOutput": "yco3dnclencvdeilvzwngs2qki",
+        "GraphQLAPIEndpointOutput": "https://ugn2kqey75aolcnah6vtnbuydi.appsync-api.ap-northeast-1.amazonaws.com/graphql",
+        "additionalAuthenticationProviders": [],
+        "name": "formsli-api-dev",
+        "region": "ap-northeast-1"
+      },
+      "lastPushTimeStamp": "2019-09-01T10:16:17.074Z"
+    }
+  }
+}

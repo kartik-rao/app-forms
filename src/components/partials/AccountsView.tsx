@@ -4,7 +4,6 @@ import { useLocalStore, useObserver } from "mobx-react";
 import * as React from "react";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
-import { Loading } from "../common/Loading";
 import { TableWrapper } from "../common/TableWrapper";
 
 export const AccountsView : React.FC<any> = () => {

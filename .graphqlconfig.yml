@@ -1,0 +1,14 @@
+projects:
+  formsli-api-dev:
+    schemaPath: src/graphql/schema.json
+    includes:
+      - src/graphql/**/*.ts
+    excludes:
+      - ./amplify/**
+    extensions:
+      amplify:
+        codeGenTarget: typescript
+        generatedFileName: src/Amplify.ts
+        docsFilePath: src/graphql
+        region: ap-northeast-1
+        maxDepth: 2

@@ -7,8 +7,9 @@ export const createAuthStore = () => {
     const store = {
         authData : {} as CognitoUser,
         authState: "loading" as string,
-        authError: "",
+        authError: "" as string,
         attributes: {},
+        context: null as string,
         handleAuthResponse: function(user: CognitoUser) {
             user.getUserAttributes((err, attributes: CognitoUserAttribute[]=[]) => {
                 if(!err) {
@@ -45,6 +46,9 @@ export const createAuthStore = () => {
             }).catch(e => {
                 console.log(e);
             });
+        },
+        setContext: function(context: string) {
+            this.context = context;
         },
         setAuthState: function (authState: string) {
             this.authState = authState;
