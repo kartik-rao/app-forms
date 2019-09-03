@@ -81,10 +81,6 @@ html, body {
     line-height: 20px;
 }
 
-.fl-main {
-
-}
-
 .fl-content {
     height: calc(100vh - 134px);
     background-color: #fff;

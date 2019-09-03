@@ -57,7 +57,7 @@ export const CanvasView : React.FC<ICanvasViewProps> = (props: ICanvasViewProps)
 
     return useObserver(() => {
         {
-           return <Layout style={{height: '100vh', overflow: 'hidden'}}>
+           return <Layout style={{height: '100%', overflow: 'hidden'}}>
             <React.Suspense fallback="Loading...">
             {localStore.showCanvas && localStore.formStore.form && <EditorStoreProvider formStore={localStore.formStore}>
                      <Canvas />

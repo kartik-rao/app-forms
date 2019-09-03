@@ -26,16 +26,14 @@ export const MainView: React.FC<any> = () => {
             <Header />
         </Layout.Header>
         <Layout.Content className="fl-content">
-            <div className="fl-main">
-                <React.Suspense fallback={<Loading />}>
-                    {store.view.currentView.name == 'canvas' && <CanvasView mode="create"/>}
-                    {store.view.currentView.name == 'forms'  && <FormsView />}
-                    {store.view.currentView.name == 'users'  && <UsersView />}
-                    {store.view.currentView.name == 'admin'  && store.auth.isAdmin && <AdminView />}
-                    {store.view.currentView.name == 'admin'  && store.auth.isAccountAdmin && <AccountAdminView/>}
-                    {store.view.currentView.name == 'accounts' && store.auth.isAdmin && <AccountsView />}
-                </React.Suspense>
-            </div>
+            <React.Suspense fallback={<Loading />}>
+                {store.view.currentView.name == 'canvas' && <CanvasView mode="create"/>}
+                {store.view.currentView.name == 'forms'  && <FormsView />}
+                {store.view.currentView.name == 'users'  && <UsersView />}
+                {store.view.currentView.name == 'admin'  && store.auth.isAdmin && <AdminView />}
+                {store.view.currentView.name == 'admin'  && store.auth.isAccountAdmin && <AccountAdminView/>}
+                {store.view.currentView.name == 'accounts' && store.auth.isAdmin && <AccountsView />}
+            </React.Suspense>
         </Layout.Content>
         <Layout.Footer className="fl-footer">
             <Footer />
