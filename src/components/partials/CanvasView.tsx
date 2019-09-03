@@ -6,7 +6,8 @@ import { useLocalStore, useObserver } from "mobx-react";
 import * as React from "react";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
-import { toJS } from "mobx";
+
+import "@kartikrao/lib-forms/lib/forms.editors.m.css";
 
 export interface ICanvasViewProps {
     mode: string,
