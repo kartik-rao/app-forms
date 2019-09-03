@@ -21,7 +21,7 @@ export const MainView: React.FC<any> = () => {
     if(!store) throw new Error("Store is null");
 
     return useObserver(() => {
-        return <div>
+        return <Layout>
         <Layout.Header className="fl-header">
             <Header />
         </Layout.Header>
@@ -40,6 +40,6 @@ export const MainView: React.FC<any> = () => {
         <Layout.Footer className="fl-footer">
             <Footer />
         </Layout.Footer>
-    </div>
+    </Layout>
     })
 }

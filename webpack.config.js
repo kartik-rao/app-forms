@@ -45,7 +45,7 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [MiniCssExtractPlugin.loader, "css-loader"],
-                include: /src\/app.css|node_modules\/antd\/|node_modules\/@aws\-amplify\//
+                include: /src\/app.css|node_modules\/antd\/|node_modules\/@aws\-amplify\/|node_modules\/@kartikrao\//
             },
             {
                 test: /\.svg/, loader: 'svg-inline-loader'

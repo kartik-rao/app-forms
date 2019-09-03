@@ -34,7 +34,6 @@ html, body {
 
 #approot {
     min-height: 100vh;
-    overflow: hidden;
     display: block;
     position: relative;
 }
@@ -83,10 +82,11 @@ html, body {
 }
 
 .fl-main {
-    height: 100%;
+
 }
 
 .fl-content {
+    height: calc(100vh - 134px);
     background-color: #fff;
 }
 
@@ -107,16 +107,7 @@ html, body {
 }
 
 .ant-layout-sider {
-    background: #3ba0e9;
     color: #fff;
-    line-height: 120px;
-}
-
-.ant-layout-content {
-    border-top: 2px solid rgb(202, 202, 202);
-    border-bottom: 2px solid rgb(202, 202, 202);
-    color: #fff;
-    height: calc(100vh - 120px);
     line-height: 120px;
 }
 
@@ -124,6 +115,11 @@ html, body {
     height: 100%
 }
 
-.ant-page-header {
-    height: 100%
+.fl-header {
+    border-bottom: 2px solid rgb(202, 202, 202);
+}
+
+.fl-footer {
+    border-top: 2px solid rgb(202, 202, 202);
+    z-index: 12;
 }
