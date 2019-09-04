@@ -18,13 +18,18 @@ export const createViewStore = () => {
         },
         get currentPath():  string {
             if(!this.currentView || !this.currentView.name || !Views[this.currentView.name]) {
-                return "";
+                if(Paths[window.location.pathname]) {
+                    return window.location.pathname;
+                } else {
+                    return "";
+                }
             }
             return Views[this.currentView.name].path;
         },
         showView: function(name: string) {
             if (name && Views[name]) {
                 this.currentView = Views[name];
+                window.history.pushState(null, null, Views[name].path)
             } else {
                 console.warn(`ViewStore.showView - view [${name}] does not exist`)
             }

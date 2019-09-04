@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import {NavigationView} from "./NavigationView";
+import NavigationView from "./NavigationView";
 
 export class Header extends React.Component<any, any> {
     props: any;

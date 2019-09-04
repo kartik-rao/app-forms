@@ -9,6 +9,7 @@ import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
 import AddFormView from "./AddFormView";
+import { Link } from "react-router-dom";
 
 export const FormsView : React.FC<any> = () => {
     const store = React.useContext(appStoreContext);
@@ -97,7 +98,7 @@ export const FormsView : React.FC<any> = () => {
             render: (text, record) => (
             <span>
                 <div style={{textAlign: "center"}}>
-                    <Button icon="setting">Edit</Button>
+                    <Link to={`/canvas/edit/${record.id}`}><Button icon="setting">Edit</Button></Link>
                     <Divider type="vertical" />
                     <Button icon="copy">Clone</Button>
                     <Divider type="vertical" />

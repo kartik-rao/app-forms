@@ -63,6 +63,7 @@ module.exports = {
         filename: '[name].js', /* Independent Entry Bundle */
         chunkFilename: '[name].chunk.js', /* Code splitting generated bundles */
         path: path.join(__dirname, 'dist'),
+        publicPath : '/',
         libraryTarget: 'window',
         library: ''
     },
@@ -78,12 +79,10 @@ module.exports = {
     },
     devServer: {
         compress: true,
-        publicPath: path.resolve("/"),
+        publicPath: "/",
         hot: true,
         port: 8085,
-        historyApiFallback: {
-            index: 'public/index.html'
-        }
+        historyApiFallback: true
     },
     plugins: [
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en-au/),

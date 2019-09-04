@@ -1,15 +1,14 @@
-import { observer, useObserver, useLocalStore } from 'mobx-react';
-import * as React from 'react';
 import { Layout } from 'antd';
-import { Footer } from "../common/FooterView"
+import { useObserver } from 'mobx-react';
+import * as React from 'react';
+import { BrowserRouter, Route } from "react-router-dom";
+import { appStoreContext } from '../../stores/AppStoreProvider';
+import { Footer } from "../common/FooterView";
 import { Header } from "../common/HeaderView";
 import { Loading } from "../common/Loading";
-
-import { appStoreContext } from '../../stores/AppStoreProvider';
-import { toJS } from 'mobx';
-import AccountList from './AccountList';
 import { CanvasView } from './CanvasView';
-import { startRouter } from '../../Router';
+
+
 
 const AccountsView = React.lazy(() => import(/* webpackChunkName: "app-accounts" */ "./AccountsView").then((module) => {return {default: module.AccountsView}}));
 const FormsView = React.lazy(() => import(/* webpackChunkName: "app-forms" */ "./FormsView").then((module) => {return {default: module.FormsView}}));
@@ -23,21 +22,24 @@ export const MainView: React.FC<any> = () => {
 
     return useObserver(() => {
         return <Layout>
-        <Layout.Header className="fl-header">
-            <Header />
-        </Layout.Header>
-        <Layout.Content className="fl-content">
-            <React.Suspense fallback={<Loading />}>
-                {store.view.currentPath == '/forms'  && <FormsView />}
-                {store.view.currentPath == '/users'  && <UsersView />}
-                {store.view.currentPath == '/admin'  && store.auth.isAdmin && <AdminView />}
-                {store.view.currentPath == '/admin'  && store.auth.isAccountAdmin && <AccountAdminView/>}
-                {store.view.currentPath == '/accounts' && store.auth.isAdmin && <AccountsView />}
-            </React.Suspense>
-        </Layout.Content>
-        <Layout.Footer className="fl-footer">
-            <Footer />
-        </Layout.Footer>
+            <BrowserRouter>
+                <Layout.Header className="fl-header">
+                    <Header />
+                </Layout.Header>
+                <Layout.Content className="fl-content">
+                    <React.Suspense fallback={<Loading />}>
+                        <Route path="/forms" component={FormsView} />
+                        <Route path="/users" component={UsersView} />
+                        <Route path="/canvas/:mode/:formId" component={CanvasView} />
+                        {store.auth.isAccountAdmin && <Route path="/admin" component={AccountAdminView}/>}
+                        {store.auth.isAdmin && <Route path="/accounts" component={AccountsView} />}
+                        {store.auth.isAdmin && <Route path="/admin" component={AdminView}/>}
+                    </React.Suspense>
+                </Layout.Content>
+                <Layout.Footer className="fl-footer">
+                    <Footer />
+                </Layout.Footer>
+        </BrowserRouter>
     </Layout>
-    })
+    });
 }

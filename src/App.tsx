@@ -5,7 +5,7 @@ import { useObserver } from "mobx-react";
 import * as React from "react";
 import './app.css';
 import { MainView } from "./components/partials/MainView";
-import { startRouter } from './Router';
+
 import { createAppStore } from './stores/AppStore';
 import { AppStoreProvider } from "./stores/AppStoreProvider";
 
@@ -72,7 +72,7 @@ const signUpConfig = {
 
 export const App : React.FC<IAppProps> = (props: IAppProps) => {
     const store = createAppStore();
-    startRouter(store);
+    // startRouter(store);
 
     return useObserver(() => {
         return <AppStoreProvider store={store}><Layout className="fl-layout">
