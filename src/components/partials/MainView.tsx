@@ -30,7 +30,7 @@ export const MainView: React.FC<any> = () => {
                     <React.Suspense fallback={<Loading />}>
                         <Route path="/forms" component={FormsView} />
                         <Route path="/users" component={UsersView} />
-                        <Route path="/canvas/:mode/:formId" component={CanvasView} />
+                        <Route path="/canvas/:mode/:formId" component={CanvasView}/>
                         {store.auth.isAccountAdmin && <Route path="/admin" component={AccountAdminView}/>}
                         {store.auth.isAdmin && <Route path="/accounts" component={AccountsView} />}
                         {store.auth.isAdmin && <Route path="/admin" component={AdminView}/>}

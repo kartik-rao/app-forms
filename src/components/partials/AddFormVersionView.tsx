@@ -11,6 +11,7 @@ import { IFormProps } from "@kartikrao/lib-forms-core";
 export interface AddFormVersionViewProps extends FormComponentProps{
     onSave: (response: IFormProps) => void;
     onCancel: () => void;
+    tenant: string;
     formData: any;
     formId: any;
 }
@@ -19,19 +20,22 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
+    console.log("Render AFV");
     const localStore = useLocalStore(() => ({
         notes: null as string,
         onOk : async function () {
             store.view.showLoading();
-            let tenant = store.auth.contextId ? store.auth.contextId : store.auth.tenant;
             try {
+                console.log("Saving Version", JSON.stringify(toJS(props.formData)))
                 let response = await API.graphql(graphqlOperation(mutations.addFormVersion, {
-                    accountId: tenant,
-                    formId: props.formId,
-                    notes: this.notes,
-                    formData: toJS(this.form.formData)
+                    input: {
+                        accountId: props.tenant,
+                        formId: props.formId,
+                        notes: this.notes,
+                        formData: JSON.stringify(toJS(props.formData))
+                    }
                 }));
-                notification.error({message: `Form version created successfully`});
+                notification.success({message: `Form version created successfully`});
                 props.onSave(response);
             } catch (error) {
                 notification.error({message: "There was an error creating a version"});
@@ -41,7 +45,8 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
     }));
 
     return useObserver(() => {
-        return <Modal
+        return <Modal mask ={true}
+            visible={true}
             title="Add Form Version"
             okText="Save"
             onCancel={props.onCancel}
@@ -50,7 +55,7 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
                 <Form.Item label="Notes">
                     {props.form.getFieldDecorator('notes', {rules:[
                         {required: true, message: "Please provide notes for this version"}
-                    ]})(<Input type="textarea" onChange={(e) => localStore.notes = e.target.value}/>)}
+                    ]})(<Input type="textarea" height={200} onChange={(e) => localStore.notes = e.target.value}/>)}
                 </Form.Item>
             </Form>
         </Modal>

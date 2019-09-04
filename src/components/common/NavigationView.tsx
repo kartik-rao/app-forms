@@ -12,7 +12,7 @@ export const NavigationView: React.FC<RouteComponentProps> = (props: RouteCompon
     if(!store) throw new Error("Store is null");
 
     const selected = [props.location.pathname];
-
+    console.log("Path Name", selected)
     return useObserver(() => {
         return store.auth.user && <Menu selectedKeys={selected} mode="horizontal" theme="light">
         <Menu.Item disabled={true}><h2 style={{margin: 0, fontVariant: "tabular-nums"}}>Forms.li</h2></Menu.Item>
