@@ -1,10 +1,13 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
-import { Form, Select } from "antd";
+import { Form, Select, Spin, Icon } from "antd";
 import { FormComponentProps } from 'antd/lib/form/Form';
 import { useLocalStore, useObserver } from "mobx-react";
 import * as React from "react";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
+import { Loading } from "../common/Loading";
+
+const antIcon = <Icon type="loading" style={{ fontSize: 16 }} spin />;
 
 const AccountList: React.FC<FormComponentProps> = (props) => {
     const store = React.useContext(appStoreContext);
@@ -15,10 +18,11 @@ const AccountList: React.FC<FormComponentProps> = (props) => {
         errors: [] as any[],
         context: null as string,
         accounts: [] as any[],
-        setContext: function(c: string) {
-            console.log("setContext", c);
-            this.context = c;
-            store.auth.setContext(this.context);
+        setContext: function(contextId: string) {
+            this.context = contextId;
+            let contextName = localStore.accounts.filter((a) => {return a.id == contextId})[0].name
+            store.auth.setContextId(this.context);
+            store.auth.setContextName(contextName);
         }
     }));
 
@@ -41,7 +45,7 @@ const AccountList: React.FC<FormComponentProps> = (props) => {
     }, []);
 
     return useObserver(() => {
-        return localStore.loading ? <></> : <Form layout="inline">
+        return localStore.loading ? <Spin indicator={antIcon}/> : <Form layout="inline">
             <Form.Item required={false} label="">
                 {props.form.getFieldDecorator('_context')(
                     <Select

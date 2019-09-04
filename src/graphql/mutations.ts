@@ -263,34 +263,7 @@ export const addFormVersion = `mutation AddFormVersion($input: AddFormVersionInp
       notes
       formData
     }
-    ownedBy {
-      id
-      ownerId
-      accountId
-      email
-      userGroup
-      given_name
-      family_name
-      phone_number
-      createdAt
-      updatedAt
-      isDeleted
-      numForms
-    }
     accountId
-    account {
-      id
-      name
-      website
-      taxId
-      ownerId
-      planId
-      createdAt
-      updatedAt
-      active
-      numForms
-      numUsers
-    }
     createdAt
     updatedAt
     startDate
@@ -304,30 +277,6 @@ export const addFormVersion = `mutation AddFormVersion($input: AddFormVersionInp
       createdAt
       notes
       formData
-    }
-    integrations {
-      id
-      integrationTypeId
-      ownerId
-      accountId
-      formId
-      active
-      authType
-      auth
-      target
-      method
-      lastExecuted
-      lastExecutionResult
-      lastExecutionResultMessage
-      createdAt
-      updatedAt
-      isDeleted
-    }
-    entries {
-      id
-      formId
-      data
-      createdAt
     }
   }
 }

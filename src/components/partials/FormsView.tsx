@@ -25,7 +25,7 @@ export const FormsView : React.FC<any> = () => {
             let addFormResponse;
             store.view.showLoading();
             try {
-                addFormResponse = await API.graphql(graphqlOperation(mutations.addForm, {form:values, notes: "Form initialized"}));
+                addFormResponse = await API.graphql(graphqlOperation(mutations.addForm, {input: values}));
                 console.log("handleAdd Response", addFormResponse);
                 if (addFormResponse.errors) {
                     this.errors = addFormResponse.errors;
@@ -56,8 +56,8 @@ export const FormsView : React.FC<any> = () => {
         key: 'name'
     }, {
         title: 'Description',
-        dataIndex: 'desc',
-        key: 'desc'
+        dataIndex: 'description',
+        key: 'description'
     },
     {
         title: 'Owner',
@@ -133,14 +133,17 @@ export const FormsView : React.FC<any> = () => {
                     <Card title={"All forms"} style={{padding: 0}}>
                         <Typography style={{float: "left"}}>{localStore.hasSelectedItems ? `Selected ${localStore.selectedItems.length} of ${localStore.forms.length}` : ''}</Typography>
                         <>
-                        {/* <React.Fragment>
-                            <Button icon="plus" type="primary" style={{float: 'right'}} onClick={()=>{localStore.showAddUser(true)}}>Add</Button>
-                        </React.Fragment> */}
+                        <React.Fragment>
+                            <Button icon="plus" type="primary" style={{float: 'right'}} onClick={()=>{localStore.showAddForm(true)}}>Add</Button>
+                        </React.Fragment>
                         </>
                     </Card>
                     {<TableWrapper errors={localStore.errors} debug={store.view.debug}
                         data={localStore.forms} columns={columns} bordered={true} rowKey="id"
                         pagination={false} onSelection={localStore.setSelectedItems}/>}
+                    {localStore.showAdd && <Drawer title="Add Form" width="350px" placement="right" closable={true} onClose={() => localStore.showAdd = false} visible={localStore.showAdd}>
+                    <AddFormView onAdd={localStore.handleAdd}/>
+                    </Drawer>}
                 </>
             }
         </Col>

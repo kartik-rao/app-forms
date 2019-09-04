@@ -128,8 +128,8 @@ export const UsersView: React.FC<IUsersViewProps> = (props: IUsersViewProps) => 
                 if (store.auth.isAdmin) {
                     console.log("Admin Query")
                     let filter : UserFilterInput;
-                    if (store.auth.context) {
-                        filter = {criteria:[{"accountId":{expression: StringFilterExpression.eq, value: [store.auth.context]}}]}
+                    if (store.auth.contextId) {
+                        filter = {criteria:[{"accountId":{expression: StringFilterExpression.eq, value: [store.auth.contextId]}}]}
                     }
                     let response = await API.graphql(graphqlOperation(queries.listUsers, {filter : filter}));
                     localStore.users = response['data']['listUsers']
@@ -148,7 +148,7 @@ export const UsersView: React.FC<IUsersViewProps> = (props: IUsersViewProps) => 
             localStore.loading = false;
         }
         fetch();
-    }, [store.auth.context])
+    }, [store.auth.contextId])
 
     return useObserver(() => {
         return <Row>

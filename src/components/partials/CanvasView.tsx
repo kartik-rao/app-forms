@@ -1,17 +1,21 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import { EditorStoreProvider } from "@kartikrao/lib-forms";
-import { createFormStore, Factory, EmptyForm, FormStoreType } from "@kartikrao/lib-forms-core";
+import { createFormStore, Factory, EmptyForm, FormStoreType, IFormContent, IFormProps } from "@kartikrao/lib-forms-core";
 import { Layout } from "antd";
 import { useLocalStore, useObserver } from "mobx-react";
 import * as React from "react";
-import * as queries from '../../graphql/queries';
-import { appStoreContext } from "../../stores/AppStoreProvider";
 
+import * as queries from '../../graphql/queries';
+
+import { appStoreContext } from "../../stores/AppStoreProvider";
+import {notification} from "antd";
+import {toJS} from "mobx";
 import "@kartikrao/lib-forms/lib/forms.editors.m.css";
+import AddFormVersionView from "./AddFormVersionView";
 
 export interface ICanvasViewProps {
     mode: string,
-    formId?: string
+    formId: string
 }
 const Canvas = React.lazy(() => import(/* webpackChunkName: "app-canvas" */ "@kartikrao/lib-forms/lib/components/canvas/Canvas").then((module) => {return {default: module.Canvas}}));
 
@@ -20,12 +24,17 @@ export const CanvasView : React.FC<ICanvasViewProps> = (props: ICanvasViewProps)
     if(!store) throw new Error("Store is null");
 
     const localStore = useLocalStore(() => ({
+        formId: props.formId as string,
         form: {
             formData:{...EmptyForm}
         } as any,
         errors: null as any,
         showCanvas: false as boolean,
-        formStore: createFormStore()
+        formStore: createFormStore(),
+        showAddVersion: false,
+        onSaveComplete : function() {
+            localStore.showAddVersion = false;
+        }
     }));
 
     React.useEffect(() => {
@@ -50,9 +59,7 @@ export const CanvasView : React.FC<ICanvasViewProps> = (props: ICanvasViewProps)
             fetch();
         } else {
             localStore.formStore.setForm(Factory.makeForm(localStore.formStore, localStore.form.formData));
-            // localStore.formStore["__id"] = "X12345";
             localStore.showCanvas = true;
-            // console.log("In CanvasView", toJS(formStore.form));
         }
     }, [props.formId]);
 
@@ -61,7 +68,8 @@ export const CanvasView : React.FC<ICanvasViewProps> = (props: ICanvasViewProps)
            return <Layout style={{height: '100%', overflow: 'hidden'}}>
             <React.Suspense fallback="Loading...">
             {localStore.showCanvas && localStore.formStore.form && <EditorStoreProvider formStore={localStore.formStore}>
-                     <Canvas />
+                    <Canvas onSave={() => localStore.showAddVersion = true}/>
+                    {localStore.showAddVersion && <AddFormVersionView formId={localStore.formId} formData={localStore.formStore} onSave={localStore.onSaveComplete} onCancel={localStore.onSaveComplete}/>}
                 </EditorStoreProvider>
             }
             </React.Suspense>

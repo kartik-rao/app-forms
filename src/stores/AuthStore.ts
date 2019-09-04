@@ -1,15 +1,18 @@
-import Auth, { CognitoUser } from "@aws-amplify/auth";
+import Auth from "@aws-amplify/auth";
 import { Hub } from "@aws-amplify/core";
-import { CognitoUserSession, CognitoUserAttribute } from "amazon-cognito-identity-js";
+import { CognitoUserSession, CognitoUserAttribute, CognitoUser } from "amazon-cognito-identity-js";
 import { observable, toJS } from "mobx";
+
+export type UserAttributesNames = "email"|"custom:group"|"custom:tenantId"|"custom:tenantName"|"given_name"|"family_name"|"environment"|"stack"|"region";
 
 export const createAuthStore = () => {
     const store = {
         authData : {} as CognitoUser,
         authState: "loading" as string,
         authError: "" as string,
-        attributes: {},
-        context: null as string,
+        attributes: {} as { [key in UserAttributesNames]?: string },
+        contextId: null as string,
+        contextName: null as string,
         handleAuthResponse: function(user: CognitoUser) {
             user.getUserAttributes((err, attributes: CognitoUserAttribute[]=[]) => {
                 if(!err) {
@@ -47,8 +50,11 @@ export const createAuthStore = () => {
                 console.log(e);
             });
         },
-        setContext: function(context: string) {
-            this.context = context;
+        setContextId: function(id: string) {
+            this.contextId = id;
+        },
+        setContextName: function(name: string) {
+            this.contextName = name;
         },
         setAuthState: function (authState: string) {
             this.authState = authState;
@@ -76,7 +82,7 @@ export const createAuthStore = () => {
                 return null;
             }
         },
-        get user() : any {
+        get user() : CognitoUser {
             if (this.authState == 'signedIn') {
                 return this.authData;
             } else {

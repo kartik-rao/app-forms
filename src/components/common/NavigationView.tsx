@@ -11,17 +11,11 @@ export const NavigationView: React.FC<any> = () => {
 
     let selected = store.view.currentView ? [store.view.currentView.name] : ["home"];
     return useObserver(() => {
-        return <><Menu selectedKeys={selected} mode="horizontal" theme="light">
+        return store.auth.user && <Menu selectedKeys={selected} mode="horizontal" theme="light">
         <Menu.Item disabled={true}><h2 style={{margin: 0, fontVariant: "tabular-nums"}}>Forms.li</h2></Menu.Item>
-        <Menu.Item key="home" onClick={(e) => store.view.currentView = ""}>
+        <Menu.Item key="home" onClick={(e) => store.view.currentView = {name: ""}}>
             <Icon type="home" />Home
         </Menu.Item>
-        {store.auth.user && store.auth.group == 'Admin' && <Menu.Item key="accounts" onClick={(e) => store.view.showView(Views.accounts.name)}>
-            <Icon type="book" />Accounts
-        </Menu.Item>}
-        {store.auth.user && store.auth.group == 'Admin' && <Menu.Item key="users" onClick={(e) => store.view.showView(Views.users.name)}>
-            <Icon type="team" />Users
-        </Menu.Item>}
         <Menu.Item key="forms" onClick={(e) => store.view.showView(Views.forms.name)}>
             <Icon type="file-text" />Forms
         </Menu.Item>
@@ -31,14 +25,19 @@ export const NavigationView: React.FC<any> = () => {
         <Menu.Item key="admin" onClick={(e) => store.view.showView(Views.admin.name)}>
             <Icon type="setting" />Admin
         </Menu.Item>
-        <Menu.Item disabled={true}>
-            {store.view.isLoading == true && <span><span style={{marginRight: '8px'}}>Loading</span><Spin size="small"/></span>}
+        { store.auth.group == 'Admin' &&
+            <Menu.Item key="accounts" onClick={(e) => store.view.showView(Views.accounts.name)}>
+                <Icon type="book" />Accounts
+            </Menu.Item>}
+        { store.auth.group == 'Admin' &&
+            <Menu.Item key="users" onClick={(e) => store.view.showView(Views.users.name)}>
+                <Icon type="team" />Users
+            </Menu.Item>
+        }
+        <Menu.Item disabled={true} style={{verticalAlign: "middle"}}>
+            <AccountList/>
         </Menu.Item>
-        {store.auth.isAdmin && <Menu.Item style={{float: "right"}} disabled={true}>
-            {/* <Button>Account</Button> */}
-            <div style={{marginTop: '12px'}}><AccountList/></div>
-        </Menu.Item>}
-        <Menu.SubMenu title={store.auth.user && store.auth.user.attributes ? store.auth.user.attributes.email : ""} style={{float:"right"}}>
+        <Menu.SubMenu title={store.auth.user && store.auth.attributes ? store.auth.attributes.email : ""} style={{float:"right"}}>
             <Menu.Item key="profile">
                 <a onClick={(e) => store.view.showView(Views.profile.name)}><Icon type="user"/> Profile</a>
             </Menu.Item>
@@ -47,7 +46,6 @@ export const NavigationView: React.FC<any> = () => {
             </Menu.Item>
         </Menu.SubMenu>
     </Menu>
-</>
     })
 }
 

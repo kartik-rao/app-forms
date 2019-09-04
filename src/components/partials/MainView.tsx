@@ -9,6 +9,7 @@ import { appStoreContext } from '../../stores/AppStoreProvider';
 import { toJS } from 'mobx';
 import AccountList from './AccountList';
 import { CanvasView } from './CanvasView';
+import { startRouter } from '../../Router';
 
 const AccountsView = React.lazy(() => import(/* webpackChunkName: "app-accounts" */ "./AccountsView").then((module) => {return {default: module.AccountsView}}));
 const FormsView = React.lazy(() => import(/* webpackChunkName: "app-forms" */ "./FormsView").then((module) => {return {default: module.FormsView}}));
@@ -27,12 +28,11 @@ export const MainView: React.FC<any> = () => {
         </Layout.Header>
         <Layout.Content className="fl-content">
             <React.Suspense fallback={<Loading />}>
-                {store.view.currentView.name == 'canvas' && <CanvasView mode="create"/>}
-                {store.view.currentView.name == 'forms'  && <FormsView />}
-                {store.view.currentView.name == 'users'  && <UsersView />}
-                {store.view.currentView.name == 'admin'  && store.auth.isAdmin && <AdminView />}
-                {store.view.currentView.name == 'admin'  && store.auth.isAccountAdmin && <AccountAdminView/>}
-                {store.view.currentView.name == 'accounts' && store.auth.isAdmin && <AccountsView />}
+                {store.view.currentPath == '/forms'  && <FormsView />}
+                {store.view.currentPath == '/users'  && <UsersView />}
+                {store.view.currentPath == '/admin'  && store.auth.isAdmin && <AdminView />}
+                {store.view.currentPath == '/admin'  && store.auth.isAccountAdmin && <AccountAdminView/>}
+                {store.view.currentPath == '/accounts' && store.auth.isAdmin && <AccountsView />}
             </React.Suspense>
         </Layout.Content>
         <Layout.Footer className="fl-footer">
