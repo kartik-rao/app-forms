@@ -255,7 +255,7 @@ export const addFormVersion = `mutation AddFormVersion($input: AddFormVersionInp
     name
     description
     versionId
-    formData {
+    version {
       id
       formId
       ownerId
@@ -276,7 +276,6 @@ export const addFormVersion = `mutation AddFormVersion($input: AddFormVersionInp
       ownerId
       createdAt
       notes
-      formData
     }
   }
 }

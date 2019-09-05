@@ -21,12 +21,10 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
-    console.log("Canvas Params", match.params);
     const localStore = useLocalStore(() => ({
         formId: match.params.formId as string,
-        form: {
-            formData: null as IFormProps
-        } as any,
+        form: {} as any,
+        formData: null as IFormProps,
         errors: null as any,
         showCanvas: false as boolean,
         formStore: createFormStore(),
@@ -47,28 +45,16 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
                 store.view.showLoading();
                 let response = await API.graphql(graphqlOperation(queries.getForm, {formId: match.params.formId}));
                 let form = response['data']['getForm'];
-                let parsed  = {
-                    ...form,
-                    formData : form.version && form.version.formData ? JSON.parse(form.version.formData) : {...EmptyForm}
-                }
-                window["parsed"] = parsed;
-                console.log("Got formdata", parsed);
-                localStore.form = parsed;
-                localStore.formStore.setForm(Factory.makeForm(localStore.formStore, localStore.form.formData))
+                localStore.form = form;
+                localStore.formData = form.version && form.version.formData ? JSON.parse(form.version.formData) : {...EmptyForm}
+                localStore.formStore.setForm(Factory.makeForm(localStore.formStore, localStore.formData))
                 store.view.hideLoading();
                 localStore.showCanvas = true;
             } catch (error) {
                 this.errors = error;
             }
         };
-
-        if(match.params.mode == "edit") {
-            fetch();
-        } else {
-            localStore.form.formData = {...EmptyForm}
-            localStore.formStore.setForm(Factory.makeForm(localStore.formStore, localStore.form.formData));
-            localStore.showCanvas = true;
-        }
+        fetch();
     }, []);
 
     return useObserver(() => {
