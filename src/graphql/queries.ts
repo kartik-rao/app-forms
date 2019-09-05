@@ -257,7 +257,7 @@ export const getForm = `query GetForm($formId: String!) {
     name
     description
     versionId
-    formData {
+    version {
       id
       formId
       ownerId
@@ -593,7 +593,7 @@ export const listForms = `query ListForms($offsetLimit: OffsetLimit, $filter: Fo
     name
     description
     versionId
-    formData {
+    version {
       id
       formId
       ownerId

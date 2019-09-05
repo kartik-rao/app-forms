@@ -9,6 +9,7 @@ import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
 import InviteUserView from "./InviteUserView";
+import { autorun, when } from "mobx";
 
 export interface IUsersViewProps {
     onUpdate?: () => void;
@@ -147,8 +148,12 @@ export const UsersView: React.FC<IUsersViewProps> = (props: IUsersViewProps) => 
             }
             localStore.loading = false;
         }
+        autorun(()=>{
+            store.auth.contextId;
+            fetch();
+        });
         fetch();
-    }, [store.auth.contextId])
+    }, [])
 
     return useObserver(() => {
         return <Row>

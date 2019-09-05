@@ -26,15 +26,16 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
         onOk : async function () {
             store.view.showLoading();
             try {
-                console.log("Saving Version", JSON.stringify(toJS(props.formData)))
-                let response = await API.graphql(graphqlOperation(mutations.addFormVersion, {
+                const payload = {
                     input: {
                         accountId: props.tenant,
                         formId: props.formId,
                         notes: this.notes,
                         formData: JSON.stringify(toJS(props.formData))
                     }
-                }));
+                }
+                console.log("Saving Version", payload);
+                let response = await API.graphql(graphqlOperation(mutations.addFormVersion, payload));
                 notification.success({message: `Form version created successfully`});
                 props.onSave(response);
             } catch (error) {

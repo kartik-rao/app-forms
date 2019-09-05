@@ -44,18 +44,18 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
         localStore.showCanvas = false;
         let fetch = async function () {
             try {
-                store.view.loading = true;
+                store.view.showLoading();
                 let response = await API.graphql(graphqlOperation(queries.getForm, {formId: match.params.formId}));
                 let form = response['data']['getForm'];
                 let parsed  = {
                     ...form,
-                    formData : form.formData && form.formData.formData ? JSON.parse(form.formData.formData) : {...EmptyForm}
+                    formData : form.version && form.version.formData ? JSON.parse(form.version.formData) : {...EmptyForm}
                 }
                 window["parsed"] = parsed;
                 console.log("Got formdata", parsed);
                 localStore.form = parsed;
                 localStore.formStore.setForm(Factory.makeForm(localStore.formStore, localStore.form.formData))
-                store.view.loading = false;
+                store.view.hideLoading();
                 localStore.showCanvas = true;
             } catch (error) {
                 this.errors = error;
