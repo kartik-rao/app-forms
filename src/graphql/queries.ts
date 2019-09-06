@@ -32,7 +32,6 @@ export const getAccount = `query GetAccount($accountId: ID!) {
       createdAt
       updatedAt
       isDeleted
-      numForms
     }
     plan {
       id
@@ -65,15 +64,13 @@ export const getAccount = `query GetAccount($accountId: ID!) {
       createdAt
       updatedAt
       isDeleted
-      numForms
     }
     forms {
       id
-      ownerId
+      ownedBy {email given_name family_name}
       name
       description
       versionId
-      accountId
       createdAt
       updatedAt
       startDate

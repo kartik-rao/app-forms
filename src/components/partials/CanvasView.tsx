@@ -12,9 +12,10 @@ import AddFormVersionView from "./AddFormVersionView";
 
 
 export interface ICanvasViewProps {
-    mode: string,
+    accountId: string;
     formId: string
 }
+
 const Canvas = React.lazy(() => import(/* webpackChunkName: "app-canvas" */ "@kartikrao/lib-forms/lib/components/canvas/Canvas").then((module) => {return {default: module.Canvas}}));
 
 export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({match}) => {
@@ -23,6 +24,7 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
 
     const localStore = useLocalStore(() => ({
         formId: match.params.formId as string,
+        accountId: match.params.accountId as string,
         form: {} as any,
         formData: null as IFormProps,
         errors: null as any,

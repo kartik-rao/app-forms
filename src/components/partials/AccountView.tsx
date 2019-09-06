@@ -1,12 +1,12 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
-import { Button, Col, List, Row, Tabs } from "antd";
+import { Button, Col, List, Row, Skeleton, Tabs } from "antd";
 import PageHeader from "antd/lib/page-header";
 import { useLocalStore, useObserver } from "mobx-react";
 import * as moment from "moment";
 import * as React from "react";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
-import { UsersView } from "./UsersView";
+import { RouteComponentProps } from "react-router-dom";
 
 const Description = ({ term, children, span = 12 }) => (
     <Col span={span}>
@@ -17,28 +17,18 @@ const Description = ({ term, children, span = 12 }) => (
     </Col>
 );
 
-export const AccoountAdminView : React.FC<any> = () => {
+export interface AccountViewProps {
+    accountId: string;
+}
+
+export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = ({match}) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
     const localStore = useLocalStore(() => ({
         account: {} as any,
         errors: [] as any[],
-        fetch : async function() {
-            store.view.showLoading();
-            try{
-                let args = {accountId: store.auth.tenant};
-                let account: any = await API.graphql(graphqlOperation(queries.getAccount, args));
-                this.account = account.data.getAccount;
-            } catch (errorResponse) {
-                console.log("ERROR", errorResponse);
-                this.errors = errorResponse.errors;
-            }
-            store.view.hideLoading();
-        },
-        updateView: function () {
-            this.fetch();
-        },
+        loading: true,
         get showErrors() {
             return store.view.debug && this.errors && this.errors.length > 0;
         },
@@ -53,12 +43,32 @@ export const AccoountAdminView : React.FC<any> = () => {
         }
     }));
 
+    React.useEffect(() => {
+        let fetch = async function() {
+            console.log("Loading");
+            localStore.loading = true;
+            store.view.setLoading({show: true, message: "Loading account", status: "active", type : "line", percent: 100});
+            try{
+                let args = {accountId: match.params.accountId};
+                console.log("Loading args", args);
+                let account: any = await API.graphql(graphqlOperation(queries.getAccount, args));
+                localStore.account = account.data.getAccount;
+                localStore.loading = false;
+            } catch (errorResponse) {
+                console.log("ERROR", errorResponse);
+                localStore.errors = errorResponse.errors;
+            }
+            store.view.resetLoading();
+        }
+        fetch();
+    }, [])
+
     return useObserver(() => {
         return <>
         {localStore.showErrors && <List dataSource={localStore.errors} renderItem={item => (
             <List.Item>{item.message}</List.Item>
         )}/>}
-        {!store.view.isLoading && localStore.account && <PageHeader title={localStore.account.name}
+        {localStore.loading ? <Skeleton active /> : <PageHeader title={localStore.account.name}
             subTitle={localStore.account.plan ? localStore.account.plan.planType.name : 'FREE'}
             extra={[ <Button key="1">Change Plan</Button> ]}
             footer={

@@ -72,7 +72,6 @@ const signUpConfig = {
 
 export const App : React.FC<IAppProps> = (props: IAppProps) => {
     const store = createAppStore();
-    // startRouter(store);
 
     return useObserver(() => {
         return <AppStoreProvider store={store}><Layout className="fl-layout">

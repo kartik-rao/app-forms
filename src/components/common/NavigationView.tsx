@@ -1,11 +1,8 @@
-import { Icon, Menu, Spin, Button } from 'antd';
+import { Icon, Menu } from 'antd';
 import { useObserver } from 'mobx-react';
 import * as React from "react";
-import { Views } from "../../RouteNames";
+import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import { appStoreContext } from '../../stores/AppStoreProvider';
-import AccountList from '../partials/AccountList';
-import { Link, RouteComponentProps } from "react-router-dom";
-import {withRouter} from 'react-router-dom';
 import { ProgressView } from '../partials/ProgressView';
 
 export const NavigationView: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
@@ -13,7 +10,7 @@ export const NavigationView: React.FC<RouteComponentProps> = (props: RouteCompon
     if(!store) throw new Error("Store is null");
 
     const selected = [props.location.pathname];
-    console.log("Path Name", selected)
+
     return useObserver(() => {
         return store.auth.user && <Menu selectedKeys={selected} mode="horizontal" theme="light">
         <Menu.Item disabled={true}><h2 style={{margin: 0, fontVariant: "tabular-nums"}}>Forms.li</h2></Menu.Item>
@@ -39,9 +36,6 @@ export const NavigationView: React.FC<RouteComponentProps> = (props: RouteCompon
                 <Link to="/users"><Icon type="team" />Users</Link>
             </Menu.Item>
         }
-        <Menu.Item disabled={true} style={{verticalAlign: "middle"}}>
-            <AccountList/>
-        </Menu.Item>
         <Menu.SubMenu title={store.auth.user && store.auth.attributes ? store.auth.attributes.email : ""} style={{float:"right"}}>
             <Menu.Item key="/profile">
                 <Link to="/profile"><Icon type="user" />Profile</Link>
@@ -51,6 +45,7 @@ export const NavigationView: React.FC<RouteComponentProps> = (props: RouteCompon
             </Menu.Item>
         </Menu.SubMenu>
         <span style={{float: "right"}}><ProgressView {...store.view.loading}/></span>
+        <Menu.Item disabled={true}><h3 style={{margin: 0, fontVariant: "tabular-nums"}}>{store.auth.attributes["custom:tenantName"]}</h3></Menu.Item>
     </Menu>
     })
 }

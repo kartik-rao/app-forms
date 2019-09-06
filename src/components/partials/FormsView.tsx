@@ -12,8 +12,14 @@ import AddFormView from "./AddFormView";
 import { Link } from "react-router-dom";
 import { toJS, autorun } from "mobx";
 import { EmptyForm } from "@kartikrao/lib-forms-core";
+import { RouteComponentProps } from "react-router-dom";
+import { match } from "minimatch";
 
-export const FormsView : React.FC<any> = () => {
+export interface FormsViewProps {
+    accountId: string;
+}
+
+export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match}) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
@@ -121,7 +127,7 @@ export const FormsView : React.FC<any> = () => {
             render: (text, record) => (
             <span>
                 <div style={{textAlign: "center"}}>
-                    <Link to={`/canvas/edit/${record.id}`}><Button icon="setting">Edit</Button></Link>
+                    <Link to={`/account/${match.params.accountId}/canvas/${record.id}`}><Button icon="setting">Edit</Button></Link>
                     <Divider type="vertical" />
                     <Button icon="copy" onClick={(e) => localStore.handleClone(record.id)}>Clone</Button>
                     <Divider type="vertical" />
@@ -136,10 +142,10 @@ export const FormsView : React.FC<any> = () => {
             localStore.loading = true;
             try {
                 store.view.setLoading({show: true, message: "Loading forms", status: "active", type : "line", percent: 100});
-                let response = await API.graphql(graphqlOperation(queries.listForms));
-                localStore.forms = response.data.listForms;
+                let response = await API.graphql(graphqlOperation(queries.getAccount, {accountId: match.params.accountId}));
+                localStore.forms = response.data.getAccount.forms;
             } catch (errorResponse) {
-                console.error(errorResponse);
+                console.error("queries.getAccount.forms", errorResponse);
                 localStore.errors = errorResponse.errors;
             }
             if (!localStore.forms) {

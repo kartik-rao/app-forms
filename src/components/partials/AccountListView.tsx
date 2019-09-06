@@ -9,7 +9,7 @@ import { Loading } from "../common/Loading";
 
 const antIcon = <Icon type="loading" style={{ fontSize: 16 }} spin />;
 
-const AccountList: React.FC<FormComponentProps> = (props) => {
+const AccountListView: React.FC<FormComponentProps> = (props) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
@@ -68,4 +68,4 @@ const AccountList: React.FC<FormComponentProps> = (props) => {
     })
 }
 
-export default Form.create()(AccountList)
+export default Form.create()(AccountListView)

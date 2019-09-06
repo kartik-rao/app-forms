@@ -5,8 +5,9 @@ import * as React from "react";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
+import { Link } from "react-router-dom";
 
-export const AccountsView : React.FC<any> = () => {
+export const AllAccountsView : React.FC<any> = () => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
@@ -30,7 +31,8 @@ export const AccountsView : React.FC<any> = () => {
     const columns = [{
         title: 'Account Name',
         dataIndex: 'name',
-        key: 'name'
+        key: 'name',
+        render: (text, record) => {return <Link to={`/account/${record.id}`}>{text}</Link>}
     }, {
         title: 'Owner',
         dataIndex: 'ownedBy.email',
