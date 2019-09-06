@@ -1,20 +1,18 @@
 import { observable } from 'mobx';
 
 import {Views, Paths} from "../RouteNames";
+import { ProgressViewProps } from '../components/partials/ProgressView';
 
 export const createViewStore = () => {
     const store = {
         currentView: {name: ''} as {name: string},
-        loading: false,
+        loading: {} as ProgressViewProps,
         debug: location.href.indexOf('localhost') > -1,
-        get isLoading() {
-            return this.loading;
+        setLoading: function(progress: ProgressViewProps) {
+            this.loading = progress;
         },
-        showLoading: function() {
-            this.loading = true;
-        },
-        hideLoading: function() {
-            this.loading = false;
+        resetLoading: function() {
+            this.loading = {};
         },
         get currentPath():  string {
             if(!this.currentView || !this.currentView.name || !Views[this.currentView.name]) {

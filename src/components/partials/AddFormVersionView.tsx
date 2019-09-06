@@ -20,11 +20,10 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
-    console.log("Render AFV");
     const localStore = useLocalStore(() => ({
         notes: null as string,
         onOk : async function () {
-            store.view.showLoading();
+            store.view.setLoading({show: true, message: "Saving Form Version", status: "active", type : "line", percent: 10});
             try {
                 const payload = {
                     input: {
@@ -34,14 +33,13 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
                         formData: JSON.stringify(toJS(props.formData))
                     }
                 }
-                console.log("Saving Version", payload);
                 let response = await API.graphql(graphqlOperation(mutations.addFormVersion, payload));
                 notification.success({message: `Form version created successfully`});
                 props.onSave(response);
             } catch (error) {
                 notification.error({message: "There was an error creating a version"});
             }
-            store.view.hideLoading();
+            store.view.resetLoading();
         }
     }));
 

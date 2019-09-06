@@ -54,6 +54,7 @@ export const AccountsView : React.FC<any> = () => {
     React.useEffect(() => {
         let fetch  = async () => {
             localStore.loading = true;
+            store.view.setLoading({show: true, message: "Loading accounts", status: "active", type : "line", percent: 100});
             try {
                 let allAccounts = await API.graphql(graphqlOperation(queries.listAccounts));
                 localStore.accounts = allAccounts['data']['listAccounts'];
@@ -65,6 +66,7 @@ export const AccountsView : React.FC<any> = () => {
                 localStore.accounts = [];
             }
             localStore.loading = false;
+            store.view.resetLoading();
         }
         fetch();
     }, []);

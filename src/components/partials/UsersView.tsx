@@ -125,9 +125,9 @@ export const UsersView: React.FC<IUsersViewProps> = (props: IUsersViewProps) => 
     React.useEffect(() => {
         async function fetch () {
             localStore.loading = true;
+            store.view.setLoading({show: true, message: "Loading users", status: "active", type : "line", percent: 100});
             try {
                 if (store.auth.isAdmin) {
-                    console.log("Admin Query")
                     let filter : UserFilterInput;
                     if (store.auth.contextId) {
                         filter = {criteria:[{"accountId":{expression: StringFilterExpression.eq, value: [store.auth.contextId]}}]}
@@ -135,7 +135,6 @@ export const UsersView: React.FC<IUsersViewProps> = (props: IUsersViewProps) => 
                     let response = await API.graphql(graphqlOperation(queries.listUsers, {filter : filter}));
                     localStore.users = response['data']['listUsers']
                 } else {
-                    console.log("AccountAdmin Query")
                     let response = await API.graphql(graphqlOperation(queries.getAccount, {"$accountId": store.auth.tenant}));
                     localStore.users = response['data']['getAccount']['users']
                 }
@@ -146,6 +145,7 @@ export const UsersView: React.FC<IUsersViewProps> = (props: IUsersViewProps) => 
             if (!localStore.users) {
                 localStore.users = [];
             }
+            store.view.resetLoading();
             localStore.loading = false;
         }
         autorun(()=>{
