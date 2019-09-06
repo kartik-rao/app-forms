@@ -6,6 +6,7 @@ import { appStoreContext } from '../../stores/AppStoreProvider';
 import AccountList from '../partials/AccountList';
 import { Link, RouteComponentProps } from "react-router-dom";
 import {withRouter} from 'react-router-dom';
+import { ProgressView } from '../partials/ProgressView';
 
 export const NavigationView: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
     const store = React.useContext(appStoreContext);
@@ -22,8 +23,8 @@ export const NavigationView: React.FC<RouteComponentProps> = (props: RouteCompon
         <Menu.Item key="/forms">
             <Link to="/forms"><Icon type="file-text" />Forms</Link>
         </Menu.Item>
-        <Menu.Item key="/canvas">
-            <Link to="/canvas/:mode/:formId"><Icon type="layout" />Canvas</Link>
+        <Menu.Item key="/integrations">
+            <Link to="/integrations"><Icon type="thunderbolt" />Integrations</Link>
         </Menu.Item>
         <Menu.Item key="/admin">
             <Link to="/admin"><Icon type="setting" />Admin</Link>
@@ -31,8 +32,9 @@ export const NavigationView: React.FC<RouteComponentProps> = (props: RouteCompon
         { store.auth.group == 'Admin' &&
             <Menu.Item key="/accounts">
                 <Link to="/accounts"><Icon type="book" />Accounts</Link>
-            </Menu.Item>}
-        { store.auth.group == 'Admin' &&
+            </Menu.Item>
+        }
+        { (store.auth.group == 'Admin' || store.auth.group == 'AccountAdmin') &&
             <Menu.Item key="/users">
                 <Link to="/users"><Icon type="team" />Users</Link>
             </Menu.Item>
@@ -48,6 +50,7 @@ export const NavigationView: React.FC<RouteComponentProps> = (props: RouteCompon
                 <a onClick={(e) => store.auth.signOut()}><Icon type="logout"/> Sign out</a>
             </Menu.Item>
         </Menu.SubMenu>
+        <span style={{float: "right"}}><ProgressView {...store.view.loading}/></span>
     </Menu>
     })
 }
