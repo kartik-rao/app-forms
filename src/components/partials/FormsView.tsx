@@ -10,6 +10,8 @@ import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
 import AddFormView from "./AddFormView";
 import { Link } from "react-router-dom";
+import { toJS, autorun } from "mobx";
+import { EmptyForm } from "@kartikrao/lib-forms-core";
 
 export const FormsView : React.FC<any> = () => {
     const store = React.useContext(appStoreContext);
@@ -21,24 +23,45 @@ export const FormsView : React.FC<any> = () => {
         showAdd: false,
         selectedItems: [] as any[],
         loading: true,
+        handleClone: async function (formId: string) {
+            try {
+                store.view.setLoading({show: true, message: "Loading source form", status: "active", type : "line", percent: 10});
+                let response = await API.graphql(graphqlOperation(queries.getForm, {formId: formId}));
+                let sourceForm = response['data']['getForm'];
+                let addFormResponse = await API.graphql(graphqlOperation(mutations.addForm, {input: {
+                    name : `Copy of ${sourceForm.name}`,
+                    description: sourceForm.description,
+                    accountId: sourceForm.accountId
+                }}));
+                store.view.setLoading({show: true, message: "Saving copy", status: "active", type : "line", percent: 30});
+                let addFormVersionResponse = await API.graphql(graphqlOperation(mutations.addFormVersion, {input: {
+                    formId: addFormResponse['data']['addForm'].id,
+                    accountId: sourceForm.accountId,
+                    notes: `Copied ${sourceForm.name}`,
+                    formData: sourceForm.version && sourceForm.version.formData ? sourceForm.version.formData : JSON.stringify({...EmptyForm})
+                }}));
+                this.forms.push(addFormVersionResponse['data']['addFormVersion']);
+            } catch (errorResponse) {
+                console.error(errorResponse);
+                localStore.errors = errorResponse.errors;
+            }
+            store.view.resetLoading();
+        },
         handleAdd: async function (values: any) {
-            console.log("FormsView.handleAdd values", values);
             let addFormResponse;
-            store.view.showLoading();
+            store.view.setLoading({show: true, message: "Creating new form", status: "active", type : "line", percent: 100});
             try {
                 addFormResponse = await API.graphql(graphqlOperation(mutations.addForm, {input: values}));
                 console.log("handleAdd Response", addFormResponse);
                 if (addFormResponse.errors) {
                     this.errors = addFormResponse.errors;
-                } else {
-                    this.fetch();
                 }
             } catch (errorResponse) {
-                this.errors = errorResponse.errors;
+                console.error(errorResponse);
+                localStore.errors = errorResponse.errors;
             }
-            console.log(this.errors);
             this.showAdd = false;
-            store.view.hideLoading();
+            store.view.resetLoading();
         },
         setSelectedItems: function(selectedItems) {
             this.selectedItems = selectedItems;
@@ -100,7 +123,7 @@ export const FormsView : React.FC<any> = () => {
                 <div style={{textAlign: "center"}}>
                     <Link to={`/canvas/edit/${record.id}`}><Button icon="setting">Edit</Button></Link>
                     <Divider type="vertical" />
-                    <Button icon="copy">Clone</Button>
+                    <Button icon="copy" onClick={(e) => localStore.handleClone(record.id)}>Clone</Button>
                     <Divider type="vertical" />
                     <Button type="danger" icon="pause">Pause</Button>
                 </div>
@@ -112,6 +135,7 @@ export const FormsView : React.FC<any> = () => {
         let fetch = async function () {
             localStore.loading = true;
             try {
+                store.view.setLoading({show: true, message: "Loading forms", status: "active", type : "line", percent: 100});
                 let response = await API.graphql(graphqlOperation(queries.listForms));
                 localStore.forms = response.data.listForms;
             } catch (errorResponse) {
@@ -122,6 +146,7 @@ export const FormsView : React.FC<any> = () => {
                 localStore.forms = [];
             }
             localStore.loading = false;
+            store.view.resetLoading();
         }
         fetch();
     }, [])
