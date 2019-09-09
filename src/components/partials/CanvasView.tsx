@@ -18,7 +18,7 @@ export interface ICanvasViewProps {
 
 const Canvas = React.lazy(() => import(/* webpackChunkName: "app-canvas" */ "@kartikrao/lib-forms/lib/components/canvas/Canvas").then((module) => {return {default: module.Canvas}}));
 
-export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({match}) => {
+export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({match, history}) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
@@ -36,7 +36,10 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
             localStore.showAddVersion = false;
         },
         onCancel: function() {
-
+            localStore.showAddVersion = false;
+        },
+        onClose: function() {
+            history.push(`/account/${match.params.accountId}/forms`)
         }
     }));
 
@@ -60,15 +63,18 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
     }, []);
 
     return useObserver(() => {
-        return <><Layout style={{height: '100%', overflow: 'hidden'}}>
+        return <Layout style={{height: '100%', overflow: 'hidden'}}>
         {localStore.showCanvas && <EditorStoreProvider formStore={localStore.formStore}>
             <React.Suspense fallback="Loading...">
-                <Canvas onSave={() => {localStore.showAddVersion = true}}/>
+                <Canvas onSave={() => {localStore.showAddVersion = true}} onClose={localStore.onClose}/>
             </React.Suspense>
+            {localStore.showAddVersion && <AddFormVersionView formId={localStore.formId}
+                tenant={localStore.form.accountId}
+                formData={localStore.formStore.form.asPlainObject}
+                onSave={localStore.onSaveComplete}
+                onCancel={localStore.onCancel}/>}
         </EditorStoreProvider>
         }
         </Layout>
-        {localStore.showAddVersion && <AddFormVersionView formId={localStore.formId} tenant={localStore.form.accountId} formData={localStore.formStore.form.asPlainObject} onSave={localStore.onSaveComplete} onCancel={localStore.onCancel}/>}
-        </>
     });
 }

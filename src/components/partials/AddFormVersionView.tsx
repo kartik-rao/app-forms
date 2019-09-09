@@ -7,6 +7,7 @@ import * as mutations from '../../graphql/mutations';
 import API, { graphqlOperation } from "@aws-amplify/api";
 import { toJS } from "mobx";
 import { IFormProps } from "@kartikrao/lib-forms-core";
+import { editorStoreContext } from "@kartikrao/lib-forms";
 
 export interface AddFormVersionViewProps extends FormComponentProps{
     onSave: (response: IFormProps) => void;
@@ -19,6 +20,9 @@ export interface AddFormVersionViewProps extends FormComponentProps{
 const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVersionViewProps) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
+
+    const editorStore = React.useContext(editorStoreContext);
+    if(!editorStore) throw new Error("EditorStore is null");
 
     const localStore = useLocalStore(() => ({
         notes: null as string,
@@ -52,9 +56,10 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
             onOk={localStore.onOk}>
             <Form layout="vertical">
                 <Form.Item label="Notes">
-                    {props.form.getFieldDecorator('notes', {rules:[
+                    { props.form.getFieldDecorator('notes', {rules:[
                         {required: true, message: "Please provide notes for this version"}
-                    ]})(<Input type="textarea" height={200} onChange={(e) => localStore.notes = e.target.value}/>)}
+                    ], initialValue: editorStore.changelog.join("\n")})
+                    (<Input type="textarea" height={200} onChange={(e) => localStore.notes = e.target.value}/>)}
                 </Form.Item>
             </Form>
         </Modal>
