@@ -1,15 +1,19 @@
 import * as React from "react";
 
-import NavigationView from "./NavigationView";
+import {NavigationView} from "./NavigationView";
+import { Card } from "antd";
+import { appStoreContext } from "../../stores/AppStoreProvider";
+import { useObserver } from "mobx-react-lite";
+import { withRouter, RouteComponentProps } from "react-router";
 
-export class Header extends React.Component<any, any> {
-    props: any;
-    constructor(props: any) {
-        super(props);
-        this.props = props;
-    }
+const Header : React.FC<RouteComponentProps<any>> = ({location}) => {
+    const store = React.useContext(appStoreContext);
+    if(!store) throw new Error("Store is null");
 
-    render() {
+    if(location && location.pathname)
+    return useObserver(() => {
         return <NavigationView />
-    }
+    })
 }
+
+export default withRouter(Header);

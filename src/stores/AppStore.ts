@@ -1,4 +1,4 @@
-import { useLocalStore } from "mobx-react";
+import { useLocalStore } from "mobx-react-lite";
 import { createAuthStore } from "./AuthStore";
 import { createRouterStore } from "./RouterStore";
 import { createViewStore } from "./ViewStore";

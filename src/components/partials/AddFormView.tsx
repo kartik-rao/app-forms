@@ -1,6 +1,6 @@
 import { Button, DatePicker, Form, Input, Row } from "antd";
 import { FormComponentProps } from 'antd/lib/form/Form';
-import { useLocalStore, useObserver } from "mobx-react";
+import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { appStoreContext } from "../../stores/AppStoreProvider";
 

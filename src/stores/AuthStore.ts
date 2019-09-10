@@ -5,27 +5,34 @@ import { observable, toJS } from "mobx";
 
 export type UserAttributesNames = "email"|"custom:group"|"custom:tenantId"|"custom:tenantName"|"given_name"|"family_name"|"environment"|"stack"|"region";
 
+
 export const createAuthStore = () => {
     const store = {
+        id: Math.random() * 1e6,
         authData : {} as CognitoUser,
         authState: "loading" as string,
         authError: "" as string,
         attributes: {} as { [key in UserAttributesNames]?: string },
         contextId: null as string,
         contextName: null as string,
+        ready : false as boolean,
+        get isReady() : boolean {
+            return this.ready == true && this.authState == "signedIn" && this.attributes && Object.keys(this.attributes).length > 0;
+        },
         handleAuthResponse: function(user: CognitoUser) {
             user.getUserAttributes((err, attributes: CognitoUserAttribute[]=[]) => {
                 if(!err) {
                     let attrs = {}
                     attributes.forEach((attr) => {
                         attrs[attr.getName()] = attr.getValue();
-                    })
+                    });
+                    this.setAuthData(user);
                     this.setUserAttributes(attrs);
                     this.setAuthState('signedIn');
-                    this.setAuthData(user);
+                    this.ready = true;
                 } else {
                     this.authError = err.message;
-                    console.log(err);
+                    console.error(err);
                 }
             });
         },
@@ -47,7 +54,7 @@ export const createAuthStore = () => {
             Auth.signOut().then(() => {
                 this.setAuthState('signIn');
             }).catch(e => {
-                console.log(e);
+                console.error(e);
             });
         },
         setContextId: function(id: string) {
@@ -69,18 +76,10 @@ export const createAuthStore = () => {
             return this.authState == 'signedIn';
         },
         get group() : string {
-            if (this.attributes) {
-                return this.attributes["custom:group"];
-            } else {
-                return null;
-            }
+            return this.attributes["custom:group"];
         },
         get tenant() : string {
-            if (this.attributes) {
-                return this.attributes["custom:tenantId"]
-            } else {
-                return null;
-            }
+            return this.attributes["custom:tenantId"]
         },
         get user() : CognitoUser {
             if (this.authState == 'signedIn') {
@@ -90,10 +89,16 @@ export const createAuthStore = () => {
             }
         },
         get isAdmin() {
-            return this.attributes && this.attributes["custom:group"] == "Admin";
+            return this.attributes["custom:group"] == "Admin";
         },
         get isAccountAdmin() {
-            return this.attributes && this.attributes["custom:group"] == "AccountAdmin";
+            return this.attributes["custom:group"] == "AccountAdmin";
+        },
+        resetAuth: function() {
+            this.setAuthData(null);
+            this.setUserAttributes({});
+            this.setAuthState('signIn');
+            this.ready = false;
         }
     }
     // let the Hub module listen on Auth events
@@ -108,28 +113,22 @@ export const createAuthStore = () => {
                         _store.handleAuthResponse(user);
                     }).catch(e => {
                         _store.authError = e.message;
-                        _store.setAuthState('signIn');
+                        _store.resetAuth();
                     });
                     break;
                 case 'signIn_failure':
-                    _store.setAuthState('signIn');
-                    _store.setAuthData(null);
+                    _store.resetAuth();
                     _store.authError = payload.data.message;
                     break;
                 case 'signUp_failure':
-                    _store.setAuthData(null);
-                    _store.setAuthState('signIn');
+                    _store.resetAuth();
                     _store.authError = payload.data.message;
                 default:
                     break;
             }
         }
     });
-    Auth.currentAuthenticatedUser().then(user => {
-        _store.handleAuthResponse(user);
-    }).catch(e => {
-        _store.setAuthState('signIn');
-    });
+
     return _store;
 }
 export type AuthStoreType = ReturnType<typeof createAuthStore>;

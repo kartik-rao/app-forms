@@ -7,7 +7,14 @@ export const createViewStore = () => {
     const store = {
         currentView: {name: ''} as {name: string},
         loading: {} as ProgressViewProps,
-        debug: location.href.indexOf('localhost') > -1,
+        debug: location.href.indexOf('localhost') > -1 as boolean,
+        inAccountMenuCollapsed: true as boolean,
+        get collapseAccountMenu() : boolean {
+            return this.inAccountMenuCollapsed;
+        },
+        toggleAccountMenu: function() {
+            this.inAccountMenuCollapsed = !this.inAccountMenuCollapsed;
+        },
         setLoading: function(progress: ProgressViewProps) {
             this.loading = progress;
         },

@@ -1,7 +1,8 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import { Button, Card, Col, Drawer, Row, Skeleton, Tag } from "antd";
 import Typography from "antd/lib/typography";
-import { useLocalStore, useObserver } from "mobx-react";
+import { autorun, toJS } from "mobx";
+import { useLocalStore, useObserver } from "mobx-react-lite";
 import moment from "moment";
 import * as React from "react";
 import { StringFilterExpression, UserFilterInput } from "../../Amplify";
@@ -9,15 +10,17 @@ import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
 import InviteUserView from "./InviteUserView";
-import { autorun, when } from "mobx";
+import { RouteComponentProps } from "react-router-dom";
 
 export interface IUsersViewProps {
-    onUpdate?: () => void;
+    // onUpdate?: () => void;
+    accountId: string;
 }
 
-export const UsersView: React.FC<IUsersViewProps> = (props: IUsersViewProps) => {
+export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match}) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
+
     const localStore = useLocalStore(() => ({
         errors: [] as any[],
         users : [] as any[],
@@ -31,7 +34,7 @@ export const UsersView: React.FC<IUsersViewProps> = (props: IUsersViewProps) => 
             this.loading = true;
             try {
               await authStore.signUp(values);
-              props.onUpdate ? props.onUpdate() : void(0);
+            //   props.onUpdate ? props.onUpdate() : void(0);
             } catch (error) {
                 this.errors = error;
                 console.log("signup error", error);
@@ -126,20 +129,24 @@ export const UsersView: React.FC<IUsersViewProps> = (props: IUsersViewProps) => 
         async function fetch () {
             localStore.loading = true;
             store.view.setLoading({show: true, message: "Loading users", status: "active", type : "line", percent: 100});
+            let query = "";
+            console.log("in useEffect", "Attributes", toJS(store.auth.attributes), "isAdmin", store.auth.isAdmin, "Tenant", store.auth.tenant);
             try {
-                if (store.auth.isAdmin) {
+                if (store.auth.isAdmin == true) {
                     let filter : UserFilterInput;
-                    if (store.auth.contextId) {
-                        filter = {criteria:[{"accountId":{expression: StringFilterExpression.eq, value: [store.auth.contextId]}}]}
+                    if (match.params.accountId) {
+                        filter = {criteria:[{"accountId":{expression: StringFilterExpression.eq, value: [match.params.accountId]}}]}
                     }
+                    query = "ListUsers";
                     let response = await API.graphql(graphqlOperation(queries.listUsers, {filter : filter}));
                     localStore.users = response['data']['listUsers']
                 } else {
+                    query = "GetAccount";
                     let response = await API.graphql(graphqlOperation(queries.getAccount, {"$accountId": store.auth.tenant}));
                     localStore.users = response['data']['getAccount']['users']
                 }
             } catch (errorResponse) {
-                console.error(errorResponse);
+                console.log(query, errorResponse.errors);
                 localStore.errors = errorResponse.errors;
             }
             if (!localStore.users) {
@@ -149,7 +156,7 @@ export const UsersView: React.FC<IUsersViewProps> = (props: IUsersViewProps) => 
             localStore.loading = false;
         }
         autorun(()=>{
-            store.auth.contextId;
+            store.auth.tenant;
             fetch();
         });
         fetch();

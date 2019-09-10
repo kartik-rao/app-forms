@@ -1,7 +1,7 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import { Form, Select, Spin, Icon } from "antd";
 import { FormComponentProps } from 'antd/lib/form/Form';
-import { useLocalStore, useObserver } from "mobx-react";
+import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";

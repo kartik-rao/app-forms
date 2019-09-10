@@ -3,7 +3,7 @@ import { EditorStoreProvider } from "@kartikrao/lib-forms";
 import { createFormStore, EmptyForm, Factory, IFormProps } from "@kartikrao/lib-forms-core";
 import "@kartikrao/lib-forms/lib/forms.editors.m.css";
 import { Layout } from "antd";
-import { useLocalStore, useObserver } from "mobx-react";
+import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import * as queries from '../../graphql/queries';

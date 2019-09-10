@@ -1,6 +1,6 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import { Card, Col, Row, Typography, Skeleton } from "antd";
-import { useLocalStore, useObserver } from "mobx-react";
+import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";

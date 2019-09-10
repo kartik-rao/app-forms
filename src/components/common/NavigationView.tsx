@@ -5,26 +5,25 @@ import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import { appStoreContext } from '../../stores/AppStoreProvider';
 import { ProgressView } from '../partials/ProgressView';
 
-export const NavigationView: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
+export interface NavigationViewProps {
+    accountId?: string;
+}
+export const NavigationView: React.FC<NavigationViewProps> = (props) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
-    const selected = [props.location.pathname];
-
+    const path = window.location.pathname;
+    let selected;
+    if(path.indexOf("forms") > -1) {
+        selected = "/form"
+    } else if (path.indexOf("user") > -1) {
+        selected = "/users"
+    }
     return useObserver(() => {
-        return store.auth.user && <Menu selectedKeys={selected} mode="horizontal" theme="light">
+        return store.auth.user && <Menu selectedKeys={[selected]} mode="horizontal" theme="light">
         <Menu.Item disabled={true}><h2 style={{margin: 0, fontVariant: "tabular-nums"}}>Forms.li</h2></Menu.Item>
         <Menu.Item key="/">
             <Link to="/"><Icon type="home" />Home</Link>
-        </Menu.Item>
-        <Menu.Item key="/forms">
-            <Link to="/forms"><Icon type="file-text" />Forms</Link>
-        </Menu.Item>
-        <Menu.Item key="/integrations">
-            <Link to="/integrations"><Icon type="thunderbolt" />Integrations</Link>
-        </Menu.Item>
-        <Menu.Item key="/admin">
-            <Link to="/admin"><Icon type="setting" />Admin</Link>
         </Menu.Item>
         { store.auth.group == 'Admin' &&
             <Menu.Item key="/accounts">
@@ -36,6 +35,18 @@ export const NavigationView: React.FC<RouteComponentProps> = (props: RouteCompon
                 <Link to="/users"><Icon type="team" />Users</Link>
             </Menu.Item>
         }
+        {props && props.accountId && <><Menu.Item>
+            <Link to={`/account/${props.accountId}/`}><Icon type="home"/><span>Home</span></Link>
+        </Menu.Item>
+        <Menu.Item>
+            <Link to={`/account/${props.accountId}/users`}><Icon type="team"/><span>Users</span></Link>
+        </Menu.Item>
+        <Menu.Item>
+            <Link to={`/account/${props.accountId}/forms`}><Icon type="file-text"/><span>Forms</span></Link>
+        </Menu.Item> </>}
+        <Menu.Item key="/admin">
+            <Link to="/admin"><Icon type="setting" />Admin</Link>
+        </Menu.Item>
         <Menu.SubMenu title={store.auth.user && store.auth.attributes ? store.auth.attributes.email : ""} style={{float:"right"}}>
             <Menu.Item key="/profile">
                 <Link to="/profile"><Icon type="user" />Profile</Link>
@@ -49,5 +60,3 @@ export const NavigationView: React.FC<RouteComponentProps> = (props: RouteCompon
     </Menu>
     })
 }
-
-export default withRouter(NavigationView);

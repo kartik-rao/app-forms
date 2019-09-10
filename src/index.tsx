@@ -13,19 +13,20 @@ Amplify.configure({
     'aws_appsync_graphqlEndpoint': 'https://ugn2kqey75aolcnah6vtnbuydi.appsync-api.ap-northeast-1.amazonaws.com/graphql',
     'aws_appsync_region': 'ap-northeast-1',
     'aws_appsync_authenticationType': 'AMAZON_COGNITO_USER_POOLS',
-    oauth: {
-        // Domain name
-        domain: 'dev-auth-formsli.auth.ap-northeast-1.amazoncognito.com',
-        // Authorized scopes
-        scope: ['phone', 'email', 'profile', 'openid'],
-        // Callback URL
-        redirectSignIn: 'http://localhost:8085/', // or 'exp://127.0.0.1:19000/--/', 'myapp://main/'
-        // Sign out URL
-        redirectSignOut: 'http://localhost:8085/', // or 'exp://127.0.0.1:19000/--/', 'myapp://main/'
-        responseType: 'code'
-    },
+    // oauth: {
+    //     // Domain name
+    //     domain: 'dev-auth-formsli.auth.ap-northeast-1.amazoncognito.com',
+    //     // Authorized scopes
+    //     scope: ['phone', 'email', 'profile', 'openid'],
+    //     // Callback URL
+    //     redirectSignIn: 'http://localhost:8085/', // or 'exp://127.0.0.1:19000/--/', 'myapp://main/'
+    //     // Sign out URL
+    //     redirectSignOut: 'http://localhost:8085/', // or 'exp://127.0.0.1:19000/--/', 'myapp://main/'
+    //     responseType: 'code'
+    // },
     graphql_headers: async () => {
         try {
+            console.log("GQL Headers Auth Running")
             const token = (await Auth.currentSession()).getIdToken().getJwtToken();
             return { Authorization: token }
         }

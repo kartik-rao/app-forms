@@ -1,6 +1,6 @@
 import { Button, Card, Empty, Icon, Input, List, Table } from "antd";
 import { PaginationConfig, TableSize } from "antd/lib/table";
-import { useLocalStore } from "mobx-react";
+import { useLocalStore } from "mobx-react-lite";
 import { useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { appStoreContext } from "../../stores/AppStoreProvider";

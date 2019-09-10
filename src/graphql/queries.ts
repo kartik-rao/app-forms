@@ -23,7 +23,6 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     ownedBy {
       id
       ownerId
-      accountId
       email
       userGroup
       given_name
@@ -55,7 +54,6 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     users {
       id
       ownerId
-      accountId
       email
       userGroup
       given_name

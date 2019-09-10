@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Modal, Form, Input, notification} from "antd";
 import { FormComponentProps } from "antd/lib/form";
-import { useLocalStore, useObserver } from "mobx-react";
+import { useLocalStore, useObserver } from "mobx-react-lite";
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import * as mutations from '../../graphql/mutations';
 import API, { graphqlOperation } from "@aws-amplify/api";
