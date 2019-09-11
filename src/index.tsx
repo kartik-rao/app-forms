@@ -26,8 +26,11 @@ Amplify.configure({
     // },
     graphql_headers: async () => {
         try {
-            console.log("GQL Headers Auth Running")
-            const token = (await Auth.currentSession()).getIdToken().getJwtToken();
+            let token = localStorage.getItem("token")
+            if(!token) {
+                token = (await Auth.currentSession()).getIdToken().getJwtToken();
+                localStorage.setItem("token", token);
+            }
             return { Authorization: token }
         }
         catch (e) {

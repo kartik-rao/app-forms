@@ -8,7 +8,6 @@ import { RouteComponentProps } from "react-router-dom";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 
-
 const Description = ({ term, children, span = 12 }) => (
     <Col span={span}>
         <div className="fl-pageheader-description">
@@ -48,12 +47,13 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (pr
         let fetch = async function() {
             localStore.loading = true;
             store.view.setLoading({show: true, message: "Loading account", status: "active", type : "line", percent: 100});
-            try{
+            try {
                 let args = {accountId: props.match.params.accountId};
                 let account: any = await API.graphql(graphqlOperation(queries.getAccount, args));
                 localStore.account = account.data.getAccount;
                 localStore.loading = false;
             } catch (errorResponse) {
+                store.view.currentAccount = null;
                 localStore.errors = errorResponse.errors;
             }
             store.view.resetLoading();
@@ -63,7 +63,6 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (pr
 
     return useObserver(() => {
         return  <>{localStore.loading ? <Skeleton active /> :
-            <><Menu><Menu.Item>Forms</Menu.Item></Menu>
             <PageHeader title={localStore.account.name}
                 subTitle={localStore.account.plan ? localStore.account.plan.planType.name : 'FREE'}>
             <div className="fl-pageheader-wrap">
@@ -74,7 +73,7 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (pr
                     <Description term="Updated">{localStore.updatedAt}</Description>
                 </Row>
             </div>
-            </PageHeader></>
+            </PageHeader>
         }
     </>
     })

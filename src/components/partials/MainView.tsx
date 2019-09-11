@@ -32,7 +32,7 @@ export const MainView: React.FC<any> = () => {
                         <Route exact={true} path="/users"                component={UsersView}  key="allusersview"/>
                         <Layout style={{height: '100%', backgroundColor: "#ffff" }}>
                             <Route path="/account/:accountId"  component={InAccountMenuView}/>
-                            <Layout.Content>
+                            <Layout.Content style={{borderLeft: "1px solid gray"}}>
                                 <Route exact path="/account/:accountId"          component={AccountView} key="accountview"/>
                                 <Route path="/account/:accountId/forms"          component={FormsView}   key="formsview"/>
                                 <Route path="/account/:accountId/users"          component={UsersView}   key="usersview"/>

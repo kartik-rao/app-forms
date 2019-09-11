@@ -6,13 +6,13 @@ import { appStoreContext } from "../../stores/AppStoreProvider";
 import { useObserver } from "mobx-react-lite";
 import { withRouter, RouteComponentProps } from "react-router";
 
-const Header : React.FC<RouteComponentProps<any>> = ({location}) => {
+const Header : React.FC<RouteComponentProps<any>> = (props) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
     if(location && location.pathname)
     return useObserver(() => {
-        return <NavigationView />
+        return <NavigationView {...props}/>
     })
 }
 

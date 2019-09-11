@@ -1,28 +1,64 @@
-import { Icon, Menu } from 'antd';
-import { useObserver } from 'mobx-react';
+import API, { graphqlOperation } from "@aws-amplify/api";
+import { Icon, Menu, Tag } from 'antd';
+import { useObserver, useLocalStore } from 'mobx-react-lite';
 import * as React from "react";
-import { Link, RouteComponentProps, withRouter } from "react-router-dom";
+import { Link, RouteComponentProps } from "react-router-dom";
+import * as queries from '../../graphql/queries';
 import { appStoreContext } from '../../stores/AppStoreProvider';
 import { ProgressView } from '../partials/ProgressView';
 
-export interface NavigationViewProps {
-    accountId?: string;
-}
-export const NavigationView: React.FC<NavigationViewProps> = (props) => {
+
+export const NavigationView: React.FC<RouteComponentProps<any>> = ({history, match, location}) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
-    const path = window.location.pathname;
-    let selected;
-    if(path.indexOf("forms") > -1) {
-        selected = "/form"
-    } else if (path.indexOf("user") > -1) {
-        selected = "/users"
-    }
+    const path = location.pathname;
+
+    const localStore = useLocalStore(() => ({
+        account: {} as any,
+        get accountId() : string {
+            let matches = path.match(/account\/(.+)\/.+/);
+            let accountId = matches && matches.length > 1 ? matches[1] : null;
+            return accountId;
+        },
+        get selected() : string[] {
+            let selected;
+            if(path.indexOf("forms") > -1) {
+                selected = "/form"
+            } else if (path.indexOf("user") > -1) {
+                selected = "/users"
+            } else if (path.indexOf("/account/") > -1) {
+                selected = "/accounts"
+            } else if (path.indexOf("/admin") > -1) {
+                selected = "/admin"
+            } else if (path.indexOf("/profile") > -1) {
+                selected = "/profile"
+            } else {
+                selected = "/home"
+            }
+            return [selected];
+        }
+    }));
+
+    let fetch = async function(accountId: string) {
+        try {
+            let account: any = await API.graphql(graphqlOperation(queries.getAccount, {accountId: accountId}));
+            localStore.account = account.data.getAccount;
+        } catch (error) {
+            localStore.account = null;
+        }
+    };
+
+    React.useEffect(() => {
+        if(localStore.accountId) {
+            fetch(localStore.accountId);
+        }
+    }, []);
+
     return useObserver(() => {
-        return store.auth.user && <Menu selectedKeys={[selected]} mode="horizontal" theme="light">
-        <Menu.Item disabled={true}><h2 style={{margin: 0, fontVariant: "tabular-nums"}}>Forms.li</h2></Menu.Item>
-        <Menu.Item key="/">
+        return store.auth.user && <Menu selectedKeys={localStore.selected} mode="horizontal" theme="light">
+        <Menu.Item key="formsli-brand" disabled={true}><h2 style={{margin: 0, fontVariant: "tabular-nums"}}>Forms.li</h2></Menu.Item>
+        <Menu.Item key="/home">
             <Link to="/"><Icon type="home" />Home</Link>
         </Menu.Item>
         { store.auth.group == 'Admin' &&
@@ -35,19 +71,10 @@ export const NavigationView: React.FC<NavigationViewProps> = (props) => {
                 <Link to="/users"><Icon type="team" />Users</Link>
             </Menu.Item>
         }
-        {props && props.accountId && <><Menu.Item>
-            <Link to={`/account/${props.accountId}/`}><Icon type="home"/><span>Home</span></Link>
-        </Menu.Item>
-        <Menu.Item>
-            <Link to={`/account/${props.accountId}/users`}><Icon type="team"/><span>Users</span></Link>
-        </Menu.Item>
-        <Menu.Item>
-            <Link to={`/account/${props.accountId}/forms`}><Icon type="file-text"/><span>Forms</span></Link>
-        </Menu.Item> </>}
         <Menu.Item key="/admin">
             <Link to="/admin"><Icon type="setting" />Admin</Link>
         </Menu.Item>
-        <Menu.SubMenu title={store.auth.user && store.auth.attributes ? store.auth.attributes.email : ""} style={{float:"right"}}>
+        <Menu.SubMenu key="usersubmenu" title={store.auth.user && store.auth.attributes ? store.auth.attributes.email : ""} style={{float:"right"}}>
             <Menu.Item key="/profile">
                 <Link to="/profile"><Icon type="user" />Profile</Link>
             </Menu.Item>
@@ -55,8 +82,10 @@ export const NavigationView: React.FC<NavigationViewProps> = (props) => {
                 <a onClick={(e) => store.auth.signOut()}><Icon type="logout"/> Sign out</a>
             </Menu.Item>
         </Menu.SubMenu>
-        <span style={{float: "right"}}><ProgressView {...store.view.loading}/></span>
-        <Menu.Item disabled={true}><h3 style={{margin: 0, fontVariant: "tabular-nums"}}>{store.auth.attributes["custom:tenantName"]}</h3></Menu.Item>
+        <Menu.Item key="accountname" disabled={true}>
+            <Tag color="geekblue">{localStore.account ? localStore.account.name : ""}</Tag>
+        </Menu.Item>
+        <span key="progressview" style={{float: "right"}}><ProgressView {...store.view.loading}/></span>
     </Menu>
     })
 }

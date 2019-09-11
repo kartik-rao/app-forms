@@ -78,7 +78,6 @@ export const App : React.FC<IAppProps> = (props: IAppProps) => {
     React.useEffect(() => {
       let fetchAuth = function() {
         Auth.currentAuthenticatedUser().then(user => {
-          console.log(`Auth [${store.auth.id}] useEffect`)
           store.auth.handleAuthResponse(user);
         }).catch(e => {
             console.log("User must sign in again");
