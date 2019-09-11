@@ -53,7 +53,6 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (pr
                 localStore.account = account.data.getAccount;
                 localStore.loading = false;
             } catch (errorResponse) {
-                store.view.currentAccount = null;
                 localStore.errors = errorResponse.errors;
             }
             store.view.resetLoading();
