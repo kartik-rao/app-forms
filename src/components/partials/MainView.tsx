@@ -15,7 +15,8 @@ const AdminView = React.lazy(() => import(/* webpackChunkName: "app-admin" */ ".
 const UsersView = React.lazy(() => import(/* webpackChunkName: "app-users" */ "./UsersView").then((module) => {return {default: module.UsersView}}));
 const AccountView = React.lazy(() => import(/* webpackChunkName: "app-accadmin" */ "./AccountView").then((module) => {return {default: module.AccountView}}));
 
-const AllPaths = ["/", "/profile", "/admin", "/accounts", "/users",
+const AllPaths = [
+    "/", "/profile", "/admin", "/accounts", "/users",
     "/account/:accountId",
     "/account/:accountId/forms",
     "/account/:accountId/users",
@@ -31,14 +32,14 @@ export const MainView: React.FC<any> = () => {
         return <Layout >
             <BrowserRouter>
                 <Layout.Header className="fl-header">
-                    <Header />
+                    <Route component={Header} exact={true} path={AllPaths} />
                 </Layout.Header>
                 <Layout.Content className="fl-content">
                     <React.Suspense fallback={<Loading />}>
                     <Layout style={{height: '100%', backgroundColor: "#ffff" }} hasSider={true}>
                         <Route component={SiderNavView} exact={true} path={AllPaths} />
                         <Layout.Content style={{borderLeft: "1px solid gray"}}>
-                        <Route exact={true} path="/accounts"             component={AllAccountsView} key="allaccountsview"/>
+                            <Route exact={true} path="/accounts"             component={AllAccountsView} key="allaccountsview"/>
                             <Route exact={true} path="/admin"                component={AdminView}   key="adminview"/>
                             <Route exact={true} path="/users"                component={UsersView}   key="allusersview"/>
                             <Route exact path="/account/:accountId"          component={AccountView} key="accountview"/>
