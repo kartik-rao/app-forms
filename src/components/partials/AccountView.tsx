@@ -61,7 +61,8 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (pr
     }, [])
 
     return useObserver(() => {
-        return  <>{localStore.loading ? <Skeleton active /> :
+        return  <Row>
+        <Col span={24} style={{padding:"25px"}}>{localStore.loading ? <Skeleton active /> :
             <PageHeader title={localStore.account.name}
                 subTitle={localStore.account.plan ? localStore.account.plan.planType.name : 'FREE'}>
             <div className="fl-pageheader-wrap">
@@ -74,6 +75,6 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (pr
             </div>
             </PageHeader>
         }
-    </>
+    </Col></Row>
     })
 }

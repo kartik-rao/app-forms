@@ -26,11 +26,8 @@ Amplify.configure({
     // },
     graphql_headers: async () => {
         try {
-            let token = localStorage.getItem("token")
-            if(!token) {
-                token = (await Auth.currentSession()).getIdToken().getJwtToken();
-                localStorage.setItem("token", token);
-            }
+            let token = (await Auth.currentSession()).getIdToken().getJwtToken();
+            localStorage.setItem("token", token);
             return { Authorization: token }
         }
         catch (e) {

@@ -130,7 +130,6 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
             localStore.loading = true;
             store.view.setLoading({show: true, message: "Loading users", status: "active", type : "line", percent: 100});
             let query = "";
-            console.log("in useEffect", "Attributes", toJS(store.auth.attributes), "isAdmin", store.auth.isAdmin, "Tenant", store.auth.tenant);
             try {
                 if (store.auth.isAdmin == true) {
                     let filter : UserFilterInput;
@@ -164,7 +163,7 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
 
     return useObserver(() => {
         return <Row>
-        <Col span={20} offset={2} style={{padding:"25px"}}>
+        <Col span={24} style={{padding:"25px"}}>
             {
                 localStore.loading ? <Skeleton active />:
                 <>

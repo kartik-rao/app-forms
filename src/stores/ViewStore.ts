@@ -9,6 +9,8 @@ export const createViewStore = () => {
         loading: {} as ProgressViewProps,
         debug: location.href.indexOf('localhost') > -1 as boolean,
         inAccountMenuCollapsed: true as boolean,
+        userContextId: null as any,
+        userContextData: null as any,
         get collapseAccountMenu() : boolean {
             return this.inAccountMenuCollapsed;
         },

@@ -155,7 +155,7 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
     }, [])
     return  useObserver(() => {
         return <Row>
-        <Col span={20} offset={2} style={{padding:"25px"}}>
+        <Col span={24} style={{padding:"25px"}}>
             {
                 localStore.loading ? <Skeleton active />:
                 <>

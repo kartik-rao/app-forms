@@ -15,7 +15,7 @@ export const NavigationView: React.FC<RouteComponentProps<any>> = ({history, mat
     const path = location.pathname;
 
     const localStore = useLocalStore(() => ({
-        account: {} as any,
+        account: null as any,
         get accountId() : string {
             let matches = path.match(/account\/(.+)\/.+/);
             let accountId = matches && matches.length > 1 ? matches[1] : null;
@@ -82,9 +82,9 @@ export const NavigationView: React.FC<RouteComponentProps<any>> = ({history, mat
                 <a onClick={(e) => store.auth.signOut()}><Icon type="logout"/> Sign out</a>
             </Menu.Item>
         </Menu.SubMenu>
-        <Menu.Item key="accountname" disabled={true}>
-            <Tag color="geekblue">{localStore.account ? localStore.account.name : ""}</Tag>
-        </Menu.Item>
+        {localStore.account && <Menu.Item key="accountname" disabled={true}>
+            <Tag color="geekblue">{localStore.account.name}</Tag>
+        </Menu.Item>}
         <span key="progressview" style={{float: "right"}}><ProgressView {...store.view.loading}/></span>
     </Menu>
     })
