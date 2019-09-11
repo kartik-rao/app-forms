@@ -1,19 +1,18 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import { Button, Card, Col, Drawer, Row, Skeleton, Tag } from "antd";
 import Typography from "antd/lib/typography";
-import { autorun, toJS } from "mobx";
+import { autorun } from "mobx";
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import moment from "moment";
 import * as React from "react";
+import { RouteComponentProps } from "react-router-dom";
 import { StringFilterExpression, UserFilterInput } from "../../Amplify";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
 import InviteUserView from "./InviteUserView";
-import { RouteComponentProps } from "react-router-dom";
 
 export interface IUsersViewProps {
-    // onUpdate?: () => void;
     accountId: string;
 }
 
@@ -28,18 +27,16 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
         selectedItems : [] as any[],
         loading: true,
         handleAdd : async function(values: any) {
-            let {store} = this.props;
-            let {authStore} = store;
-            values["custom:source"] = authStore.user.username;
+            values["custom:source"] = store.auth.user.getUsername();
             this.loading = true;
             try {
-              await authStore.signUp(values);
-            //   props.onUpdate ? props.onUpdate() : void(0);
+                store.view.setLoading({show: true, message: "Adding User", status: "active", type : "line", percent: 100});
+                await store.auth.signUp(values);
             } catch (error) {
                 this.errors = error;
                 console.log("signup error", error);
             } finally {
-                store.hideLoading();
+                store.view.resetLoading();
             }
             this.showAdd = false;
         },
