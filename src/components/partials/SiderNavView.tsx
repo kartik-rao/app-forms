@@ -43,7 +43,7 @@ export const SiderNavView : React.FC<RouteComponentProps<SiderNavViewProps>> = (
                 </Menu.Item>
             }
             {store.auth.isAdmin && !!match.params.accountId && <Menu.Divider key="admin-divider"/>}
-            {match.params.accountId && <Menu.Item key="a-account">
+            {match.params.accountId && <Menu.Item key="a-account" >
                 <Link to={`/account/${match.params.accountId}/`}><Icon type="home"/><span>Account</span></Link>
             </Menu.Item>}
             {match.params.accountId && <Menu.Item  key="a-users">
