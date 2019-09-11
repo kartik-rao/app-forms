@@ -1,37 +1,53 @@
-import * as React from "react";
-import {Logger} from "@kartikrao/lib-logging";
-import {NavigationView} from "./NavigationView";
-import { appStoreContext } from "../../stores/AppStoreProvider";
-import { useObserver, useLocalStore } from "mobx-react-lite";
-import { withRouter, RouteComponentProps } from "react-router";
 import API, { graphqlOperation } from "@aws-amplify/api";
-import * as queries from '../../graphql/queries';
-import { toJS } from "mobx";
-import { Breadcrumb, Menu, Icon, Tag } from "antd";
+import { Logger } from "@kartikrao/lib-logging";
+import { Icon, Menu } from "antd";
+import { useLocalStore, useObserver } from "mobx-react-lite";
+import * as React from "react";
+import { RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
+import * as queries from '../../graphql/queries';
+import { appStoreContext } from "../../stores/AppStoreProvider";
 import { ProgressView } from "../partials/ProgressView";
-
 
 const logger = Logger.getInstance(['HeaderView'], Logger.severity.info);
 
 let withFirstUpper = function(str: string) : string {
     return str[0].toUpperCase() + str.substring(1);
 }
+
 const Header : React.FC<RouteComponentProps<any>> = (props) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
     const localStore = useLocalStore(() => ({
-        currentPath : props.location.pathname,
-        loading: true as boolean,
-        account: {} as any,
-        get currentContext() : string {
-            let context = this.currentPath;
-            context = context.replace(/\//g, " / ");
-            if (store.view.userContextId) {
-                return context.replace(store.view.userContextId, this.account.name);
+        loading: false as boolean,
+        account: null as any,
+        get accountId() : string {
+            if(!store.auth.isAdmin) {
+                return store.auth.tenant;
             } else {
-                return context;
+                let matches = localStore.currentPath.match(/account\/([\w|\-]+)/);
+                if(matches && matches.length > 1) {
+                    return matches[1];
+                } else {
+                    return null;
+                }
+            }
+        },
+        currentPath : props.location.pathname,
+        get breadcrumb() : string {
+            let breadcrumb = this.currentPath;
+            if (this.accountId) {
+                if (this.account) {
+                    breadcrumb = breadcrumb.replace("/account/","");
+                    breadcrumb = breadcrumb.replace(/\//g, " / ");
+                    return breadcrumb.replace(this.accountId, this.account.name);
+                } else {
+                    // When this is called on first load before fetch as run
+                    return "";
+                }
+            } else {
+                return `All ${breadcrumb.replace("/", "")}`;
             }
         }
     }));
@@ -44,38 +60,26 @@ const Header : React.FC<RouteComponentProps<any>> = (props) => {
         let fetch = async function() {
             localStore.loading = true;
             try {
-                let account: any = await API.graphql(graphqlOperation(queries.getAccount, {accountId: store.view.userContextId}));
-                store.view.userContextData = account.data.getAccount;
+                let account: any = await API.graphql(graphqlOperation(queries.getAccount, {accountId: localStore.accountId}));
                 localStore.account = account.data.getAccount;
             } catch (error) {
-                logger.error(`Header.useEffect.getAccount(${store.view.userContextId})`, error);
+                logger.error(`Header.useEffect.getAccount(${localStore.accountId})`, error);
             }
             localStore.loading = false;
         }
 
-        let contextId;
-        if(!store.auth.isAdmin) {
-            contextId = store.auth.tenant;
-        } else {
-            let matches = props.location.pathname.match(/account\/(.+)\//);
-            if(matches && matches.length > 1) {
-                contextId = matches[1];
-            }
-        }
-        if(contextId && (contextId != store.view.userContextId || !store.view.userContextData)) {
-            store.view.userContextId = contextId;
+        if(localStore.accountId) {
             fetch();
         } else {
-            store.view.userContextId = null;
-            store.view.userContextData = null;
+            localStore.account = null;
         }
-    }, []);
+    }, [localStore.accountId]);
 
     return useObserver(() => {
-        return <><Menu mode="horizontal" theme="light">
+        return <Menu mode="horizontal" theme="light">
             <Menu.Item key="formsli-brand" disabled={true}><h2 style={{margin: 0, fontVariant: "tabular-nums"}}>Forms.li</h2></Menu.Item>
-            {!localStore.loading && <Menu.Item key="user-context" disabled={true}><h4 style={{margin: 0, fontVariant: "tabular-nums"}}> {localStore.currentContext} </h4></Menu.Item>}
-            <Menu.SubMenu key="usersubmenu" title={store.auth.user && store.auth.attributes ? store.auth.attributes.email : ""} style={{float:"right"}}>
+            <Menu.Item key="breadcrumb" disabled={true}>{!localStore.loading && <h4 style={{margin: 0, fontVariant: "tabular-nums"}}> {localStore.breadcrumb} </h4>}</Menu.Item>
+            <Menu.SubMenu key="user-menu" title={store.auth.user && store.auth.attributes ? store.auth.attributes.email : ""} style={{float:"right"}}>
                 <Menu.Item key="/profile">
                     <Link to="/profile"><Icon type="user" />Profile</Link>
                 </Menu.Item>
@@ -85,8 +89,6 @@ const Header : React.FC<RouteComponentProps<any>> = (props) => {
             </Menu.SubMenu>
             <span key="progressview" style={{float: "right"}}><ProgressView {...store.view.loading}/></span>
         </Menu>
-
-        </>
     })
 }
 

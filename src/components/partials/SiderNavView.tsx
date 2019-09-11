@@ -30,11 +30,11 @@ export const SiderNavView : React.FC<RouteComponentProps<SiderNavViewProps>> = (
     history.listen((location) => {
         localStore.currentPath = location.pathname;
     });
-
+    console.log(match.params.accountId, store.auth.isAdmin)
     return useObserver(() => {
         return <Layout.Sider theme="light" trigger={null} collapsible collapsed={store.view.collapseAccountMenu}>
             <Menu mode="inline" selectedKeys={localStore.selectedPath}>
-            {store.auth.isAdmin && <Menu.Item key="account">
+            {store.auth.isAdmin && <Menu.Item key="accounts">
                     <Link to="/accounts"><Icon type="book" /><span>All Accounts</span></Link>
                 </Menu.Item>
             }
@@ -42,7 +42,7 @@ export const SiderNavView : React.FC<RouteComponentProps<SiderNavViewProps>> = (
                     <Link to="/users"><Icon type="team" /><span>All Users</span></Link>
                 </Menu.Item>
             }
-            {store.auth.isAdmin && <Menu.Divider key="admin-divider"/>}
+            {store.auth.isAdmin && !!match.params.accountId && <Menu.Divider key="admin-divider"/>}
             {match.params.accountId && <Menu.Item key="a-account">
                 <Link to={`/account/${match.params.accountId}/`}><Icon type="home"/><span>Account</span></Link>
             </Menu.Item>}
