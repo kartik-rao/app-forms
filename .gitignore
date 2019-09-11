@@ -1,6 +1,5 @@
 node_modules
 .awcache
-
 build/
 dist/
 node_modules/
