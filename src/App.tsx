@@ -1,3 +1,4 @@
+import Auth from "@aws-amplify/auth";
 import 'airbnb-browser-shims';
 import { Col, Layout, Row } from "antd";
 import { Authenticator, Greetings } from 'aws-amplify-react';
@@ -5,11 +6,9 @@ import { useObserver } from "mobx-react-lite";
 import * as React from "react";
 import './app.css';
 import { MainView } from "./components/partials/MainView";
-import Auth from "@aws-amplify/auth";
-
 import { createAppStore } from './stores/AppStore';
 import { AppStoreProvider } from "./stores/AppStoreProvider";
-import { autorun } from 'mobx';
+
 
 export interface IAppProps {
     authState?: string;
@@ -80,7 +79,6 @@ export const App : React.FC<IAppProps> = (props: IAppProps) => {
         Auth.currentAuthenticatedUser().then(user => {
           store.auth.handleAuthResponse(user);
         }).catch(e => {
-            console.log("User must sign in again");
             store.auth.resetAuth();
         });
       }

@@ -1,13 +1,10 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
-import { Form, Select, Spin, Icon } from "antd";
+import { Form, Icon, Select, Skeleton } from "antd";
 import { FormComponentProps } from 'antd/lib/form/Form';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
-import { Loading } from "../common/Loading";
-
-const antIcon = <Icon type="loading" style={{ fontSize: 16 }} spin />;
 
 const AccountListView: React.FC<FormComponentProps> = (props) => {
     const store = React.useContext(appStoreContext);
@@ -29,6 +26,7 @@ const AccountListView: React.FC<FormComponentProps> = (props) => {
     React.useEffect(() => {
         let fetch  = async () => {
             localStore.loading = true;
+            store.view.setLoading({show: true, message: "Loading accounts", status: "active", type : "line", percent: 100});
             try {
                 let allAccounts = await API.graphql(graphqlOperation(queries.listAccounts));
                 localStore.accounts = allAccounts['data']['listAccounts'];
@@ -40,12 +38,13 @@ const AccountListView: React.FC<FormComponentProps> = (props) => {
                 localStore.accounts = [];
             }
             localStore.loading = false;
+            store.view.resetLoading();
         }
         fetch();
     }, []);
 
     return useObserver(() => {
-        return localStore.loading ? <Spin indicator={antIcon}/> : <Form layout="inline">
+        return localStore.loading ? <Skeleton active /> : <Form layout="inline">
             <Form.Item required={false} label="">
                 {props.form.getFieldDecorator('_context')(
                     <Select

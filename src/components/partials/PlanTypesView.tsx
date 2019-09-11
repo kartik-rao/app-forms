@@ -1,11 +1,9 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
-import { Card, Col, Empty, List, Row, Spin, Table, Skeleton, Typography, Tag } from "antd";
-import { useLocalStore } from "mobx-react-lite";
-import { useObserver } from "mobx-react-lite";
+import { Card, Col, Row, Skeleton, Tag, Typography } from "antd";
+import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
-import { Loading } from "../common/Loading";
 import { TableWrapper } from "../common/TableWrapper";
 
 export const PlanTypesView: React.FC<any> = () => {
