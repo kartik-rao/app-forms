@@ -1,4 +1,4 @@
-import { Button, Card, Empty, Icon, Input, List, Table } from "antd";
+import { Button, Card, Empty, Icon, Input, List, Table, Result } from "antd";
 import { PaginationConfig, TableSize } from "antd/lib/table";
 import { useLocalStore } from "mobx-react-lite";
 import { useObserver } from "mobx-react-lite";
@@ -21,7 +21,6 @@ export interface ITableWrapperProps {
     size?: TableSize;
     rowKey: string;
     actions?: React.ReactFragment;
-    debug?: boolean;
     errors: any[];
     onSelection?: any;
 }
@@ -37,7 +36,7 @@ export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapper
         bordered : props.bordered || false,
         size : props.size || 'middle',
         actions : props.actions,
-        debug : props.debug || false,
+        debug : store.config.debug,
         errors : props.errors || [],
         onSelection : props.onSelection,
         searchText: null as string,
@@ -101,22 +100,35 @@ export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapper
         get hasSelected() : boolean {
             return this.selectedRowKeys.length > 0;
         },
-        get showErrors() {
-            return this.debug && this.errors && this.errors.length > 0;
+        get hasErrors() {
+            return this.errors && this.errors.length > 0;
         },
         get isEmpty() {
             return !this.data || this.data.length == 0;
         }
     }));
+
+    const ErrorList = (
+        local.debug ? <List>
+            {local.errors.map((e, i) => {
+                return <List.Item key={e.errorType}>{e.message}</List.Item>
+            })}
+        </List> : <></>
+    );
+
     return useObserver(() => {
         return <div>
-        {!local.isEmpty && <Table rowSelection={{selectedRowKeys : local.selectedRowKeys, onChange : local.onSelectChange }}
+        {!local.isEmpty && !local.hasErrors && <Table rowSelection={{selectedRowKeys : local.selectedRowKeys, onChange : local.onSelectChange }}
             dataSource={local.data} bordered={local.bordered} rowKey={local.rowKey} size={local.size}
             pagination={local.pagination} columns={local.columns}/>}
-        {local.isEmpty && <Card><Empty/></Card> }
-        {local.showErrors && <List dataSource={local.errors} renderItem={(item) => (
-            <List.Item>{item.message}</List.Item>
-        )}/>}
+        {local.isEmpty && !local.hasErrors && <Card><Empty/></Card>}
+        {local.hasErrors &&
+            <Result
+            status="error"
+            title="There was an error running this operation."
+            extra={ErrorList}
+          />
+        }
     </div>
     })
 }
