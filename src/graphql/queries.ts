@@ -477,15 +477,6 @@ export const listUsers = `query ListUsers($offsetLimit: OffsetLimit, $filter: Us
     account {
       id
       name
-      website
-      taxId
-      ownerId
-      planId
-      createdAt
-      updatedAt
-      active
-      numForms
-      numUsers
     }
     email
     userGroup
