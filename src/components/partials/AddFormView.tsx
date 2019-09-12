@@ -6,6 +6,7 @@ import { appStoreContext } from "../../stores/AppStoreProvider";
 
 export interface IAddFormViewProps extends FormComponentProps {
     onAdd: any;
+    accountId: string;
 }
 
 export const AddFormView : React.FC<IAddFormViewProps> = (props: IAddFormViewProps) => {
@@ -45,7 +46,7 @@ export const AddFormView : React.FC<IAddFormViewProps> = (props: IAddFormViewPro
                 <Form.Item style={{visibility : store.auth.isAdmin ? 'visible' : 'hidden'}} required={true} label="Tenant Id" help={store.auth.contextName || store.auth.attributes["custom:tenantName"]}>
                     {props.form.getFieldDecorator('accountId', {
                         rules: [{ required: true, message: 'Please provide a tenant' }],
-                        initialValue : store.auth.isAdmin ? store.auth.contextId : store.auth.attributes["custom:tenantId"],
+                        initialValue : props.accountId,
                     })(<Input type={store.auth.isAdmin ? 'text' : 'hidden'} readOnly/>)}
                 </Form.Item>
                 <Form.Item required={true} label="Name" help="A name for this form">
