@@ -75,17 +75,17 @@ export const AllAccountsView : React.FC<any> = () => {
 
     return useObserver(() => {
         return <Row>
-        <Col span={20} offset={2}  style={{padding:"25px"}}>
+        <Col span={24} style={{padding:"25px"}}>
             {
                 localStore.loading ? <Skeleton active /> :
-                <>
-                    <Card title={"All accounts"} style={{padding: 0}}>
-                        <Typography style={{float: "left"}}>{localStore.hasSelectedItems ? `Selected ${localStore.selectedItems.length} of ${localStore.accounts.length}` : ''}</Typography>
+                    <Card title={"All accounts"} style={{padding: 0}} bodyStyle={{padding:0}}
+                        extra={<Typography style={{float: "right", fontWeight: 'bold', marginRight: '15px'}}>
+                            {localStore.hasSelectedItems ? `Selected ${localStore.selectedItems.length} of ${localStore.accounts.length}` : ''}
+                        </Typography>}>
+                        <TableWrapper errors={localStore.errors}
+                            data={localStore.accounts} columns={columns} bordered={true} rowKey="id"
+                            pagination={false} onSelection={localStore.setSelectedItems}/>
                     </Card>
-                    {<TableWrapper errors={localStore.errors} debug={store.view.debug}
-                        data={localStore.accounts} columns={columns} bordered={true} rowKey="id"
-                        pagination={false} onSelection={localStore.setSelectedItems}/>}
-                </>
             }
         </Col>
     </Row>
