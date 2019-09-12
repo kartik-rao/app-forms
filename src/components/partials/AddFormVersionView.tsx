@@ -24,17 +24,22 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
     const editorStore = React.useContext(editorStoreContext);
     if(!editorStore) throw new Error("EditorStore is null");
 
+    const config = store.config.envConfig;
     const localStore = useLocalStore(() => ({
         notes: null as string,
         onOk : async function () {
             store.view.setLoading({show: true, message: "Saving Form Version", status: "active", type : "line", percent: 10});
             try {
+                let formData : IFormProps = {...toJS(props.formData)};
+                if(!formData.submitTarget) {
+                    formData.submitTarget = `https://${config.api.rest.endpoint}/form/entry/${props.formId}`;
+                }
                 const payload = {
                     input: {
                         accountId: props.tenant,
                         formId: props.formId,
                         notes: this.notes,
-                        formData: JSON.stringify(toJS(props.formData))
+                        formData: JSON.stringify(toJS(formData))
                     }
                 }
                 let response = await API.graphql(graphqlOperation(mutations.addFormVersion, payload));
