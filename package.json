@@ -12,7 +12,7 @@
     "sync:dev": "aws s3 sync dist/ s3://fl-dev-webapp --acl public-read --profile fl-infrastructure && aws s3 sync public/ s3://fl-dev-webapp/public --acl public-read --profile fl-infrastructure",
     "sync:prod": "aws s3 sync dist/ s3://fl-prod-webapp --acl public-read --profile fl-infrastructure && aws s3 sync public/ s3://fl-prod-webapp/public --acl public-read --profile fl-infrastructure",
     "deploy:dev": "cross-env NODE_ENV=development APP_HOST=dev-app.forms.li npm run pack:dev && npm run sync:dev",
-    "deploy:prod": "cross-env NODE_ENV=development APP_HOST=app.forms.li npm run pack && npm run sync:prod",
+    "deploy:prod": "cross-env NODE_ENV=production APP_HOST=app.forms.li npm run pack && npm run sync:prod",
     "preversion": "npm test",
     "version": "npm run build && git add -A lib",
     "postversion": "git push && git push --tags",
