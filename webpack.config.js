@@ -86,6 +86,13 @@ module.exports = {
     },
     plugins: [
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en-au/),
+        new webpack.DefinePlugin({
+            __ENV__     : JSON.stringify(env),
+            __DEBUG__   : JSON.stringify(isDevelopment ? true : false),
+            __VERSION__ : JSON.stringify(require("./package.json").version),
+            __REGION__  : JSON.stringify(process.env.REGION ? process.env.REGION : "ap-northeast-1") ,
+            __HOSTNAME__: JSON.stringify(process.env.APP_HOST ? process.env.APP_HOST : "localhost")
+        }),
         new CheckerPlugin(),
         new MiniCssExtractPlugin({
             filename: '[name].css',

@@ -8,11 +8,11 @@ import './app.css';
 import { MainView } from "./components/partials/MainView";
 import { createAppStore } from './stores/AppStore';
 import { AppStoreProvider } from "./stores/AppStoreProvider";
+import { AppConfig } from "./config";
 
 
 export interface IAppProps {
-    authState?: string;
-    authData?: any;
+    config : AppConfig
 }
 
 const signUpConfig = {
@@ -72,8 +72,7 @@ const signUpConfig = {
 }
 
 export const App : React.FC<IAppProps> = (props: IAppProps) => {
-    const store = createAppStore();
-
+    const store = createAppStore(props.config);
     React.useEffect(() => {
       let fetchAuth = function() {
         Auth.currentAuthenticatedUser().then(user => {
