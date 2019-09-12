@@ -28,7 +28,7 @@ interface ApiConfig {
 }
 
 
-interface StageConfig  {
+interface EnvironmentConfig  {
     auth : AuthConfig;
     api  : ApiConfig;
 }
@@ -36,29 +36,23 @@ interface StageConfig  {
 type Environment = "development"|"staging"|"production";
 
 export interface AppConfig {
-    env: Environment;
-    region: string;
-    version: string;
-    hostname: string;
-    staging    : StageConfig;
-    development: StageConfig;
-    production : StageConfig;
+    env      : Environment;
+    envConfig: EnvironmentConfig;
+    debug    : boolean;
+    region   : string;
+    version  : string;
+    hostname : string;
 }
 
-export default {
-    env     : __ENV__,
-    region  : __REGION__,
-    debug   : __DEBUG__,
-    version : __VERSION__,
-    hostname: __HOSTNAME__,
+const _config = {
     development: {
-        auth : {
-            userPoolId: 'ap-northeast-1_Q798Nsl33',
-            userPoolWebClientId: "7pvdgcaflsg9juob60mosafi9d",
-            region: __REGION__,
-            mandatorySignIn: true
-        },
-        api  : {
+    auth : {
+        userPoolId: 'ap-northeast-1_Q798Nsl33',
+        userPoolWebClientId: "7pvdgcaflsg9juob60mosafi9d",
+        region: __REGION__,
+        mandatorySignIn: true
+    },
+    api : {
             graph : {
                 'aws_appsync_region': __REGION__,
                 'aws_appsync_graphqlEndpoint': 'https://ugn2kqey75aolcnah6vtnbuydi.appsync-api.ap-northeast-1.amazonaws.com/graphql',
@@ -71,4 +65,13 @@ export default {
     },
     staging: null,
     production: null
+}
+
+export default {
+    env     : __ENV__,
+    region  : __REGION__,
+    debug   : __DEBUG__,
+    version : __VERSION__,
+    hostname: __HOSTNAME__,
+    envConfig   : _config[__ENV__]
 } as AppConfig;

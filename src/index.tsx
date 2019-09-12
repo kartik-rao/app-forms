@@ -10,10 +10,10 @@ Sentry.init({
 });
 
 import config from "./config";
-const stageConfig = config[config.env];
+const envConfig = config.envConfig;
 
 Amplify.configure({
-    ...stageConfig.api.graph,
+    ...envConfig.api.graph,
     graphql_headers: async () => {
         // Get from local storage ?
         try {
@@ -26,7 +26,7 @@ Amplify.configure({
             return {};
         }
     },
-    Auth: stageConfig.auth
+    Auth: envConfig.auth
 });
 
 ReactDOM.render(<App config={config}/>, document.getElementById('approot'));
