@@ -101,17 +101,14 @@ export const PlanTypesView: React.FC<any> = () => {
 
     return useObserver(() => {
         return <Row>
-            <Col span={20} offset={2} style={{padding: "25px"}}>
+            <Col span={24} style={{padding: "25px"}}>
                 {
                     localStore.loading ? <Skeleton active /> :
-                    <>
-                    <Card title={"Plan Types"} style={{padding: 0}}>
-                        <Typography style={{float: "left"}}></Typography>
+                    <Card title={"Plan Types"} style={{padding: 0}} extra={<Typography style={{float: "left"}}></Typography>}>
+                        <TableWrapper errors={localStore.errors}
+                        data={localStore.planTypes} columns={columns} bordered={true} rowKey="id"
+                        pagination={false} onSelection={localStore.setSelectedItems}/>
                     </Card>
-                    {<TableWrapper errors={localStore.errors} debug={store.view.debug}
-                    data={localStore.planTypes} columns={columns} bordered={true} rowKey="id"
-                    pagination={false} onSelection={localStore.setSelectedItems}/>}
-                    </>
                 }
             </Col>
         </Row>
