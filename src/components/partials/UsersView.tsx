@@ -3,7 +3,7 @@ import { Button, Card, Col, Drawer, Row, Skeleton, Tag } from "antd";
 import Typography from "antd/lib/typography";
 import { autorun } from "mobx";
 import { useLocalStore, useObserver } from "mobx-react-lite";
-import moment from "moment";
+import dayjs from 'dayjs';
 import * as React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { StringFilterExpression, UserFilterInput } from "../../Amplify";
@@ -19,7 +19,9 @@ export interface IUsersViewProps {
 export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match}) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
+    const now = dayjs();
 
+    let config = store.config.envConfig;
     const localStore = useLocalStore(() => ({
         errors: [] as any[],
         users : [] as any[],
@@ -31,7 +33,7 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
             this.loading = true;
             try {
                 store.view.setLoading({show: true, message: "Adding User", status: "active", type : "line", percent: 100});
-                await store.auth.signUp(values);
+                await store.auth.signUp(config.api.rest.endpoint, values);
             } catch (error) {
                 this.errors = error;
                 console.log("signup error", error);
@@ -53,14 +55,6 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
     }));
 
     const columns = [
-    {
-        title: 'Account',
-        dataIndex: 'account',
-        key: 'account_name',
-        render: (text, record) => {
-            return <span>{record.account ? record.account.name : '-'}</span>
-        }
-    },
     {
         title: 'First Name',
         dataIndex: 'given_name',
@@ -87,13 +81,13 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
             value: 'AccountAdmin',
           }, {
             text: 'Editor',
-            value: 'Editor',
+            value: 'AccountEditor',
         }, {
-            text: 'Viewer',
+            text: 'AccountViewer',
             value: 'Viewer',
         }],
         render: (text, record) => {
-            let color = record.userGroup == 'AccountAdmin' ? 'red' : (record.userGroup == 'Editor' ? 'orange' : 'green')
+            let color = record.userGroup == 'AccountAdmin' ? 'red' : (record.userGroup == 'AccountEditor' ? 'orange' : record.userGroup == 'AccountViewer' ? 'green' : 'blue');
             return <Tag color={color}>{record.userGroup}</Tag>
         },
     },
@@ -103,10 +97,12 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
         key: 'createdAt',
         defaultSortOrder: 'descend',
         render: (text, record) => {
-            return <span>{moment(text).format("Do MMMM YYYY hh:mm A")}</span>
+            let created = dayjs(record.createdAt);
+            let date = created.year() != now.year() ? created.format('D MMM YY hh:mm a') : created.format('D MMM hh:mm a')
+            return <span>{date}</span>
         },
         sorter: (a, b) => {;
-            return moment(a["createdAt"]).diff(moment(b["createdAt"]))
+            return dayjs(a["createdAt"]).diff(dayjs(b["createdAt"]))
         },
         sortDirections: ['descend', 'ascend']
     },
@@ -121,6 +117,17 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
           </span>
         )
     }];
+
+    if(!match.params.accountId && store.auth.isAdmin) {
+        columns.unshift({
+            title: 'Account',
+            dataIndex: 'account',
+            key: 'account_name',
+            render: (text, record) => {
+                return <span>{record.account ? record.account.name : '-'}</span>
+            }
+        })
+    }
 
     React.useEffect(() => {
         async function fetch () {
@@ -163,19 +170,16 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
         <Col span={24} style={{padding:"25px"}}>
             {
                 localStore.loading ? <Skeleton active />:
-                <>
-                    <Card title={"All users"} style={{padding: 0}}>
-                        <Typography style={{float: "left"}}>{localStore.hasSelectedItems ? `Selected ${localStore.selectedItems.length} of ${localStore.users.length}` : ''}</Typography>
+                    <Card title={"All users"} style={{padding: 0}} bodyStyle={{padding: 0}} extra={
                         <>
                         <React.Fragment>
                             <Button icon="plus" type="primary" style={{float: 'right'}} onClick={()=>{localStore.showAddUser(true)}}>Add</Button>
-                        </React.Fragment>
-                        </>
+                            <Typography style={{fontWeight:'bold', float: "right", marginRight:'15px', marginTop: '6px'}}>{localStore.hasSelectedItems ? `Selected ${localStore.selectedItems.length} of ${localStore.users.length}` : ''}</Typography>
+                        </React.Fragment></>
+                        }>
+                        <TableWrapper errors={localStore.errors} data={localStore.users} columns={columns} bordered={true} rowKey="id"
+                            pagination={false} onSelection={localStore.setSelectedItems}/>
                     </Card>
-                    {<TableWrapper errors={localStore.errors} debug={store.view.debug}
-                        data={localStore.users} columns={columns} bordered={true} rowKey="id"
-                        pagination={false} onSelection={localStore.setSelectedItems}/>}
-                </>
             }
             {localStore.showAdd && <Drawer title="Add User" placement="right" closable={true} onClose={() => localStore.showAdd = false} visible={localStore.showAdd}>
                 <InviteUserView onAdd={localStore.handleAdd}/>
