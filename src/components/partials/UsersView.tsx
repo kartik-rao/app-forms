@@ -21,7 +21,7 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
     if(!store) throw new Error("Store is null");
     const now = dayjs();
 
-    let config = store.config.envConfig;
+    const config = store.config.envConfig;
     const localStore = useLocalStore(() => ({
         errors: [] as any[],
         users : [] as any[],
