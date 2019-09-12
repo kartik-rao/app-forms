@@ -2,7 +2,7 @@ import API, { graphqlOperation } from "@aws-amplify/api";
 import { Col, Row, Skeleton, Menu } from "antd";
 import PageHeader from "antd/lib/page-header";
 import { useLocalStore, useObserver } from "mobx-react-lite";
-import * as moment from "moment";
+import dayjs from 'dayjs';
 import * as React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import * as queries from '../../graphql/queries';
@@ -24,6 +24,7 @@ export interface AccountViewProps {
 export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (props) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
+    const now = dayjs();
 
     const localStore = useLocalStore(() => ({
         account: {} as any,
@@ -33,10 +34,17 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (pr
             return store.view.debug && this.errors && this.errors.length > 0;
         },
         get createdAt() {
-            return this.account ? moment(this.account.createdAt).format("Do MMMM YYYY") : "";
+            let created = dayjs(this.account.createdAt);
+            let date = created.year() != now.year() ? created.format('D MMM YY hh:mm a') : created.format('D MMM hh:mm a');
+            return date;
         },
         get updatedAt() {
-            return this.account && this.account.updatedAt ? moment(this.account.updatedAt).format("Do MMMM YYYY") : "";
+            if (!this.account.updatedAt) {
+                return "-";
+            }
+            let updated = dayjs(this.account.updatedAt);
+            let date = updated.year() != now.year() ? updated.format('D MMM YY hh:mm a') : updated.format('D MMM hh:mm a');
+            return date;
         },
         get mailTo() {
             return `mailto:${this.account.ownedBy.email}`;
