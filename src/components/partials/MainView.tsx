@@ -1,7 +1,7 @@
 import { Layout } from 'antd';
 import { useObserver } from 'mobx-react';
 import * as React from 'react';
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter, Route, Redirect } from "react-router-dom";
 import { appStoreContext } from '../../stores/AppStoreProvider';
 import { Footer } from "../common/FooterView";
 import Header from "../common/HeaderView";
@@ -47,6 +47,9 @@ export const MainView: React.FC<any> = () => {
                             <Route path="/account/:accountId/users"          component={UsersView}   key="usersview"/>
                             <Route path="/account/:accountId/form/:formId"   component={CanvasView}  key="formview"/>
                             <Route path="/account/:accountId/canvas/:formId" component={CanvasView}  key="canvasview"/>
+                            <Route exact path="/" render={() => (
+                                !store.auth.isAdmin ? <Redirect to={`/account/${store.auth.tenant}`}/> : <Redirect to={`/accounts`}/>
+                            )}/>
                         </Layout.Content>
                     </Layout>
                     </React.Suspense>
