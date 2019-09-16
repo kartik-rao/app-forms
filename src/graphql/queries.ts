@@ -23,6 +23,7 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     ownedBy {
       id
       ownerId
+      accountId
       email
       userGroup
       given_name
@@ -31,6 +32,7 @@ export const getAccount = `query GetAccount($accountId: ID!) {
       createdAt
       updatedAt
       isDeleted
+      numForms
     }
     plan {
       id
@@ -54,6 +56,7 @@ export const getAccount = `query GetAccount($accountId: ID!) {
     users {
       id
       ownerId
+      accountId
       email
       userGroup
       given_name
@@ -62,19 +65,23 @@ export const getAccount = `query GetAccount($accountId: ID!) {
       createdAt
       updatedAt
       isDeleted
+      numForms
     }
     forms {
       id
-      ownedBy {email given_name family_name}
+      ownerId
       name
       description
       versionId
+      accountId
       createdAt
       updatedAt
       startDate
       endDate
       isPaused
       isDeleted
+      redirectNotStarted
+      redirectHasEnded
     }
   }
 }
@@ -83,6 +90,20 @@ export const getUser = `query GetUser($userId: ID!) {
   getUser(userId: $userId) {
     id
     ownerId
+    ownedBy {
+      id
+      ownerId
+      accountId
+      email
+      userGroup
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+      numForms
+    }
     accountId
     account {
       id
@@ -254,6 +275,7 @@ export const getForm = `query GetForm($formId: String!) {
     versionId
     version {
       id
+      accountId
       formId
       ownerId
       createdAt
@@ -262,7 +284,6 @@ export const getForm = `query GetForm($formId: String!) {
     }
     ownedBy {
       id
-      ownerId
       email
       userGroup
       given_name
@@ -272,6 +293,9 @@ export const getForm = `query GetForm($formId: String!) {
     account {
       id
       name
+      createdAt
+      updatedAt
+      active
     }
     createdAt
     updatedAt
@@ -279,6 +303,40 @@ export const getForm = `query GetForm($formId: String!) {
     endDate
     isPaused
     isDeleted
+    redirectNotStarted
+    redirectHasEnded
+    versions {
+      id
+      ownedBy {given_name family_name email}
+      createdAt
+      notes
+    }
+  }
+}
+`;
+export const getFormVersion = `query GetFormVersion($versionId: String!) {
+  getFormVersion(versionId: $versionId) {
+    id
+    accountId
+    formId
+    ownerId
+    ownedBy {
+      id
+      ownerId
+      accountId
+      email
+      userGroup
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+      numForms
+    }
+    createdAt
+    notes
+    formData
   }
 }
 `;
@@ -348,6 +406,8 @@ export const getIntegration = `query GetIntegration($integrationId: String!) {
       endDate
       isPaused
       isDeleted
+      redirectNotStarted
+      redirectHasEnded
     }
     active
     authType
@@ -380,14 +440,20 @@ export const getFormEntry = `query GetFormEntry($formEntryId: String!) {
       endDate
       isPaused
       isDeleted
+      redirectNotStarted
+      redirectHasEnded
     }
     data
     createdAt
   }
 }
 `;
-export const listAccounts = `query ListAccounts($offsetLimit: OffsetLimit, $filter: AccountFilterInput) {
-  listAccounts(offsetLimit: $offsetLimit, filter: $filter) {
+export const listAccounts = `query ListAccounts(
+  $offsetLimit: OffsetLimit
+  $filter: AccountFilterInput
+  $sort: AccountSortInput
+) {
+  listAccounts(offsetLimit: $offsetLimit, filter: $filter, sort: $sort) {
     id
     name
     addresses {
@@ -465,18 +531,47 @@ export const listAccounts = `query ListAccounts($offsetLimit: OffsetLimit, $filt
       endDate
       isPaused
       isDeleted
+      redirectNotStarted
+      redirectHasEnded
     }
   }
 }
 `;
-export const listUsers = `query ListUsers($offsetLimit: OffsetLimit, $filter: UserFilterInput) {
-  listUsers(offsetLimit: $offsetLimit, filter: $filter) {
+export const listUsers = `query ListUsers(
+  $offsetLimit: OffsetLimit
+  $filter: UserFilterInput
+  $sort: UserSortInput
+) {
+  listUsers(offsetLimit: $offsetLimit, filter: $filter, sort: $sort) {
     id
     ownerId
+    ownedBy {
+      id
+      ownerId
+      accountId
+      email
+      userGroup
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+      numForms
+    }
     accountId
     account {
       id
       name
+      website
+      taxId
+      ownerId
+      planId
+      createdAt
+      updatedAt
+      active
+      numForms
+      numUsers
     }
     email
     userGroup
@@ -490,8 +585,12 @@ export const listUsers = `query ListUsers($offsetLimit: OffsetLimit, $filter: Us
   }
 }
 `;
-export const listPlans = `query ListPlans($offsetLimit: OffsetLimit, $filter: PlanFilterInput) {
-  listPlans(offsetLimit: $offsetLimit, filter: $filter) {
+export const listPlans = `query ListPlans(
+  $offsetLimit: OffsetLimit
+  $filter: PlanFilterInput
+  $sort: PlanSortInput
+) {
+  listPlans(offsetLimit: $offsetLimit, filter: $filter, sort: $sort) {
     id
     accountId
     account {
@@ -544,8 +643,12 @@ export const listPlans = `query ListPlans($offsetLimit: OffsetLimit, $filter: Pl
   }
 }
 `;
-export const listPlanTypes = `query ListPlanTypes($offsetLimit: OffsetLimit, $filter: PlanTypeFilterInput) {
-  listPlanTypes(offsetLimit: $offsetLimit, filter: $filter) {
+export const listPlanTypes = `query ListPlanTypes(
+  $offsetLimit: OffsetLimit
+  $filter: PlanTypeFilterInput
+  $sort: PlanTypeSortInput
+) {
+  listPlanTypes(offsetLimit: $offsetLimit, filter: $filter, sort: $sort) {
     id
     ownerId
     ownedBy {
@@ -572,25 +675,20 @@ export const listPlanTypes = `query ListPlanTypes($offsetLimit: OffsetLimit, $fi
   }
 }
 `;
-export const listForms = `query ListForms($offsetLimit: OffsetLimit, $filter: FormFilterInput) {
-  listForms(offsetLimit: $offsetLimit, filter: $filter) {
+export const listForms = `query ListForms(
+  $offsetLimit: OffsetLimit
+  $filter: FormFilterInput
+  $sort: FormSortInput
+) {
+  listForms(offsetLimit: $offsetLimit, filter: $filter, sort: $sort) {
     id
     ownerId
     name
     description
     versionId
-    version {
-      id
-      formId
-      ownerId
-      createdAt
-      notes
-    }
     ownedBy {
       id
-      accountId
       email
-      userGroup
       given_name
       family_name
     }
@@ -598,9 +696,6 @@ export const listForms = `query ListForms($offsetLimit: OffsetLimit, $filter: Fo
     account {
       id
       name
-      planId
-      active
-      numForms
     }
     createdAt
     updatedAt
@@ -608,21 +703,44 @@ export const listForms = `query ListForms($offsetLimit: OffsetLimit, $filter: Fo
     endDate
     isPaused
     isDeleted
-    versions {
+    redirectNotStarted
+    redirectHasEnded
+  }
+}
+`;
+export const listFormVersions = `query ListFormVersions(
+  $offsetLimit: OffsetLimit
+  $filter: FormVersionFilterInput
+  $sort: FormVersionSortInput
+) {
+  listFormVersions(offsetLimit: $offsetLimit, filter: $filter, sort: $sort) {
+    id
+    accountId
+    formId
+    ownerId
+    ownedBy {
       id
-      formId
-      ownerId
-      createdAt
-      notes
+      email
+      userGroup
+      given_name
+      family_name
     }
+    createdAt
+    notes
+    formData
   }
 }
 `;
 export const listIntegrationTypes = `query ListIntegrationTypes(
   $offsetLimit: OffsetLimit
   $filter: IntegrationTypeFilterInput
+  $sort: IntegrationTypeSortInput
 ) {
-  listIntegrationTypes(offsetLimit: $offsetLimit, filter: $filter) {
+  listIntegrationTypes(
+    offsetLimit: $offsetLimit
+    filter: $filter
+    sort: $sort
+  ) {
     id
     ownerId
     ownedBy {
@@ -661,8 +779,9 @@ export const listIntegrationTypes = `query ListIntegrationTypes(
 export const listIntegrations = `query ListIntegrations(
   $offsetLimit: OffsetLimit
   $filter: IntegrationFilterInput
+  $sort: IntegrationSortInput
 ) {
-  listIntegrations(offsetLimit: $offsetLimit, filter: $filter) {
+  listIntegrations(offsetLimit: $offsetLimit, filter: $filter, sort: $sort) {
     id
     integrationTypeId
     integrationType {
@@ -690,6 +809,8 @@ export const listIntegrations = `query ListIntegrations(
       endDate
       isPaused
       isDeleted
+      redirectNotStarted
+      redirectHasEnded
     }
     active
     authType
@@ -722,6 +843,8 @@ export const listFormEntries = `query ListFormEntries($offsetLimit: OffsetLimit,
       endDate
       isPaused
       isDeleted
+      redirectNotStarted
+      redirectHasEnded
     }
     data
     createdAt
@@ -753,6 +876,8 @@ export const listFormEntriesByTime = `query ListFormEntriesByTime(
       endDate
       isPaused
       isDeleted
+      redirectNotStarted
+      redirectHasEnded
     }
     data
     createdAt

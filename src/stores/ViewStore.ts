@@ -7,6 +7,7 @@ export const createViewStore = () => {
     const store = {
         currentView: {name: ''} as {name: string},
         loading: {} as ProgressViewProps,
+        idNameMap: {} as any,
         debug: location.href.indexOf('localhost') > -1 as boolean,
         inAccountMenuCollapsed: true as boolean,
         userContextId: null as any,

@@ -15,13 +15,14 @@ let withFirstUpper = function(str: string) : string {
     return str[0].toUpperCase() + str.substring(1);
 }
 
-const Header : React.FC<RouteComponentProps<any>> = (props) => {
+const Header : React.FC<RouteComponentProps<any>> = ({match, location, history}) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
     const localStore = useLocalStore(() => ({
         loading: false as boolean,
         account: null as any,
+        form: null as any,
         get accountId() : string {
             if(!store.auth.isAdmin) {
                 return store.auth.tenant;
@@ -34,14 +35,26 @@ const Header : React.FC<RouteComponentProps<any>> = (props) => {
                 }
             }
         },
-        currentPath : props.location.pathname,
+        get formId() : string {
+            let matches = localStore.currentPath.match(/form\/([\w|\-]+)/);
+            if(matches && matches.length > 1) {
+                return matches[1];
+            } else {
+                return null;
+            }
+        },
+        currentPath : location.pathname,
         get breadcrumb() : string {
             let breadcrumb = this.currentPath;
             if (this.accountId) {
                 if (this.account) {
                     breadcrumb = breadcrumb.replace("/account/","");
                     breadcrumb = breadcrumb.replace(/\//g, " / ");
-                    return breadcrumb.replace(this.accountId, this.account.name);
+                    breadcrumb = breadcrumb.replace(this.accountId, this.account.name);
+                    if(this.formId && this.form) {
+                        breadcrumb = breadcrumb.replace(this.formId, this.form.name);
+                    }
+                    return breadcrumb;
                 } else {
                     // When this is called on first load before fetch as run
                     return "";
@@ -52,12 +65,12 @@ const Header : React.FC<RouteComponentProps<any>> = (props) => {
         }
     }));
 
-    props.history.listen((location) => {
+    history.listen((location) => {
         localStore.currentPath = location.pathname;
     });
 
     React.useEffect(() => {
-        let fetch = async function() {
+        let fetchAccount = async function() {
             localStore.loading = true;
             try {
                 let account: any = await API.graphql(graphqlOperation(queries.getAccount, {accountId: localStore.accountId}));
@@ -68,12 +81,28 @@ const Header : React.FC<RouteComponentProps<any>> = (props) => {
             localStore.loading = false;
         }
 
+        let fetchForm = async function() {
+            localStore.loading = true;
+            try {
+                let form: any = await API.graphql(graphqlOperation(queries.getForm, {formId: localStore.formId}));
+                localStore.form = form.data.getForm;
+            } catch (error) {
+                logger.error(`Header.useEffect.getForm(${localStore.formId})`, error);
+            }
+            localStore.loading = false;
+        }
+
         if(localStore.accountId) {
-            fetch();
+            fetchAccount();
         } else {
             localStore.account = null;
         }
-    }, [localStore.accountId]);
+        if(localStore.formId) {
+            fetchForm();
+        } else {
+            localStore.form = null;
+        }
+    }, [localStore.accountId, localStore.formId]);
 
     return useObserver(() => {
         return <Menu mode="horizontal" theme="light">

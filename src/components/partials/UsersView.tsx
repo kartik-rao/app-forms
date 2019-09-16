@@ -47,7 +47,6 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
         },
         setSelectedItems: function (selectedItems) {
             this.selectedItems = selectedItems;
-            console.log(selectedItems);
         },
         get hasSelectedItems() {
             return this.selectedItems.length > 0;

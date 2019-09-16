@@ -25,7 +25,6 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (pr
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
     const now = dayjs();
-
     const localStore = useLocalStore(() => ({
         account: {} as any,
         errors: [] as any[],
@@ -66,7 +65,7 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (pr
             store.view.resetLoading();
         }
         fetch();
-    }, [])
+    }, []);
 
     return useObserver(() => {
         return  <Row>

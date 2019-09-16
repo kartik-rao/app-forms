@@ -13,7 +13,7 @@ import AddFormVersionView from "./AddFormVersionView";
 
 export interface ICanvasViewProps {
     accountId: string;
-    formId: string
+    formId: string;
 }
 
 const Canvas = React.lazy(() => import(/* webpackChunkName: "app-canvas" */ "@kartikrao/lib-forms/lib/components/canvas/Canvas").then((module) => {return {default: module.Canvas}}));

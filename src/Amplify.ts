@@ -128,7 +128,7 @@ export type AccountFilterInput = {
   name?: StringFilter | null,
   createdAt?: DateFilter | null,
   updatedAt?: DateFilter | null,
-  planId?: IntFilter | null,
+  planId?: StringFilter | null,
   active?: IntFilter | null,
   criteria?: Array< AccountFilterInput > | null,
 };
@@ -184,9 +184,23 @@ export type IntFilter = {
   value?: Array< number > | null,
 };
 
+export type AccountSortInput = {
+  name?: SortOrder | null,
+  createdAt?: SortOrder | null,
+  updatedAt?: SortOrder | null,
+  planId?: SortOrder | null,
+  sortBy?: Array< AccountSortInput > | null,
+};
+
+export enum SortOrder {
+  asc = "asc",
+  desc = "desc",
+}
+
+
 export type UserFilterInput = {
   accountId?: StringFilter | null,
-  ownerId?: IntFilter | null,
+  ownerId?: StringFilter | null,
   email?: StringFilter | null,
   userGroup?: StringFilter | null,
   given_name?: StringFilter | null,
@@ -197,10 +211,21 @@ export type UserFilterInput = {
   criteria?: Array< UserFilterInput > | null,
 };
 
+export type UserSortInput = {
+  accountId?: SortOrder | null,
+  email?: SortOrder | null,
+  given_name?: SortOrder | null,
+  family_name?: SortOrder | null,
+  userGroup?: SortOrder | null,
+  createdAt?: SortOrder | null,
+  updatedAt?: SortOrder | null,
+  sortBy?: Array< UserSortInput > | null,
+};
+
 export type PlanFilterInput = {
-  accountId?: IntFilter | null,
-  ownerId?: IntFilter | null,
-  planTypeId?: IntFilter | null,
+  accountId?: StringFilter | null,
+  ownerId?: StringFilter | null,
+  planTypeId?: StringFilter | null,
   lastBillDate?: DateFilter | null,
   createdAt?: DateFilter | null,
   updatedAt?: DateFilter | null,
@@ -209,8 +234,17 @@ export type PlanFilterInput = {
   criteria?: Array< PlanFilterInput > | null,
 };
 
+export type PlanSortInput = {
+  createdAt?: SortOrder | null,
+  updatedAt?: SortOrder | null,
+  lastBillDate?: SortOrder | null,
+  startDate?: SortOrder | null,
+  endDate?: SortOrder | null,
+  sortBy?: Array< PlanSortInput > | null,
+};
+
 export type PlanTypeFilterInput = {
-  ownerId?: IntFilter | null,
+  ownerId?: StringFilter | null,
   cost?: FloatFilter | null,
   billingTerm?: StringFilter | null,
   name?: StringFilter | null,
@@ -226,10 +260,19 @@ export type FloatFilter = {
   value?: Array< number > | null,
 };
 
+export type PlanTypeSortInput = {
+  name?: SortOrder | null,
+  billingTerm?: SortOrder | null,
+  cost?: SortOrder | null,
+  createdAt?: SortOrder | null,
+  updatedAt?: SortOrder | null,
+  sortBy?: Array< PlanTypeSortInput > | null,
+};
+
 export type FormFilterInput = {
   name?: StringFilter | null,
-  ownerId?: IntFilter | null,
-  accountId?: IntFilter | null,
+  ownerId?: StringFilter | null,
+  accountId?: StringFilter | null,
   createdAt?: DateFilter | null,
   updatedAt?: DateFilter | null,
   startsAt?: DateFilter | null,
@@ -239,9 +282,31 @@ export type FormFilterInput = {
   criteria?: Array< FormFilterInput > | null,
 };
 
+export type FormSortInput = {
+  name?: SortOrder | null,
+  createdAt?: SortOrder | null,
+  updatedAt?: SortOrder | null,
+  startsAt?: SortOrder | null,
+  endsAt?: SortOrder | null,
+  sortBy?: Array< FormSortInput > | null,
+};
+
+export type FormVersionFilterInput = {
+  accountId?: StringFilter | null,
+  formId?: StringFilter | null,
+  ownerId?: StringFilter | null,
+  createdAt?: DateFilter | null,
+  criteria?: Array< FormVersionFilterInput > | null,
+};
+
+export type FormVersionSortInput = {
+  createdAt?: SortOrder | null,
+  sortBy?: Array< FormVersionSortInput > | null,
+};
+
 export type IntegrationTypeFilterInput = {
-  ownerId?: IntFilter | null,
-  planTypeId?: IntFilter | null,
+  ownerId?: StringFilter | null,
+  planTypeId?: StringFilter | null,
   name?: StringFilter | null,
   createdAt?: DateFilter | null,
   updatedAt?: DateFilter | null,
@@ -249,10 +314,17 @@ export type IntegrationTypeFilterInput = {
   criteria?: Array< IntegrationTypeFilterInput > | null,
 };
 
+export type IntegrationTypeSortInput = {
+  name?: SortOrder | null,
+  createdAt?: SortOrder | null,
+  updatedAt?: SortOrder | null,
+  sortBy?: Array< IntegrationTypeSortInput > | null,
+};
+
 export type IntegrationFilterInput = {
-  ownerId?: IntFilter | null,
-  accountId?: IntFilter | null,
-  formId?: IntFilter | null,
+  ownerId?: StringFilter | null,
+  accountId?: StringFilter | null,
+  formId?: StringFilter | null,
   active?: IntFilter | null,
   isDeleted?: IntFilter | null,
   lastExecuted?: DateFilter | null,
@@ -260,6 +332,13 @@ export type IntegrationFilterInput = {
   createdAt?: DateFilter | null,
   updatedAt?: DateFilter | null,
   criteria?: Array< IntegrationFilterInput > | null,
+};
+
+export type IntegrationSortInput = {
+  lastExecuted?: SortOrder | null,
+  createdAt?: SortOrder | null,
+  updatedAt?: SortOrder | null,
+  sortBy?: Array< IntegrationSortInput > | null,
 };
 
 export type AddPlanTypeMutationVariables = {
@@ -274,7 +353,7 @@ export type AddPlanTypeMutation = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -323,7 +402,7 @@ export type AddPlanMutation = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -370,7 +449,7 @@ export type AddIntegrationTypeMutation = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -430,7 +509,7 @@ export type AddIntegrationMutation = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -438,6 +517,8 @@ export type AddIntegrationMutation = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     },
     active: number,
     authType: string | null,
@@ -464,20 +545,21 @@ export type AddFormMutation = {
     ownerId: string,
     name: string,
     description: string,
-    versionId: string,
-    formData:  {
+    versionId: string | null,
+    version:  {
       __typename: "FormVersion",
       id: string,
+      accountId: string,
       formId: string,
       ownerId: string,
       createdAt: string | null,
       notes: string | null,
-      formData: string | null,
+      formData: string,
     } | null,
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -510,14 +592,17 @@ export type AddFormMutation = {
     endDate: string | null,
     isPaused: boolean | null,
     isDeleted: boolean | null,
+    redirectNotStarted: string | null,
+    redirectHasEnded: string | null,
     versions:  Array< {
       __typename: "FormVersion",
       id: string,
+      accountId: string,
       formId: string,
       ownerId: string,
       createdAt: string | null,
       notes: string | null,
-      formData: string | null,
+      formData: string,
     } | null > | null,
     integrations:  Array< {
       __typename: "Integration",
@@ -559,20 +644,21 @@ export type AddFormVersionMutation = {
     ownerId: string,
     name: string,
     description: string,
-    versionId: string,
-    formData:  {
+    versionId: string | null,
+    version:  {
       __typename: "FormVersion",
       id: string,
+      accountId: string,
       formId: string,
       ownerId: string,
       createdAt: string | null,
       notes: string | null,
-      formData: string | null,
+      formData: string,
     } | null,
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -605,14 +691,17 @@ export type AddFormVersionMutation = {
     endDate: string | null,
     isPaused: boolean | null,
     isDeleted: boolean | null,
+    redirectNotStarted: string | null,
+    redirectHasEnded: string | null,
     versions:  Array< {
       __typename: "FormVersion",
       id: string,
+      accountId: string,
       formId: string,
       ownerId: string,
       createdAt: string | null,
       notes: string | null,
-      formData: string | null,
+      formData: string,
     } | null > | null,
     integrations:  Array< {
       __typename: "Integration",
@@ -655,7 +744,7 @@ export type UpdatePlanTypeMutation = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -704,7 +793,7 @@ export type UpdatePlanMutation = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -767,7 +856,7 @@ export type UpdateAccountMutation = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -802,7 +891,7 @@ export type UpdateAccountMutation = {
     users:  Array< {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -820,7 +909,7 @@ export type UpdateAccountMutation = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -828,6 +917,8 @@ export type UpdateAccountMutation = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     } | null > | null,
   },
 };
@@ -860,7 +951,7 @@ export type UpdateAccountPlanMutation = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -895,7 +986,7 @@ export type UpdateAccountPlanMutation = {
     users:  Array< {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -913,7 +1004,7 @@ export type UpdateAccountPlanMutation = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -921,6 +1012,8 @@ export type UpdateAccountPlanMutation = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     } | null > | null,
   },
 };
@@ -933,7 +1026,22 @@ export type UpdateUserMutation = {
   updateUser:  {
     __typename: "User",
     id: string,
-    ownerId: string,
+    ownerId: string | null,
+    ownedBy:  {
+      __typename: "User",
+      id: string,
+      ownerId: string | null,
+      accountId: string | null,
+      email: string,
+      userGroup: string,
+      given_name: string,
+      family_name: string,
+      phone_number: string | null,
+      createdAt: string | null,
+      updatedAt: string | null,
+      isDeleted: number | null,
+      numForms: number | null,
+    } | null,
     accountId: string | null,
     account:  {
       __typename: "Account",
@@ -973,7 +1081,7 @@ export type UpdateIntegrationTypeMutation = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1033,7 +1141,7 @@ export type UpdateIntegrationMutation = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -1041,6 +1149,8 @@ export type UpdateIntegrationMutation = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     },
     active: number,
     authType: string | null,
@@ -1067,20 +1177,21 @@ export type UpdateFormMutation = {
     ownerId: string,
     name: string,
     description: string,
-    versionId: string,
-    formData:  {
+    versionId: string | null,
+    version:  {
       __typename: "FormVersion",
       id: string,
+      accountId: string,
       formId: string,
       ownerId: string,
       createdAt: string | null,
       notes: string | null,
-      formData: string | null,
+      formData: string,
     } | null,
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1113,14 +1224,17 @@ export type UpdateFormMutation = {
     endDate: string | null,
     isPaused: boolean | null,
     isDeleted: boolean | null,
+    redirectNotStarted: string | null,
+    redirectHasEnded: string | null,
     versions:  Array< {
       __typename: "FormVersion",
       id: string,
+      accountId: string,
       formId: string,
       ownerId: string,
       createdAt: string | null,
       notes: string | null,
-      formData: string | null,
+      formData: string,
     } | null > | null,
     integrations:  Array< {
       __typename: "Integration",
@@ -1162,20 +1276,21 @@ export type DeleteFormMutation = {
     ownerId: string,
     name: string,
     description: string,
-    versionId: string,
-    formData:  {
+    versionId: string | null,
+    version:  {
       __typename: "FormVersion",
       id: string,
+      accountId: string,
       formId: string,
       ownerId: string,
       createdAt: string | null,
       notes: string | null,
-      formData: string | null,
+      formData: string,
     } | null,
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1208,14 +1323,17 @@ export type DeleteFormMutation = {
     endDate: string | null,
     isPaused: boolean | null,
     isDeleted: boolean | null,
+    redirectNotStarted: string | null,
+    redirectHasEnded: string | null,
     versions:  Array< {
       __typename: "FormVersion",
       id: string,
+      accountId: string,
       formId: string,
       ownerId: string,
       createdAt: string | null,
       notes: string | null,
-      formData: string | null,
+      formData: string,
     } | null > | null,
     integrations:  Array< {
       __typename: "Integration",
@@ -1258,7 +1376,7 @@ export type DeletePlanTypeMutation = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1308,7 +1426,7 @@ export type DeletePlanMutation = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1371,7 +1489,7 @@ export type DeleteAccountMutation = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1406,7 +1524,7 @@ export type DeleteAccountMutation = {
     users:  Array< {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1424,7 +1542,7 @@ export type DeleteAccountMutation = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -1432,6 +1550,8 @@ export type DeleteAccountMutation = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     } | null > | null,
   },
 };
@@ -1444,7 +1564,22 @@ export type DeleteUserMutation = {
   deleteUser:  {
     __typename: "User",
     id: string,
-    ownerId: string,
+    ownerId: string | null,
+    ownedBy:  {
+      __typename: "User",
+      id: string,
+      ownerId: string | null,
+      accountId: string | null,
+      email: string,
+      userGroup: string,
+      given_name: string,
+      family_name: string,
+      phone_number: string | null,
+      createdAt: string | null,
+      updatedAt: string | null,
+      isDeleted: number | null,
+      numForms: number | null,
+    } | null,
     accountId: string | null,
     account:  {
       __typename: "Account",
@@ -1484,7 +1619,7 @@ export type DeleteIntegrationTypeMutation = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1544,7 +1679,7 @@ export type DeleteIntegrationMutation = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -1552,6 +1687,8 @@ export type DeleteIntegrationMutation = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     },
     active: number,
     authType: string | null,
@@ -1582,7 +1719,7 @@ export type AddFormEntryMutation = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -1590,6 +1727,8 @@ export type AddFormEntryMutation = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     },
     data: string,
     createdAt: string,
@@ -1624,7 +1763,7 @@ export type GetAccountQuery = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1659,7 +1798,7 @@ export type GetAccountQuery = {
     users:  Array< {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1677,7 +1816,7 @@ export type GetAccountQuery = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -1685,6 +1824,8 @@ export type GetAccountQuery = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     } | null > | null,
   } | null,
 };
@@ -1697,7 +1838,22 @@ export type GetUserQuery = {
   getUser:  {
     __typename: "User",
     id: string,
-    ownerId: string,
+    ownerId: string | null,
+    ownedBy:  {
+      __typename: "User",
+      id: string,
+      ownerId: string | null,
+      accountId: string | null,
+      email: string,
+      userGroup: string,
+      given_name: string,
+      family_name: string,
+      phone_number: string | null,
+      createdAt: string | null,
+      updatedAt: string | null,
+      isDeleted: number | null,
+      numForms: number | null,
+    } | null,
     accountId: string | null,
     account:  {
       __typename: "Account",
@@ -1752,7 +1908,7 @@ export type GetPlanQuery = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1814,7 +1970,7 @@ export type GetActiveAccountPlanQuery = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1861,7 +2017,7 @@ export type GetPlanTypeQuery = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1894,20 +2050,21 @@ export type GetFormQuery = {
     ownerId: string,
     name: string,
     description: string,
-    versionId: string,
-    formData:  {
+    versionId: string | null,
+    version:  {
       __typename: "FormVersion",
       id: string,
+      accountId: string,
       formId: string,
       ownerId: string,
       createdAt: string | null,
       notes: string | null,
-      formData: string | null,
+      formData: string,
     } | null,
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -1940,14 +2097,17 @@ export type GetFormQuery = {
     endDate: string | null,
     isPaused: boolean | null,
     isDeleted: boolean | null,
+    redirectNotStarted: string | null,
+    redirectHasEnded: string | null,
     versions:  Array< {
       __typename: "FormVersion",
       id: string,
+      accountId: string,
       formId: string,
       ownerId: string,
       createdAt: string | null,
       notes: string | null,
-      formData: string | null,
+      formData: string,
     } | null > | null,
     integrations:  Array< {
       __typename: "Integration",
@@ -1978,6 +2138,38 @@ export type GetFormQuery = {
   } | null,
 };
 
+export type GetFormVersionQueryVariables = {
+  versionId: string,
+};
+
+export type GetFormVersionQuery = {
+  getFormVersion:  {
+    __typename: "FormVersion",
+    id: string,
+    accountId: string,
+    formId: string,
+    ownerId: string,
+    ownedBy:  {
+      __typename: "User",
+      id: string,
+      ownerId: string | null,
+      accountId: string | null,
+      email: string,
+      userGroup: string,
+      given_name: string,
+      family_name: string,
+      phone_number: string | null,
+      createdAt: string | null,
+      updatedAt: string | null,
+      isDeleted: number | null,
+      numForms: number | null,
+    },
+    createdAt: string | null,
+    notes: string | null,
+    formData: string,
+  } | null,
+};
+
 export type GetIntegrationTypeQueryVariables = {
   integrationTypeId: string,
 };
@@ -1990,7 +2182,7 @@ export type GetIntegrationTypeQuery = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -2050,7 +2242,7 @@ export type GetIntegrationQuery = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -2058,6 +2250,8 @@ export type GetIntegrationQuery = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     },
     active: number,
     authType: string | null,
@@ -2088,7 +2282,7 @@ export type GetFormEntryQuery = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -2096,6 +2290,8 @@ export type GetFormEntryQuery = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     },
     data: string,
     createdAt: string,
@@ -2105,6 +2301,7 @@ export type GetFormEntryQuery = {
 export type ListAccountsQueryVariables = {
   offsetLimit?: OffsetLimit | null,
   filter?: AccountFilterInput | null,
+  sort?: AccountSortInput | null,
 };
 
 export type ListAccountsQuery = {
@@ -2131,7 +2328,7 @@ export type ListAccountsQuery = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -2166,7 +2363,7 @@ export type ListAccountsQuery = {
     users:  Array< {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -2184,7 +2381,7 @@ export type ListAccountsQuery = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -2192,6 +2389,8 @@ export type ListAccountsQuery = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     } | null > | null,
   } | null > | null,
 };
@@ -2199,13 +2398,29 @@ export type ListAccountsQuery = {
 export type ListUsersQueryVariables = {
   offsetLimit?: OffsetLimit | null,
   filter?: UserFilterInput | null,
+  sort?: UserSortInput | null,
 };
 
 export type ListUsersQuery = {
   listUsers:  Array< {
     __typename: "User",
     id: string,
-    ownerId: string,
+    ownerId: string | null,
+    ownedBy:  {
+      __typename: "User",
+      id: string,
+      ownerId: string | null,
+      accountId: string | null,
+      email: string,
+      userGroup: string,
+      given_name: string,
+      family_name: string,
+      phone_number: string | null,
+      createdAt: string | null,
+      updatedAt: string | null,
+      isDeleted: number | null,
+      numForms: number | null,
+    } | null,
     accountId: string | null,
     account:  {
       __typename: "Account",
@@ -2236,6 +2451,7 @@ export type ListUsersQuery = {
 export type ListPlansQueryVariables = {
   offsetLimit?: OffsetLimit | null,
   filter?: PlanFilterInput | null,
+  sort?: PlanSortInput | null,
 };
 
 export type ListPlansQuery = {
@@ -2261,7 +2477,7 @@ export type ListPlansQuery = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -2299,6 +2515,7 @@ export type ListPlansQuery = {
 export type ListPlanTypesQueryVariables = {
   offsetLimit?: OffsetLimit | null,
   filter?: PlanTypeFilterInput | null,
+  sort?: PlanTypeSortInput | null,
 };
 
 export type ListPlanTypesQuery = {
@@ -2309,7 +2526,7 @@ export type ListPlanTypesQuery = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -2334,6 +2551,7 @@ export type ListPlanTypesQuery = {
 export type ListFormsQueryVariables = {
   offsetLimit?: OffsetLimit | null,
   filter?: FormFilterInput | null,
+  sort?: FormSortInput | null,
 };
 
 export type ListFormsQuery = {
@@ -2343,20 +2561,21 @@ export type ListFormsQuery = {
     ownerId: string,
     name: string,
     description: string,
-    versionId: string,
-    formData:  {
+    versionId: string | null,
+    version:  {
       __typename: "FormVersion",
       id: string,
+      accountId: string,
       formId: string,
       ownerId: string,
       createdAt: string | null,
       notes: string | null,
-      formData: string | null,
+      formData: string,
     } | null,
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -2389,14 +2608,17 @@ export type ListFormsQuery = {
     endDate: string | null,
     isPaused: boolean | null,
     isDeleted: boolean | null,
+    redirectNotStarted: string | null,
+    redirectHasEnded: string | null,
     versions:  Array< {
       __typename: "FormVersion",
       id: string,
+      accountId: string,
       formId: string,
       ownerId: string,
       createdAt: string | null,
       notes: string | null,
-      formData: string | null,
+      formData: string,
     } | null > | null,
     integrations:  Array< {
       __typename: "Integration",
@@ -2427,9 +2649,44 @@ export type ListFormsQuery = {
   } | null > | null,
 };
 
+export type ListFormVersionsQueryVariables = {
+  offsetLimit?: OffsetLimit | null,
+  filter?: FormVersionFilterInput | null,
+  sort?: FormVersionSortInput | null,
+};
+
+export type ListFormVersionsQuery = {
+  listFormVersions:  Array< {
+    __typename: "FormVersion",
+    id: string,
+    accountId: string,
+    formId: string,
+    ownerId: string,
+    ownedBy:  {
+      __typename: "User",
+      id: string,
+      ownerId: string | null,
+      accountId: string | null,
+      email: string,
+      userGroup: string,
+      given_name: string,
+      family_name: string,
+      phone_number: string | null,
+      createdAt: string | null,
+      updatedAt: string | null,
+      isDeleted: number | null,
+      numForms: number | null,
+    },
+    createdAt: string | null,
+    notes: string | null,
+    formData: string,
+  } | null > | null,
+};
+
 export type ListIntegrationTypesQueryVariables = {
   offsetLimit?: OffsetLimit | null,
   filter?: IntegrationTypeFilterInput | null,
+  sort?: IntegrationTypeSortInput | null,
 };
 
 export type ListIntegrationTypesQuery = {
@@ -2440,7 +2697,7 @@ export type ListIntegrationTypesQuery = {
     ownedBy:  {
       __typename: "User",
       id: string,
-      ownerId: string,
+      ownerId: string | null,
       accountId: string | null,
       email: string,
       userGroup: string,
@@ -2475,6 +2732,7 @@ export type ListIntegrationTypesQuery = {
 export type ListIntegrationsQueryVariables = {
   offsetLimit?: OffsetLimit | null,
   filter?: IntegrationFilterInput | null,
+  sort?: IntegrationSortInput | null,
 };
 
 export type ListIntegrationsQuery = {
@@ -2501,7 +2759,7 @@ export type ListIntegrationsQuery = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -2509,6 +2767,8 @@ export type ListIntegrationsQuery = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     },
     active: number,
     authType: string | null,
@@ -2540,7 +2800,7 @@ export type ListFormEntriesQuery = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -2548,6 +2808,8 @@ export type ListFormEntriesQuery = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     },
     data: string,
     createdAt: string,
@@ -2571,7 +2833,7 @@ export type ListFormEntriesByTimeQuery = {
       ownerId: string,
       name: string,
       description: string,
-      versionId: string,
+      versionId: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -2579,6 +2841,8 @@ export type ListFormEntriesByTimeQuery = {
       endDate: string | null,
       isPaused: boolean | null,
       isDeleted: boolean | null,
+      redirectNotStarted: string | null,
+      redirectHasEnded: string | null,
     },
     data: string,
     createdAt: string,

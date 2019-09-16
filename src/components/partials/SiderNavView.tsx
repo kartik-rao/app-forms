@@ -30,7 +30,7 @@ export const SiderNavView : React.FC<RouteComponentProps<SiderNavViewProps>> = (
     history.listen((location) => {
         localStore.currentPath = location.pathname;
     });
-    console.log(match.params.accountId, store.auth.isAdmin)
+
     return useObserver(() => {
         return <Layout.Sider theme="light" trigger={null} collapsible collapsed={store.view.collapseAccountMenu}>
             <Menu mode="inline" selectedKeys={localStore.selectedPath}>

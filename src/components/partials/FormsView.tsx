@@ -1,6 +1,6 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import { EmptyForm, IFormProps } from "@kartikrao/lib-forms-core";
-import { Button, Card, Col, Drawer, Dropdown, Icon, Menu, Row, Skeleton, Tag } from "antd";
+import { Button, Card, Col, Drawer, Dropdown, Icon, Menu, Row, Skeleton, Tag, Table } from "antd";
 import Typography from "antd/lib/typography";
 import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
@@ -11,6 +11,7 @@ import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
 import AddFormView from "./AddFormView";
+import { toJS } from "mobx";
 
 export interface FormsViewProps {
     accountId: string;
@@ -47,7 +48,7 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
                 this.forms.push(addFormVersionResponse['data']['addFormVersion']);
             } catch (errorResponse) {
                 console.error(errorResponse);
-                localStore.errors = errorResponse.errors;
+                this.errors = errorResponse.errors;
             }
             store.view.resetLoading();
         },
@@ -56,13 +57,12 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
             store.view.setLoading({show: true, message: "Creating new form", status: "active", type : "line", percent: 100});
             try {
                 addFormResponse = await API.graphql(graphqlOperation(mutations.addForm, {input: values}));
-                console.log("handleAdd Response", addFormResponse);
                 if (addFormResponse.errors) {
                     this.errors = addFormResponse.errors;
                 }
             } catch (errorResponse) {
                 console.error(errorResponse);
-                localStore.errors = errorResponse.errors;
+                this.errors = errorResponse.errors;
             }
             this.showAdd = false;
             store.view.resetLoading();
@@ -81,7 +81,10 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
     const columns = [{
         title: 'Name',
         dataIndex: 'name',
-        key: 'name'
+        key: 'name',
+        render: (text, record) => {
+            return <span><Link to={`/account/${match.params.accountId}/form/${record.id}`}>{text}</Link></span>
+        }
     }, {
         title: 'Description',
         dataIndex: 'description',
@@ -103,7 +106,7 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
         sortDirections: ['descend', 'ascend'],
         render:(text, record) => {
             let created = dayjs(record.createdAt);
-            let date = created.year() != now.year() ? created.format('D MMM YY hh:mm a') : created.format('D MMM hh:mm a')
+            let date = created.year() != now.year() ? created.format('DD MMM YY hh:mm a') : created.format('DD MMM hh:mm a')
             return <span>{date}</span>
         }
     },
@@ -137,11 +140,6 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
         key: 'action',
         render: (text, record) => (
             <Dropdown overlay={<Menu>
-                <Menu.Item key="action-properties">
-                    <Link to={`/account/${match.params.accountId}/canvas/${record.id}`}>
-                        <span><Icon type="tool"/>  Properties</span>
-                    </Link>
-                </Menu.Item>
                 <Menu.Item key="action-canvas">
                     <Link to={`/account/${match.params.accountId}/canvas/${record.id}`}>
                         <span><Icon type="highlight"/>  Design</span>
@@ -162,13 +160,14 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
         )
         }
     ];
+
     React.useEffect(() => {
         let fetch = async function () {
             localStore.loading = true;
             try {
                 store.view.setLoading({show: true, message: "Loading forms", status: "active", type : "line", percent: 100});
-                let response = await API.graphql(graphqlOperation(queries.getAccount, {accountId: match.params.accountId}));
-                localStore.forms = response.data.getAccount.forms;
+                let response = await API.graphql(graphqlOperation(queries.listForms, {filter: {criteria: [{accountId: {expression: "eq", value: [match.params.accountId]}}]}}));
+                localStore.forms = response.data.listForms;
             } catch (errorResponse) {
                 console.error("queries.getAccount.forms", errorResponse);
                 localStore.errors = errorResponse.errors;
@@ -180,7 +179,8 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
             store.view.resetLoading();
         }
         fetch();
-    }, [])
+    }, []);
+
     return  useObserver(() => {
         return <Row>
         <Col span={24} style={{padding:"25px"}}>
@@ -195,8 +195,8 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
                         </>
                     }>
                         <TableWrapper errors={localStore.errors}
-                        data={localStore.forms} columns={columns} bordered={true} rowKey="id"
-                        pagination={false} onSelection={localStore.setSelectedItems}/>
+                            data={localStore.forms} columns={columns} bordered={true} rowKey="id"
+                            pagination={false} onSelection={localStore.setSelectedItems} />
                     </Card>
                     {localStore.showAdd && <Drawer title="Add Form" width="350px" placement="right" closable={true} onClose={() => localStore.showAdd = false} visible={localStore.showAdd}>
                         <AddFormView onAdd={localStore.handleAdd} accountId={match.params.accountId}/>
