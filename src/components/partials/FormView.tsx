@@ -1,6 +1,6 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import * as React from "react";
-import {PageHeader, Row, Col, Card, Skeleton, Badge, Button, Popconfirm, Tag, Divider, Typography, Statistic} from "antd";
+import {PageHeader, Row, Col, Card, Skeleton, Badge, Button, Popconfirm, Tag, Divider, Typography, Statistic, Timeline, notification} from "antd";
 import { Link, RouteComponentProps } from "react-router-dom";
 import * as mutations from '../../graphql/mutations';
 import * as queries from '../../graphql/queries';
@@ -8,6 +8,8 @@ import { appStoreContext } from "../../stores/AppStoreProvider";
 import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import { TableWrapper } from "../common/TableWrapper";
+import  EditFormView from "./EditFormView";
+import moment from "moment";
 
 export interface FormViewProps {
     accountId: string;
@@ -29,11 +31,15 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
-    const now = dayjs();
     const localStore = useLocalStore(() => ({
         loading: true,
         form: null as any,
         errors: [] as any[],
+        showEditForm: false as boolean,
+        refresh: false as boolean,
+        onUpdateComplete : function () {
+            this.showEditForm = false;
+        },
         toggleFormPause : async function() {
             try {
                 store.view.setLoading({show: true, message: this.form.isPaused ? "Activating Form" : "Pausing Form", status: "active", type : "line", percent: 100});
@@ -53,6 +59,8 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                 if(response.version.formData) {
                     response.version.formData = JSON.parse(response.version.formData);
                 }
+                notification.success({message: `Active version changed successfully`});
+                localStore.form = response;
             } catch (errorResponse) {
                 console.error("activateVersion - queries.updateForm", errorResponse);
                 this.errors = errorResponse.errors;
@@ -90,7 +98,11 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             try {
                 store.view.setLoading({show: true, message: "Loading form", status: "active", type : "line", percent: 100});
                 let response = await API.graphql(graphqlOperation(queries.getForm, {formId: match.params.formId}));
-                localStore.form = response.data.getForm;
+                response = response.data.getForm;
+                if(response.version.formData) {
+                    response.version.formData = JSON.parse(response.version.formData);
+                }
+                localStore.form = response;
             } catch (errorResponse) {
                 console.error("queries.getAccount.forms", errorResponse);
                 localStore.errors = errorResponse.errors;
@@ -102,7 +114,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             store.view.resetLoading();
         }
         fetch();
-    }, []);
+    }, [localStore.refresh]);
 
     const columns = [
         {title: "Detail", key: "notes", dataIndex: "notes"},
@@ -110,14 +122,14 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         {title: "Created", key: "createdAt", dataIndex: "createdAt", render: (text, record) => {return <span>{dayjs(text).format('DD MMM YY hh:mm a')}</span>}},
         {title: "By", key: "owner", dataIndex: "ownedBy", render: (text, record) => {return <span>{record.ownedBy.given_name} {record.ownedBy.family_name}</span>}},
         {title: "Actions", key: "actions", render: (text, record) => {return <span>
-            <Button disabled={record.id == localStore.form.versionId} type="primary" size="small" title="Activate">Activate</Button>
+            <Button disabled={record.id == localStore.form.versionId} onClick={() => localStore.activateVersion(record.id)} type="primary" size="small" title="Activate">Activate</Button>
         </span>}},
     ]
 
     const formActions = useObserver(() => {
         return <span> {
             localStore.form ? <>
-                <Button size="small" className="fl-right-margin-ten">Settings</Button>
+                <Button size="small" className="fl-right-margin-ten" onClick={() => {localStore.showEditForm = true}}>Settings</Button>
                 <Popconfirm title={localStore.form.isPaused == 1 ? "Activate & start accepting entries ?" : "Pause & stop accepting entries ?"} onConfirm={() => localStore.toggleFormPause()}>
                     <Button className="fl-right-margin-ten" size="small" type={localStore.form.isPaused == 1 ? "primary" : "danger"}>{localStore.form.isPaused == 1 ? "Activate" : "Pause"}</Button>
                 </Popconfirm>
@@ -134,21 +146,23 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
 
     return useObserver(() => {
         return localStore.loading ? <Skeleton active />: <PageHeader title={localStore.form.name} subTitle={localStore.form.isPaused ? <Tag color="orange">Paused</Tag> : <Tag color="green">Running</Tag>} extra={formActions}>
+        {localStore.showEditForm ? <EditFormView editForm={localStore.form} onUpdate={localStore.onUpdateComplete}/> : <>
             <Typography.Paragraph>{localStore.form.description}</Typography.Paragraph>
-        <Row>
-            {localStore.form.startDate && <Col span={3}>Starts - {localStore.form.startDate ? dayjs(localStore.form.startDate).format('D MMM YY hh:mm a'): "Not Set"}</Col>}
-            {localStore.form.endDate && <Col span={3}>Ends - {localStore.form.endDate ? dayjs(localStore.form.endDate).format('D MMM YY hh:mm a'): "Not Set"}</Col>}
-            <Statistic title="On Success" value={localStore.expectedSubmitResult.success} />
-            <Col span={3}>On Success <Tag color="green">{localStore.expectedSubmitResult.success}</Tag>{localStore.successRedirect ? <a href={localStore.successRedirect} target="_blank">Preview</a>: ""}</Col>
-            <Col span={3}>On Error <Tag color="red">{localStore.expectedSubmitResult.error}</Tag>{localStore.errorRedirect ? <a href={localStore.errorRedirect} target="_blank">Preview</a>: ""}</Col>
-        </Row>
-        <Divider />
-        <Row type="flex">
-            <Col span={24}>
-            <TableWrapper title={() => <span>{localStore.form.name} versions</span>} errors={localStore.errors} data={localStore.form.versions} columns={columns} 
+            <Row>
+                <Col span={3}>Starts {localStore.form.startDate ? <Tag color="green">{dayjs(localStore.form.startDate).format('DD MMM YY hh:mm a')}</Tag>: <Tag>Not Set</Tag>}</Col>
+                <Col span={3}>Ends {localStore.form.endDate ? <Tag color="red">{dayjs(localStore.form.endDate).format('DD MMM YY hh:mm a')}</Tag>: <Tag>Not Set</Tag>}</Col>
+                <Col span={4}>On Success <Tag color="green">{localStore.expectedSubmitResult.success}</Tag>{localStore.successRedirect ? <a href={localStore.successRedirect} target="_blank">Preview</a>: ""}</Col>
+                <Col span={4}>On Error <Tag color="red">{localStore.expectedSubmitResult.error}</Tag>{localStore.errorRedirect ? <a href={localStore.errorRedirect} target="_blank">Preview</a>: ""}</Col>
+            </Row>
+            <Divider />
+            <Row type="flex">
+                <Col span={24} >
+                <TableWrapper title={() => <span>{localStore.form.name} versions</span>} errors={localStore.errors} data={localStore.form.versions} columns={columns} 
                 bordered={true} rowKey="id" pagination={false} />
-            </Col>
-        </Row>
+                </Col>
+            </Row>
+        </>
+        }
     </PageHeader>
     })
 }

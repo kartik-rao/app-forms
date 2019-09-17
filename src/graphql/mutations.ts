@@ -749,7 +749,6 @@ export const updateForm = `mutation UpdateForm($input: UpdateFormInput) {
       createdAt
       updatedAt
       isDeleted
-      numForms
     }
     accountId
     account {
@@ -762,8 +761,6 @@ export const updateForm = `mutation UpdateForm($input: UpdateFormInput) {
       createdAt
       updatedAt
       active
-      numForms
-      numUsers
     }
     createdAt
     updatedAt
@@ -780,31 +777,7 @@ export const updateForm = `mutation UpdateForm($input: UpdateFormInput) {
       ownerId
       createdAt
       notes
-      formData
-    }
-    integrations {
-      id
-      integrationTypeId
-      ownerId
-      accountId
-      formId
-      active
-      authType
-      auth
-      target
-      method
-      lastExecuted
-      lastExecutionResult
-      lastExecutionResultMessage
-      createdAt
-      updatedAt
-      isDeleted
-    }
-    entries {
-      id
-      formId
-      data
-      createdAt
+      ownedBy {email given_name family_name}
     }
   }
 }
