@@ -10,5 +10,14 @@
     "editor.quickSuggestionsDelay": 50,
     "workbench.editor.enablePreview": false,
     "editor.hover.delay": 500,
-    "editor.minimap.enabled": false
+    "editor.minimap.enabled": false,
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/dist/**": true,
+        "**/lib/**": true,
+        "**/.awcache/**": true,
+        "**/*.map" : true
+    }
 }
