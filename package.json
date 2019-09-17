@@ -32,7 +32,7 @@
     "@aws-amplify/storage": "^1.1.0",
     "@aws-amplify/ui": "^1.0.23",
     "@aws-amplify/xr": "^0.1.22",
-    "@kartikrao/lib-forms": "^3.7.4",
+    "@kartikrao/lib-forms": "^3.7.5",
     "@kartikrao/lib-forms-core": "^6.6.3",
     "@kartikrao/lib-logging": "^1.6.0",
     "@kartikrao/lib-storage": "^1.2.2",
