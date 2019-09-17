@@ -26,6 +26,7 @@ export interface ITableWrapperProps {
     onSelection?: any;
     expandedRowRender?: any;
     expandedRowKeys?: any;
+    emptyText?: string;
 }
 
 export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapperProps) => {
@@ -124,7 +125,7 @@ export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapper
         {!local.isEmpty && !local.hasErrors && <Table title={props.title} rowSelection={{selectedRowKeys : local.selectedRowKeys, onChange : local.onSelectChange }}
             dataSource={local.data} bordered={local.bordered} rowKey={local.rowKey} size={local.size} pagination={local.pagination} 
             columns={local.columns} expandedRowRender={props.expandedRowRender} expandedRowKeys={props.expandedRowKeys||[]}/>}
-        {local.isEmpty && !local.hasErrors && <Card><Empty/></Card>}
+        {local.isEmpty && !local.hasErrors && <Card><Empty description={props.emptyText}/></Card>}
         {local.hasErrors &&
             <Result
             status="error"

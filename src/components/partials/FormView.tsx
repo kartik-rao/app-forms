@@ -1,6 +1,6 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import * as React from "react";
-import {PageHeader, Row, Col, Card, Skeleton, Badge, Button, Popconfirm, Tag, Divider, Typography, Statistic, Timeline, notification} from "antd";
+import {PageHeader, Row, Col, Card, Skeleton, Badge, Button, Popconfirm, Tag, Divider, Typography, Statistic, Timeline, notification, Icon, Drawer} from "antd";
 import { Link, RouteComponentProps } from "react-router-dom";
 import * as mutations from '../../graphql/mutations';
 import * as queries from '../../graphql/queries';
@@ -99,7 +99,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                 store.view.setLoading({show: true, message: "Loading form", status: "active", type : "line", percent: 100});
                 let response = await API.graphql(graphqlOperation(queries.getForm, {formId: match.params.formId}));
                 response = response.data.getForm;
-                if(response.version.formData) {
+                if(response.version && response.version.formData) {
                     response.version.formData = JSON.parse(response.version.formData);
                 }
                 localStore.form = response;
@@ -131,22 +131,22 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             localStore.form ? <>
                 <Button size="small" className="fl-right-margin-ten" onClick={() => {localStore.showEditForm = true}}>Settings</Button>
                 <Popconfirm title={localStore.form.isPaused == 1 ? "Activate & start accepting entries ?" : "Pause & stop accepting entries ?"} onConfirm={() => localStore.toggleFormPause()}>
-                    <Button className="fl-right-margin-ten" size="small" type={localStore.form.isPaused == 1 ? "primary" : "danger"}>{localStore.form.isPaused == 1 ? "Activate" : "Pause"}</Button>
+                    <Button className="fl-right-margin-ten" size="small" disabled={!localStore.form.versions || localStore.form.versions.length == 0} type={localStore.form.isPaused == 1 ? "primary" : "danger"}>{localStore.form.isPaused == 1 ? "Activate" : "Pause"}</Button>
                 </Popconfirm>
                 <Popconfirm title={"This will delete the form and all versions. Are you sure ?"} onConfirm={() => localStore.deleteForm()}>
                     <Button className="fl-right-margin-ten" size="small" type="danger">Delete</Button>
                 </Popconfirm>
-                <Link to={`/account/${match.params.accountId}/canvas/${match.params.formId}`}>
-                    <Button size="small" className="fl-right-margin-ten">Add Version</Button>
-                </Link>
             </> : <></>
         }
         </span>
     });
 
     return useObserver(() => {
-        return localStore.loading ? <Skeleton active />: <PageHeader title={localStore.form.name} subTitle={localStore.form.isPaused ? <Tag color="orange">Paused</Tag> : <Tag color="green">Running</Tag>} extra={formActions}>
-        {localStore.showEditForm ? <EditFormView editForm={localStore.form} onUpdate={localStore.onUpdateComplete}/> : <>
+        return localStore.loading ? <Skeleton active />: <>
+            <Drawer bodyStyle={{overflow: 'hidden'}} placement="right" visible={localStore.showEditForm} width={600} title={"Form settings"} closable maskClosable onClose={() => localStore.onUpdateComplete()}>
+                <Row><Col span={24}><EditFormView editForm={localStore.form} onUpdate={localStore.onUpdateComplete}/></Col></Row>
+            </Drawer>
+            <PageHeader onBack={() => history.push(`/account/${match.params.accountId}/forms`)} title={localStore.form.name} subTitle={localStore.form.isPaused ? <Tag color="orange">Paused</Tag> : <Tag color="green">Running</Tag>} extra={formActions}>
             <Typography.Paragraph>{localStore.form.description}</Typography.Paragraph>
             <Row>
                 <Col span={3}>Starts {localStore.form.startDate ? <Tag color="green">{dayjs(localStore.form.startDate).format('DD MMM YY hh:mm a')}</Tag>: <Tag>Not Set</Tag>}</Col>
@@ -157,12 +157,15 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             <Divider />
             <Row type="flex">
                 <Col span={24} >
-                <TableWrapper title={() => <span>{localStore.form.name} versions</span>} errors={localStore.errors} data={localStore.form.versions} columns={columns} 
+                <Card title={<span>{localStore.form.name} versions</span>} style={{padding: 0}} bodyStyle={{padding:0}} extra={<Link to={`/account/${match.params.accountId}/canvas/${match.params.formId}`}>
+                    <Button size="small" className="fl-right-margin-ten"><Icon type="plus"/>Add Version</Button>
+                </Link>}>
+                <TableWrapper emptyText='No versions, click "Add version" to create one.' title={() => <span>{localStore.form.name} versions</span>} errors={localStore.errors} data={localStore.form.versions} columns={columns} 
                 bordered={true} rowKey="id" pagination={false} />
+                </Card>
                 </Col>
             </Row>
-        </>
-        }
-    </PageHeader>
+        </PageHeader>
+    </>
     })
 }

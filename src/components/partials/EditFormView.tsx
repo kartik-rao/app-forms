@@ -12,6 +12,30 @@ export interface EditFormViewProps extends FormComponentProps {
     onUpdate: (data: any) => void;
 }
 
+const formItemLayout = {
+    labelCol: {
+      xs: { span: 10 },
+      sm: { span: 10},
+    },
+    wrapperCol: {
+      xs: { span: 14 },
+      sm: { span: 14 },
+    },
+};
+
+const tailFormItemLayout = {
+    wrapperCol: {
+      xs: {
+        span: 24,
+        offset: 20,
+      },
+      sm: {
+        span: 24,
+        offset: 20,
+      },
+    },
+};
+
 const EditFormView : React.FC<EditFormViewProps> = (props: EditFormViewProps) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
@@ -55,58 +79,47 @@ const EditFormView : React.FC<EditFormViewProps> = (props: EditFormViewProps) =>
     let {getFieldDecorator} = props.form;
 
     return useObserver(() => {
-        return  <Card title="Form Activation Settings" size="small">
-            <Form onSubmit={localStore.handleSubmit}>
-            <Row>
-                <Col span={6} offset={1}>
-                    <Form.Item label="Start Date" help="Schedule form activation">
-                        {
-                            getFieldDecorator('startDate', {
-                                initialValue: editForm.startDate ? moment(editForm.startDate, moment.ISO_8601) : null,
-                            })(<DatePicker showTime format="YYYY-MM-DDTHH:mm:ss[Z]" 
-                                    onChange={(e) => localStore.onChange('startDate', e)}
-                                    disabledDate={(current) => {return localStore.endDate ? current.isAfter(localStore.endDate): false}}/>)
-                        }
-                    </Form.Item>
-                    <Form.Item label="Pre-Start Redirect URL" help="Users will be redirected prior to the Start Date">
-                            {
-                            getFieldDecorator('redirectNotStarted', {
-                                initialValue: localStore.redirectNotStarted,
-                                rules: [{pattern: /^(https?):\/\/[^\s$.?#].[^\s]*$/gm}]
-                            })(<Input onChange={(e) => localStore.onChange('redirectNotStarted', e.target.value)}/>)
-                        }
-                    </Form.Item>
-                </Col>
-                <Col span={6} offset={1}>
-                    <Form.Item label="End Date" help="Schedule form deactivation">
-                            {
-                            getFieldDecorator('endDate', {
-                                initialValue: editForm.endDate ? moment(editForm.endDate, moment.ISO_8601) : null,
-                            })(<DatePicker showTime  format="YYYY-MM-DDTHH:mm:ss[Z]" 
-                                    onChange={(e) => localStore.onChange('endDate', e)}
-                                    disabledDate={(current) => {return localStore.startDate ? current.isBefore(localStore.startDate): false}} />)
-                        }
-                    </Form.Item>
-                    <Form.Item label="Post-End Redirect URL" help="Users will be redirected past the End Date">
-                            {
-                            getFieldDecorator('redirectHasEnded', {
-                                initialValue: localStore.redirectHasEnded,
-                                rules: [{pattern: /^(https?):\/\/[^\s$.?#].[^\s]*$/gm}]
-                            })(<Input onChange={(e) => localStore.onChange('redirectHasEnded', e)}/>)
-                        }
-                    </Form.Item>
-                </Col>
-            </Row>
-            <Row>
-                <Col span={4} offset={16}>
-                    <Form.Item>
-                    <Button htmlType="submit" type="primary" disabled={!localStore.isDirty} className="fl-right-margin-ten">Apply</Button>
-                    <Button htmlType="submit" type="danger" onClick={() => props.onUpdate(null)}>Cancel</Button>
-                    </Form.Item>
-                </Col>
-            </Row>
+        return <Form onSubmit={localStore.handleSubmit}  {...formItemLayout} layout={"horizontal"}>
+            <Form.Item label="Start Date" help="Schedule form activation">
+                {
+                    getFieldDecorator('startDate', {
+                        initialValue: editForm.startDate ? moment(editForm.startDate, moment.ISO_8601) : null,
+                    })(<DatePicker showTime format="YYYY-MM-DDTHH:mm:ss[Z]"
+                            onChange={(e) => localStore.onChange('startDate', e)}
+                            style={{width: '225px'}}
+                            disabledDate={(current) => {return localStore.endDate ? current.isAfter(localStore.endDate): false}}/>)
+                }
+            </Form.Item>
+            <Form.Item label="Pre-Start Redirect URL" help="Users will be redirected prior to the Start Date">
+                    {
+                    getFieldDecorator('redirectNotStarted', {
+                        initialValue: localStore.redirectNotStarted,
+                        rules: [{pattern: /^(https?):\/\/[^\s$.?#].[^\s]*$/gm}]
+                    })(<Input onChange={(e) => localStore.onChange('redirectNotStarted', e.target.value)}/>)
+                }
+            </Form.Item>
+            <Form.Item label="End Date" help="Schedule form deactivation">
+                    {
+                    getFieldDecorator('endDate', {
+                        initialValue: editForm.endDate ? moment(editForm.endDate, moment.ISO_8601) : null,
+                    })(<DatePicker showTime  format="YYYY-MM-DDTHH:mm:ss[Z]" 
+                            onChange={(e) => localStore.onChange('endDate', e)}
+                            style={{width: '225px'}}
+                            disabledDate={(current) => {return localStore.startDate ? current.isBefore(localStore.startDate): false}} />)
+                }
+            </Form.Item>
+            <Form.Item label="Post-End Redirect URL" help="Users will be redirected past the End Date">
+                    {
+                    getFieldDecorator('redirectHasEnded', {
+                        initialValue: localStore.redirectHasEnded,
+                        rules: [{pattern: /^(https?):\/\/[^\s$.?#].[^\s]*$/gm}]
+                    })(<Input onChange={(e) => localStore.onChange('redirectHasEnded', e)}/>)
+                }
+            </Form.Item>
+            <Form.Item style={{marginTop: '15px'}} {...tailFormItemLayout}>
+                <Button htmlType="submit" type="primary" disabled={!localStore.isDirty}>Apply</Button>
+            </Form.Item>
         </Form>
-        </Card>
     })
 }
 
