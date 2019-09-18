@@ -12,7 +12,7 @@ import { editorStoreContext } from "@kartikrao/lib-forms";
 export interface AddFormVersionViewProps extends FormComponentProps{
     onSave: (response: IFormProps) => void;
     onCancel: () => void;
-    tenant: string;
+    tenantId: string;
     formData: any;
     formId: any;
 }
@@ -26,17 +26,15 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
 
     const config = store.config.envConfig;
     const localStore = useLocalStore(() => ({
-        notes: null as string,
+        notes: editorStore.changelog.join("\n"),
         onOk : async function () {
             store.view.setLoading({show: true, message: "Saving Form Version", status: "active", type : "line", percent: 10});
             try {
                 let formData : IFormProps = {...toJS(props.formData)};
-                if(!formData.submitTarget) {
-                    formData.submitTarget = `https://${config.api.rest.endpoint}/form/entry/${props.formId}`;
-                }
+                formData.submitTarget = `${config.api.rest.endpoint}/form/entry/${props.tenantId}/${props.formId}`;
                 const payload = {
                     input: {
-                        accountId: props.tenant,
+                        accountId: props.tenantId,
                         formId: props.formId,
                         notes: this.notes,
                         formData: JSON.stringify(toJS(formData))
@@ -64,7 +62,7 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
                     { props.form.getFieldDecorator('notes', {rules:[
                         {required: true, message: "Please provide notes for this version"}
                     ], initialValue: editorStore.changelog.join("\n")})
-                    (<Input type="textarea" height={200} onChange={(e) => localStore.notes = e.target.value}/>)}
+                    (<Input.TextArea style={{whiteSpace: "pre-wrap", height: 400}} onChange={(e) => localStore.notes = e.target.value}/>)}
                 </Form.Item>
             </Form>
         </Modal>
