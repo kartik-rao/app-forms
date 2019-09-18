@@ -254,7 +254,7 @@ export const addForm = `mutation AddForm($input: AddFormInput!) {
   }
 }
 `;
-export const addFormVersion = `mutation AddFormVersion($input: AddFormVersionInput) {
+export const addFormVersion = `mutation AddFormVersion($input: AddFormVersionInput!) {
   addFormVersion(input: $input) {
     id
     ownerId
