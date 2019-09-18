@@ -64,6 +64,9 @@ export const createAuthStore = () => {
             });
             return response.json();
         },
+        changePassword: async function(oldPassword: string, newPassword: string) {
+            return Auth.changePassword(this.user, oldPassword, newPassword);
+        },
         signOut: function () {
             Auth.signOut().then(() => {
                 this.setAuthState('signIn');
