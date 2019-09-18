@@ -31,6 +31,8 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
+    const config = store.config.envConfig;
+
     const localStore = useLocalStore(() => ({
         loading: true,
         form: null as any,
@@ -43,6 +45,16 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         toggleFormPause : async function() {
             try {
                 store.view.setLoading({show: true, message: this.form.isPaused ? "Activating Form" : "Pausing Form", status: "active", type : "line", percent: 100});
+                if (this.form.isPaused) {
+                    let createStreamURL = `${config.api.rest.endpoint}/stream/${match.params.formId}?tenantId=${match.params.accountId}`;
+                    let streamResponse = await store.auth.withSession(createStreamURL, "put");
+                    console.log(streamResponse);
+                    if(streamResponse.message != "OK") {
+                        notification.error({message: `Unable to active Form - ${streamResponse.message}`});
+                        store.view.resetLoading();
+                        return;
+                    }
+                }
                 let response = await API.graphql(graphqlOperation(mutations.updateForm, {input: {id: match.params.formId, isPaused: this.form.isPaused == 0 ? 1 : 0}}));
                 this.form.isPaused = response.data.updateForm.isPaused;
             } catch (errorResponse) {
