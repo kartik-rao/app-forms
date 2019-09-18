@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { ProgressView } from "../partials/ProgressView";
+import { toJS } from "mobx";
 
 const logger = Logger.getInstance(['HeaderView'], Logger.severity.info);
 
@@ -23,6 +24,7 @@ const Header : React.FC<RouteComponentProps<any>> = ({match, location, history})
         loading: false as boolean,
         account: null as any,
         form: null as any,
+        user: null as any,
         get accountId() : string {
             if(!store.auth.isAdmin) {
                 return store.auth.tenant;
@@ -33,6 +35,14 @@ const Header : React.FC<RouteComponentProps<any>> = ({match, location, history})
                 } else {
                     return null;
                 }
+            }
+        },
+        get userId() : string {
+            let matches = localStore.currentPath.match(/profile\/([\w|\-]+)/);
+            if(matches && matches.length > 1) {
+                return matches[1];
+            } else {
+                return null;
             }
         },
         get formId() : string {
@@ -60,7 +70,10 @@ const Header : React.FC<RouteComponentProps<any>> = ({match, location, history})
                     return "";
                 }
             } else {
-                return `All ${breadcrumb.replace("/", "")}`;
+                if(this.userId && this.user) {
+                    breadcrumb = breadcrumb.replace(this.userId, `${this.user.given_name} ${this.user.family_name}`);
+                }
+                return this.currentPath.indexOf('profile') == -1 ? `All ${breadcrumb.replace("/", "")}` : breadcrumb.replace("/ profile", "Profile");
             }
         }
     }));
@@ -92,6 +105,21 @@ const Header : React.FC<RouteComponentProps<any>> = ({match, location, history})
             localStore.loading = false;
         }
 
+        let fetchUser = async function() {
+            localStore.loading = true;
+            try {
+                let user: any = await API.graphql(graphqlOperation(queries.getUser, {userId: localStore.userId}));
+                localStore.user = user.data.getUser;
+            } catch (error) {
+                logger.error(`Header.useEffect.getUser(${localStore.userId})`, error);
+            }
+            localStore.loading = false;
+        }
+        if(localStore.userId) {
+            fetchUser();
+        } else {
+            localStore.user = null;
+        }
         if(localStore.accountId) {
             fetchAccount();
         } else {
@@ -102,7 +130,7 @@ const Header : React.FC<RouteComponentProps<any>> = ({match, location, history})
         } else {
             localStore.form = null;
         }
-    }, [localStore.accountId, localStore.formId]);
+    }, [localStore.accountId, localStore.formId, localStore.userId]);
 
     return useObserver(() => {
         return <Menu mode="horizontal" theme="light">
@@ -110,7 +138,7 @@ const Header : React.FC<RouteComponentProps<any>> = ({match, location, history})
             <Menu.Item key="breadcrumb" disabled={true}>{!localStore.loading && <h4 style={{margin: 0, fontVariant: "tabular-nums"}}> {localStore.breadcrumb} </h4>}</Menu.Item>
             <Menu.SubMenu key="user-menu" title={store.auth.user && store.auth.attributes ? store.auth.attributes.email : ""} style={{float:"right"}}>
                 <Menu.Item key="/profile">
-                    <Link to="/profile"><Icon type="user" />Profile</Link>
+                    <Link to={`/profile/${store.auth.user.getUsername()}`}><Icon type="user" />Profile</Link>
                 </Menu.Item>
                 <Menu.Item key="/logout">
                     <a onClick={(e) => store.auth.signOut()}><Icon type="logout"/> Sign out</a>
