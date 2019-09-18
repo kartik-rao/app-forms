@@ -36,6 +36,20 @@ export const createAuthStore = () => {
                 }
             });
         },
+        withSession: async function(endpoint: string, method: string, body?: any) {
+            let session: CognitoUserSession = await Auth.currentSession();
+            let token = session.getIdToken().getJwtToken()
+
+            let response = await fetch(endpoint, {
+                    method: method,
+                    headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                    },
+                    body: body ? JSON.stringify(body) : null
+            });
+            return response.json();
+        },
         signUp: async function (signupEndpoint: string, signupData: any) {
             let session: CognitoUserSession = await Auth.currentSession();
             let token = session.getIdToken().getJwtToken()
