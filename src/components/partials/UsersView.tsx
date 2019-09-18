@@ -33,7 +33,7 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
             this.loading = true;
             try {
                 store.view.setLoading({show: true, message: "Adding User", status: "active", type : "line", percent: 100});
-                await store.auth.signUp(config.api.rest.endpoint, values);
+                await store.auth.signUp(`${config.api.rest}/invite`, values);
             } catch (error) {
                 this.errors = error;
                 console.log("signup error", error);
