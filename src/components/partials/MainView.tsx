@@ -13,11 +13,13 @@ const AllAccountsView = React.lazy(() => import(/* webpackChunkName: "app-accoun
 const FormsView = React.lazy(() => import(/* webpackChunkName: "app-forms" */ "./FormsView").then((module) => {return {default: module.FormsView}}));
 const AdminView = React.lazy(() => import(/* webpackChunkName: "app-admin" */ "./AdminView").then((module) => {return {default: module.AdminView}}));
 const UsersView = React.lazy(() => import(/* webpackChunkName: "app-users" */ "./UsersView").then((module) => {return {default: module.UsersView}}));
-const AccountView = React.lazy(() => import(/* webpackChunkName: "app-accadmin" */ "./AccountView").then((module) => {return {default: module.AccountView}}));
-const FormView = React.lazy(() => import(/* webpackChunkName: "app-accadmin" */ "./FormView").then((module) => {return {default: module.FormView}}));
+const AccountView = React.lazy(() => import(/* webpackChunkName: "app-account" */ "./AccountView").then((module) => {return {default: module.AccountView}}));
+const FormView = React.lazy(() => import(/* webpackChunkName: "app-form" */ "./FormView").then((module) => {return {default: module.FormView}}));
+const ProfileView = React.lazy(() => import(/* webpackChunkName: "app-profile" */ "./ProfileView").then((module) => {return {default: module.ProfileView}}));
 
 const AllPaths = [
     "/", "/profile", "/admin", "/accounts", "/users",
+    "/profile/:userId",
     "/account/:accountId",
     "/account/:accountId/forms",
     "/account/:accountId/users",
@@ -46,11 +48,13 @@ export const MainView: React.FC<any> = () => {
                             <Route exact path="/account/:accountId"          component={AccountView} key="accountview"/>
                             <Route path="/account/:accountId/forms"          component={FormsView}   key="formsview"/>
                             <Route path="/account/:accountId/users"          component={UsersView}   key="usersview"/>
-                            <Route path="/account/:accountId/form/:formId"   component={FormView}  key="formview"/>
+                            <Route path="/profile/:userId"                   component={ProfileView} key="profileview"/>
+                            <Route path="/account/:accountId/form/:formId"   component={FormView}    key="formview"/>
                             <Route path="/account/:accountId/canvas/:formId" component={CanvasView}  key="canvasview"/>
                             <Route exact path="/" render={() => (
                                 !store.auth.isAdmin ? <Redirect to={`/account/${store.auth.tenant}`}/> : <Redirect to={`/accounts`}/>
                             )}/>
+                            
                         </Layout.Content>
                     </Layout>
                     </React.Suspense>
