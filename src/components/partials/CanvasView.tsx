@@ -69,7 +69,7 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
                 <Canvas onSave={() => {localStore.showAddVersion = true}} onClose={localStore.onClose}/>
             </React.Suspense>
             {localStore.showAddVersion && <AddFormVersionView formId={localStore.formId}
-                tenant={localStore.form.accountId}
+                tenantId={localStore.form.accountId}
                 formData={localStore.formStore.form.asPlainObject}
                 onSave={localStore.onSaveComplete}
                 onCancel={localStore.onCancel}/>}
