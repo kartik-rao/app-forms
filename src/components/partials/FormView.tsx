@@ -48,7 +48,6 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                 if (this.form.isPaused) {
                     let createStreamURL = `${config.api.rest.endpoint}/stream/${match.params.formId}?tenantId=${match.params.accountId}`;
                     let streamResponse = await store.auth.withSession(createStreamURL, "put");
-                    console.log(streamResponse);
                     if(streamResponse.message != "OK") {
                         notification.error({message: `Unable to active Form - ${streamResponse.message}`});
                         store.view.resetLoading();
@@ -129,7 +128,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     }, [localStore.refresh]);
 
     const columns = [
-        {title: "Detail", key: "notes", dataIndex: "notes"},
+        {title: "Detail", key: "notes", dataIndex: "notes", render:(text, record) => <p style={{whiteSpace: "pre-line"}}>{text}</p>},
         {title: "Active", key: "active", render:(text, record) => record.id == localStore.form.versionId ? <Badge status="success"/> : <Badge status="default"/>},
         {title: "Created", key: "createdAt", dataIndex: "createdAt", render: (text, record) => {return <span>{dayjs(text).format('DD MMM YY hh:mm a')}</span>}},
         {title: "By", key: "owner", dataIndex: "ownedBy", render: (text, record) => {return <span>{record.ownedBy.given_name} {record.ownedBy.family_name}</span>}},
