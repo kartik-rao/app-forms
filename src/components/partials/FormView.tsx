@@ -133,7 +133,8 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         {title: "Created", key: "createdAt", dataIndex: "createdAt", render: (text, record) => {return <span>{dayjs(text).format('DD MMM YY hh:mm a')}</span>}},
         {title: "By", key: "owner", dataIndex: "ownedBy", render: (text, record) => {return <span>{record.ownedBy.given_name} {record.ownedBy.family_name}</span>}},
         {title: "Actions", key: "actions", render: (text, record) => {return <span>
-            <Button disabled={record.id == localStore.form.versionId} onClick={() => localStore.activateVersion(record.id)} type="primary" size="small" title="Activate">Activate</Button>
+            <Button disabled={record.id == localStore.form.versionId} onClick={() => localStore.activateVersion(record.id)} type="primary" size="small" title="Activate" className="fl-right-margin-ten"><Icon type="check"/> Activate</Button>
+            <Button disabled={record.id == localStore.form.versionId} onClick={() => localStore.activateVersion(record.id)} type="danger" size="small" title="Delete"><Icon type="delete"/> Delete</Button>
         </span>}},
     ]
 

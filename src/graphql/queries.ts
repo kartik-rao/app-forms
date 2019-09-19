@@ -102,7 +102,6 @@ export const getUser = `query GetUser($userId: ID!) {
       createdAt
       updatedAt
       isDeleted
-      numForms
     }
     accountId
     account {
@@ -115,7 +114,6 @@ export const getUser = `query GetUser($userId: ID!) {
       createdAt
       updatedAt
       active
-      numForms
       numUsers
     }
     email
@@ -126,7 +124,6 @@ export const getUser = `query GetUser($userId: ID!) {
     createdAt
     updatedAt
     isDeleted
-    numForms
   }
 }
 `;
@@ -547,8 +544,6 @@ export const listUsers = `query ListUsers(
     ownerId
     ownedBy {
       id
-      ownerId
-      accountId
       email
       userGroup
       given_name
@@ -557,7 +552,6 @@ export const listUsers = `query ListUsers(
       createdAt
       updatedAt
       isDeleted
-      numForms
     }
     accountId
     account {
@@ -570,8 +564,6 @@ export const listUsers = `query ListUsers(
       createdAt
       updatedAt
       active
-      numForms
-      numUsers
     }
     email
     userGroup
@@ -581,7 +573,6 @@ export const listUsers = `query ListUsers(
     createdAt
     updatedAt
     isDeleted
-    numForms
   }
 }
 `;

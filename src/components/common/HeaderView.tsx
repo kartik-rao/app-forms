@@ -136,14 +136,13 @@ const Header : React.FC<RouteComponentProps<any>> = ({match, location, history})
         return <Menu mode="horizontal" theme="light">
             <Menu.Item key="formsli-brand" disabled={true}><h2 style={{margin: 0, fontVariant: "tabular-nums"}}>Forms.li</h2></Menu.Item>
             <Menu.Item key="breadcrumb" disabled={true}>{!localStore.loading && <h4 style={{margin: 0, fontVariant: "tabular-nums"}}> {localStore.breadcrumb} </h4>}</Menu.Item>
-            <Menu.SubMenu key="user-menu" title={store.auth.user && store.auth.attributes ? store.auth.attributes.email : ""} style={{float:"right"}}>
-                <Menu.Item key="/profile">
+            <Menu.Item key="user-menu" style={{float:"right"}} disabled={true}>
+                <h4 style={{margin: 0, fontVariant: "tabular-nums"}}> {store.auth.user && store.auth.attributes ? store.auth.attributes.email : ""} </h4>
+                {/* <Menu.Item key="/profile">
                     <Link to={`/profile/${store.auth.user.getUsername()}`}><Icon type="user" />Profile</Link>
                 </Menu.Item>
-                <Menu.Item key="/logout">
-                    <a onClick={(e) => store.auth.signOut()}><Icon type="logout"/> Sign out</a>
-                </Menu.Item>
-            </Menu.SubMenu>
+                 */}
+            </Menu.Item>
             <span key="progressview" style={{float: "right"}}><ProgressView {...store.view.loading}/></span>
         </Menu>
     })

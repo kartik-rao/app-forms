@@ -68,8 +68,10 @@ export const createAuthStore = () => {
             return Auth.changePassword(this.user, oldPassword, newPassword);
         },
         signOut: function () {
+            console.log("Sign Out Called");
+            let self = this;
             Auth.signOut().then(() => {
-                this.setAuthState('signIn');
+                self.resetAuth();
             }).catch(e => {
                 console.error(e);
             });

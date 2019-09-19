@@ -54,7 +54,6 @@ export const MainView: React.FC<any> = () => {
                             <Route exact path="/" render={() => (
                                 !store.auth.isAdmin ? <Redirect to={`/account/${store.auth.tenant}`}/> : <Redirect to={`/accounts`}/>
                             )}/>
-                            
                         </Layout.Content>
                     </Layout>
                     </React.Suspense>
