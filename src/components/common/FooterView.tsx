@@ -1,8 +1,12 @@
 import * as React from "react";
 import {Menu, Icon} from "antd";
+import config from "../../config";
 
 export const Footer : React.FC = () => {
     return <Menu selectedKeys={null} mode="horizontal" theme="light">
+        <Menu.Item key="version" style={{float: 'left'}}>
+            <span>v{config.version}</span>
+        </Menu.Item>
         <Menu.Item key="privacy" style={{float: 'right'}}>
             <Icon type="lock" />Privacy
         </Menu.Item>
