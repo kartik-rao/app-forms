@@ -55,7 +55,9 @@ export const ProfileView: React.FC<RouteComponentProps<any>> = ({match, history}
             try {
                 query = "GetAccount";
                 let response = await API.graphql(graphqlOperation(queries.getUser, {"userId": match.params.userId}));
-                localStore.user = response['data']['getUser'];
+                let user = response['data']['getUser'];
+                store.view.idNameMap[match.params.userId] = `${user.given_name} ${user.family_name}`;
+                localStore.user = user;
             } catch (errorResponse) {
                 console.log(query, errorResponse.errors);
                 localStore.errors = errorResponse.errors;

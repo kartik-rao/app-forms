@@ -83,7 +83,7 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
         dataIndex: 'name',
         key: 'name',
         render: (text, record) => {
-            return <span><Link to={`/account/${match.params.accountId}/form/${record.id}`}>{text}</Link></span>
+            return <span><Link to={`/account/${match.params.accountId}/forms/${record.id}`}>{text}</Link></span>
         }
     }, {
         title: 'Description',

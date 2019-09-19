@@ -1,17 +1,13 @@
 import { observable } from 'mobx';
-
-import {Views, Paths} from "../RouteNames";
 import { ProgressViewProps } from '../components/partials/ProgressView';
 
 export const createViewStore = () => {
     const store = {
-        currentView: {name: ''} as {name: string},
+        currentPath : location.pathname as string,
         loading: {} as ProgressViewProps,
         idNameMap: {} as any,
         debug: location.href.indexOf('localhost') > -1 as boolean,
         inAccountMenuCollapsed: true as boolean,
-        userContextId: null as any,
-        userContextData: null as any,
         get collapseAccountMenu() : boolean {
             return this.inAccountMenuCollapsed;
         },
@@ -24,23 +20,64 @@ export const createViewStore = () => {
         resetLoading: function() {
             this.loading = {};
         },
-        get currentPath():  string {
-            if(!this.currentView || !this.currentView.name || !Views[this.currentView.name]) {
-                if(Paths[window.location.pathname]) {
-                    return window.location.pathname;
-                } else {
-                    return "";
-                }
-            }
-            return Views[this.currentView.name].path;
-        },
-        showView: function(name: string) {
-            if (name && Views[name]) {
-                this.currentView = Views[name];
-                window.history.pushState(null, null, Views[name].path)
+        isUUID(str: string) : boolean {
+            if(!str) {
+                return false;
             } else {
-                console.warn(`ViewStore.showView - view [${name}] does not exist`)
+                let matches = str.match(/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/i)
+                return matches != null && matches.length > 0;
             }
+        },
+        get lastPathFragment() : string {
+            if (!this.currentPath) {
+                return "";
+            }
+            // remove leading slash
+            let path = this.currentPath.substring(1);
+            // remove trailing slash
+            if(path.lastIndexOf("/") == path.length -1) {
+                path = path.substring(0, path.length -1)
+            }
+    
+            let segments = path.split("/");
+            if(segments[0] == "account") {
+                // In account pages
+                // Account home page
+                if (segments.length == 2) {
+                    return segments[0];
+                } else if(segments.length == 3) {
+                    // entity index page
+                    let parts = path.match(/(account)\/([\w-]+)\/([\w]+)/)
+                    return parts[parts.length - 1];
+                } else if(segments.length > 3){
+                    // entity etail page
+                    let parts = path.match(/(account)\/([\w-]+)\/([\w]+)\/([\w-]+)/)
+                    return parts[parts.length - 2];
+                }
+            } else {
+                return segments[0];
+            }
+        },
+        get breadcrumb(): string {
+            if (!this.currentPath) {
+                return "";
+            }
+            // remove leading slash
+            let path = this.currentPath.substring(1);
+            // remove trailing slash
+            if(path.lastIndexOf("/") == path.length -1) {
+                path = path.substring(0, path.length -1)
+            }
+            let segments : string[] = path.split("/");
+            let self = this;
+            let translated = segments.map((s: string) => {
+                if(this.isUUID(s)) {
+                    return self.idNameMap[s] ? self.idNameMap[s] : s;
+                } else {
+                    return s;
+                }
+            });
+            return translated.join(" / ")
         }
     };
     return observable(store);

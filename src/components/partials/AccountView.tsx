@@ -57,6 +57,8 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (pr
             try {
                 let args = {accountId: props.match.params.accountId};
                 let account: any = await API.graphql(graphqlOperation(queries.getAccount, args));
+                account = account.data.getAccount;
+                store.view.idNameMap[props.match.params.accountId] = account.name;
                 localStore.account = account.data.getAccount;
                 localStore.loading = false;
             } catch (errorResponse) {

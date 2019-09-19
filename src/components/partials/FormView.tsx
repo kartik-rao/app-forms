@@ -113,6 +113,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                 if(response.version && response.version.formData) {
                     response.version.formData = JSON.parse(response.version.formData);
                 }
+                store.view.idNameMap[match.params.formId] = response.name;
                 localStore.form = response;
             } catch (errorResponse) {
                 console.error("queries.getAccount.forms", errorResponse);
