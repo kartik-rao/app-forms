@@ -73,6 +73,7 @@
     "cross-env": "^5.2.0",
     "css-loader": "^2.1.0",
     "fork-ts-checker-webpack-plugin": "^1.0.0",
+    "graphql-typescript-definitions": "^0.17.3",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^4.0.0-beta.8",
     "jasmine": "^3.3.1",
