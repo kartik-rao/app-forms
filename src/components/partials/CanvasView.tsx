@@ -39,7 +39,7 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
             localStore.showAddVersion = false;
         },
         onClose: function() {
-            history.push(`/account/${match.params.accountId}/forms`)
+            history.push(`/account/${match.params.accountId}/forms/${match.params.formId}`)
         }
     }));
 
