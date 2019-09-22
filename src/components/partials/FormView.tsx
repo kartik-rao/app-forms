@@ -1,6 +1,6 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import * as React from "react";
-import {PageHeader, Row, Col, Card, Skeleton, Badge, Button, Popconfirm, Tag, Divider, Typography, Statistic, Timeline, notification, Icon, Drawer, List} from "antd";
+import {PageHeader, Row, Col, Card, Skeleton, Badge, Button, Popconfirm, Tag, Divider, Typography, Statistic, Timeline, notification, Icon, Drawer, List, Popover} from "antd";
 import { Link, RouteComponentProps } from "react-router-dom";
 import * as mutations from '../../graphql/mutations';
 import * as queries from '../../graphql/queries';
@@ -11,6 +11,7 @@ import { TableWrapper } from "../common/TableWrapper";
 import  EditFormView from "./EditFormView";
 import moment from "moment";
 import { BadgeProps } from "antd/lib/badge";
+import { autorun } from "mobx";
 
 export interface FormViewProps {
     accountId: string;
@@ -85,12 +86,15 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             try {
                 store.view.setLoading({show: true, message: "Deleting Version", status: "active", type : "line", percent: 100});
                 await API.graphql(graphqlOperation(mutations.deleteFormVersion, {input:{accountId: match.params.accountId, formId: match.params.formId, versionId: versionId}}));
+                // TODO: View is not refreshing after delete
                 if (localStore.form.versions) {
                     localStore.form.versions = localStore.form.versions.filter((version) => {
                         return version.id != versionId;
-                    })
+                    });
                 }
+
                 notification.success({message: `Version deleted successfully`});
+                localStore.refresh = !localStore.refresh;
             } catch (errorResponse) {
                 console.error("activateVersion - queries.deleteVersion", errorResponse);
                 this.errors = errorResponse.errors;
@@ -161,26 +165,29 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         {title: "Detail", key: "notes", dataIndex: "notes", render:(text, record) => <p style={{whiteSpace: "pre-line"}}>{text}</p>},
         {title: "Created", key: "createdAt", dataIndex: "createdAt", render: (text, record) => {return <span>{dayjs(text).format('DD MMM YY hh:mm a')}</span>}},
         {title: "By", key: "owner", dataIndex: "ownedBy", render: (text, record) => {return <span>{record.ownedBy.given_name} {record.ownedBy.family_name}</span>}},
-        {title: "Actions", key: "actions", render: (text, record) => {return useObserver(() => {return <span>
-            <Button disabled={record.id == localStore.form.versionId} onClick={() => localStore.activateVersion(record.id)} type="primary" size="small" title="Activate" className="fl-right-margin-ten"><Icon type="check"/> Activate</Button>
-            <Button disabled={record.id == localStore.form.versionId} onClick={() => localStore.deleteVersion(record.id)} type="danger" size="small" title="Delete"><Icon type="delete"/> Delete</Button>
-        </span>})}},
+        {title: "Actions", key: "actions", render: (text, record) => {return <span>
+                <Button disabled={record.id == localStore.form.versionId} onClick={() => localStore.activateVersion(record.id)} type="primary" size="small" title="Activate" className="fl-right-margin-ten"><Icon type="check"/> Activate</Button>
+                <Button disabled={record.id == localStore.form.versionId} onClick={() => localStore.deleteVersion(record.id)} type="danger" size="small" title="Delete"><Icon type="delete"/> Delete</Button>
+            </span>
+        }},
     ]
 
-    const formActions = useObserver(() => {
-        return <span> {
-            localStore.form ? <>
-                <Button size="small" className="fl-right-margin-ten" onClick={() => {localStore.showEditForm = true}}>Settings</Button>
-                <Popconfirm title={localStore.form.isPaused == 1 ? "Activate & start accepting entries ?" : "Pause & stop accepting entries ?"} onConfirm={() => localStore.toggleFormPause()}>
-                    <Button className="fl-right-margin-ten" size="small" disabled={!localStore.form.versions || localStore.form.versions.length == 0} type={localStore.form.isPaused == 1 ? "primary" : "danger"}>{localStore.form.isPaused == 1 ? "Activate" : "Pause"}</Button>
-                </Popconfirm>
-                <Popconfirm title={"This will delete the form and all versions. Are you sure ?"} onConfirm={() => localStore.deleteForm()}>
-                    <Button className="fl-right-margin-ten" size="small" type="danger">Delete</Button>
-                </Popconfirm>
-            </> : <></>
-        }
-        </span>
-    });
+    const FormActions : React.FC<any> = () => {
+        return useObserver(() => {
+            return <span> {
+                localStore.form ? <>
+                    <Button size="small" className="fl-right-margin-ten" onClick={() => {localStore.showEditForm = true}}>Settings</Button>
+                    <Popconfirm title={localStore.form.isPaused == 1 ? "Activate & start accepting entries ?" : "Pause & stop accepting entries ?"} onConfirm={() => localStore.toggleFormPause()}>
+                        <Button className="fl-right-margin-ten" size="small" disabled={!localStore.form.versions || localStore.form.versions.length == 0} type={localStore.form.isPaused == 1 ? "primary" : "danger"}>{localStore.form.isPaused == 1 ? "Activate" : "Pause"}</Button>
+                    </Popconfirm>
+                    <Popconfirm title={"This will delete the form and all versions. Are you sure ?"} onConfirm={() => localStore.deleteForm()}>
+                        <Button className="fl-right-margin-ten" size="small" type="danger">Delete</Button>
+                    </Popconfirm>
+                </> : <></>
+            }
+            </span>
+        })
+    };
 
     const BadgeText : React.FC<{status: "error"|"success"|"warning"|"processing", text: string}> = ({status, text}) => {
         return <strong>{text}<Badge status={status} style={{marginLeft: "10px"}}></Badge></strong>
@@ -200,9 +207,10 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     const FormStatus : React.FC<any> = () => {
         return useObserver(() => {
             return <>
-            {localStore.form.isPaused ? <BadgeText status="warning" text="Paused"/> : <BadgeText status="processing" text="Running"/>}
-            {localStore.form.startDate && <span className="fl-left-margin-ten fl-right-margin-ten">From<Tag style={{marginLeft: '5px'}}>{dayjs(localStore.form.startDate).format(DATE_FORMAT)}</Tag></span>}
-            {localStore.form.endDate && <span>To<Tag style={{marginLeft: '5px'}}>{dayjs(localStore.form.endDate).format(DATE_FORMAT)}</Tag></span>}
+            {localStore.form.version && <Popover content={<ChangeList />}>{localStore.form.version.displayName}</Popover>}
+            <span className="fl-left-margin-ten">{localStore.form.isPaused ? <BadgeText status="warning" text="Paused"/> : <BadgeText status="processing" text="Running"/>}</span>
+            {localStore.form.startDate && <span className="fl-left-margin-ten">From<Tag style={{marginLeft: '5px'}}>{dayjs(localStore.form.startDate).format(DATE_FORMAT)}</Tag></span>}
+            {localStore.form.endDate && <span>-<Tag style={{marginLeft: '5px'}}>{dayjs(localStore.form.endDate).format(DATE_FORMAT)}</Tag></span>}
             </>
         })
     };
@@ -212,13 +220,13 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             <Drawer bodyStyle={{overflow: 'hidden'}} placement="right" visible={localStore.showEditForm} width={600} title={"Form settings"} closable maskClosable onClose={() => localStore.onUpdateComplete()}>
                 <Row><Col span={24}><EditFormView editForm={localStore.form} onUpdate={localStore.onUpdateComplete}/></Col></Row>
             </Drawer>
-            <PageHeader onBack={() => history.push(`/account/${match.params.accountId}/forms`)} title={localStore.form.name} subTitle={<FormStatus />} extra={formActions}>
+            <PageHeader onBack={() => history.push(`/account/${match.params.accountId}/forms`)} title={localStore.form.name} subTitle={<FormStatus />} extra={<FormActions/>}>
             <Typography.Paragraph>{localStore.form.description}</Typography.Paragraph>
             <Row>
                 {localStore.form.version && 
                     <Col span={6}>
-                        <Statistic title="Active Version" value={localStore.form.version.displayName}/>
-                        <ChangeList />
+                        
+                        
                 </Col>}
             </Row>
             <Row>
