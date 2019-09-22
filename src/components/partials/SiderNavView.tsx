@@ -8,6 +8,7 @@ export interface SiderNavViewProps {
     accountId: string;
 }
 
+
 export const SiderNavView : React.FC<RouteComponentProps<SiderNavViewProps>> = ({match, location, history}) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");

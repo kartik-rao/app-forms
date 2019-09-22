@@ -1,6 +1,10 @@
 import { observable } from 'mobx';
 import { ProgressViewProps } from '../components/partials/ProgressView';
 
+let withFirstUpper = function(str: string) : string {
+    return str[0].toUpperCase() + str.substring(1);
+}
+
 export const createViewStore = () => {
     const store = {
         currentPath : location.pathname as string,
@@ -74,7 +78,7 @@ export const createViewStore = () => {
                 if(this.isUUID(s)) {
                     return self.idNameMap[s] ? self.idNameMap[s] : s;
                 } else {
-                    return s;
+                    return withFirstUpper(s);
                 }
             });
             return translated.join(" / ")

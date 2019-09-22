@@ -1,20 +1,14 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
 import { Logger } from "@kartikrao/lib-logging";
-import { Icon, Menu } from "antd";
+import { Menu } from "antd";
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import { Link } from "react-router-dom";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { ProgressView } from "../partials/ProgressView";
-import { toJS } from "mobx";
 
 const logger = Logger.getInstance(['HeaderView'], Logger.severity.info);
-
-let withFirstUpper = function(str: string) : string {
-    return str[0].toUpperCase() + str.substring(1);
-}
 
 const Header : React.FC<RouteComponentProps<any>> = ({match, location, history}) => {
     const store = React.useContext(appStoreContext);
