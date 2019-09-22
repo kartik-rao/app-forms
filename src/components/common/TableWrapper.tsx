@@ -122,7 +122,7 @@ export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapper
 
     return useObserver(() => {
         return <div>
-        {!local.isEmpty && !local.hasErrors && <Table title={props.title} rowSelection={{selectedRowKeys : local.selectedRowKeys, onChange : local.onSelectChange }}
+        {!local.isEmpty && !local.hasErrors && <Table useFixedHeader title={props.title} rowSelection={{selectedRowKeys : local.selectedRowKeys, onChange : local.onSelectChange }}
             dataSource={local.data} bordered={local.bordered} rowKey={local.rowKey} size={local.size} pagination={local.pagination} 
             columns={local.columns} expandedRowRender={props.expandedRowRender} expandedRowKeys={props.expandedRowKeys||[]}/>}
         {local.isEmpty && !local.hasErrors && <Card><Empty description={props.emptyText}/></Card>}
