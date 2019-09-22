@@ -43,8 +43,15 @@ export type AddFormInput = {
 export type AddFormVersionInput = {
   accountId: string,
   formId: string,
+  displayName: string,
   notes: string,
   formData: string,
+};
+
+export type AttachFormVersionInput = {
+  formId: string,
+  versionId: string,
+  accountId: string,
 };
 
 export type UpdatePlanTypeInput = {
@@ -117,7 +124,14 @@ export type DeleteFormInput = {
   accountId: string,
 };
 
+export type DeleteFormVersionInput = {
+  accountId: string,
+  formId: string,
+  versionId: string,
+};
+
 export type AddFormEntryInput = {
+  formId: string,
   data: string,
 };
 
@@ -512,6 +526,7 @@ export type AddIntegrationMutation = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -548,6 +563,7 @@ export type AddFormMutation = {
     name: string,
     description: string,
     versionId: string | null,
+    versionActivatedDate: string | null,
     version:  {
       __typename: "FormVersion",
       id: string,
@@ -555,6 +571,7 @@ export type AddFormMutation = {
       formId: string,
       ownerId: string,
       createdAt: string | null,
+      displayName: string,
       notes: string | null,
       formData: string,
     } | null,
@@ -603,6 +620,7 @@ export type AddFormMutation = {
       formId: string,
       ownerId: string,
       createdAt: string | null,
+      displayName: string,
       notes: string | null,
       formData: string,
     } | null > | null,
@@ -647,6 +665,7 @@ export type AddFormVersionMutation = {
     name: string,
     description: string,
     versionId: string | null,
+    versionActivatedDate: string | null,
     version:  {
       __typename: "FormVersion",
       id: string,
@@ -654,6 +673,7 @@ export type AddFormVersionMutation = {
       formId: string,
       ownerId: string,
       createdAt: string | null,
+      displayName: string,
       notes: string | null,
       formData: string,
     } | null,
@@ -702,6 +722,109 @@ export type AddFormVersionMutation = {
       formId: string,
       ownerId: string,
       createdAt: string | null,
+      displayName: string,
+      notes: string | null,
+      formData: string,
+    } | null > | null,
+    integrations:  Array< {
+      __typename: "Integration",
+      id: string,
+      integrationTypeId: string,
+      ownerId: string,
+      accountId: string,
+      formId: string,
+      active: number,
+      authType: string | null,
+      auth: string | null,
+      target: string | null,
+      method: string | null,
+      lastExecuted: string | null,
+      lastExecutionResult: number | null,
+      lastExecutionResultMessage: string | null,
+      createdAt: string | null,
+      updatedAt: string | null,
+      isDeleted: number | null,
+    } | null > | null,
+    entries:  Array< {
+      __typename: "FormEntry",
+      id: string,
+      formId: string,
+      data: string,
+      createdAt: string,
+    } | null > | null,
+  },
+};
+
+export type AttachFormVersionMutationVariables = {
+  input: AttachFormVersionInput,
+};
+
+export type AttachFormVersionMutation = {
+  attachFormVersion:  {
+    __typename: "Form",
+    id: string,
+    ownerId: string,
+    name: string,
+    description: string,
+    versionId: string | null,
+    versionActivatedDate: string | null,
+    version:  {
+      __typename: "FormVersion",
+      id: string,
+      accountId: string,
+      formId: string,
+      ownerId: string,
+      createdAt: string | null,
+      displayName: string,
+      notes: string | null,
+      formData: string,
+    } | null,
+    ownedBy:  {
+      __typename: "User",
+      id: string,
+      ownerId: string | null,
+      accountId: string | null,
+      email: string,
+      userGroup: string,
+      given_name: string,
+      family_name: string,
+      phone_number: string | null,
+      createdAt: string | null,
+      updatedAt: string | null,
+      isDeleted: number | null,
+      numForms: number | null,
+    },
+    accountId: string,
+    account:  {
+      __typename: "Account",
+      id: string,
+      name: string,
+      website: string | null,
+      taxId: string | null,
+      ownerId: string,
+      planId: string | null,
+      createdAt: string | null,
+      updatedAt: string | null,
+      active: number | null,
+      numForms: number | null,
+      numUsers: number | null,
+    },
+    createdAt: string,
+    updatedAt: string | null,
+    startDate: string | null,
+    endDate: string | null,
+    isPaused: number | null,
+    isDeleted: number | null,
+    redirectNotStarted: string | null,
+    redirectHasEnded: string | null,
+    versions:  Array< {
+      __typename: "FormVersion",
+      id: string,
+      accountId: string,
+      formId: string,
+      ownerId: string,
+      createdAt: string | null,
+      displayName: string,
       notes: string | null,
       formData: string,
     } | null > | null,
@@ -912,6 +1035,7 @@ export type UpdateAccountMutation = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -1007,6 +1131,7 @@ export type UpdateAccountPlanMutation = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -1144,6 +1269,7 @@ export type UpdateIntegrationMutation = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -1180,6 +1306,7 @@ export type UpdateFormMutation = {
     name: string,
     description: string,
     versionId: string | null,
+    versionActivatedDate: string | null,
     version:  {
       __typename: "FormVersion",
       id: string,
@@ -1187,6 +1314,7 @@ export type UpdateFormMutation = {
       formId: string,
       ownerId: string,
       createdAt: string | null,
+      displayName: string,
       notes: string | null,
       formData: string,
     } | null,
@@ -1235,6 +1363,7 @@ export type UpdateFormMutation = {
       formId: string,
       ownerId: string,
       createdAt: string | null,
+      displayName: string,
       notes: string | null,
       formData: string,
     } | null > | null,
@@ -1268,7 +1397,7 @@ export type UpdateFormMutation = {
 };
 
 export type DeleteFormMutationVariables = {
-  input?: DeleteFormInput | null,
+  input: DeleteFormInput,
 };
 
 export type DeleteFormMutation = {
@@ -1279,6 +1408,7 @@ export type DeleteFormMutation = {
     name: string,
     description: string,
     versionId: string | null,
+    versionActivatedDate: string | null,
     version:  {
       __typename: "FormVersion",
       id: string,
@@ -1286,6 +1416,7 @@ export type DeleteFormMutation = {
       formId: string,
       ownerId: string,
       createdAt: string | null,
+      displayName: string,
       notes: string | null,
       formData: string,
     } | null,
@@ -1334,6 +1465,7 @@ export type DeleteFormMutation = {
       formId: string,
       ownerId: string,
       createdAt: string | null,
+      displayName: string,
       notes: string | null,
       formData: string,
     } | null > | null,
@@ -1545,6 +1677,7 @@ export type DeleteAccountMutation = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -1682,6 +1815,7 @@ export type DeleteIntegrationMutation = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -1706,33 +1840,48 @@ export type DeleteIntegrationMutation = {
   },
 };
 
+export type DeleteFormVersionMutationVariables = {
+  input: DeleteFormVersionInput,
+};
+
+export type DeleteFormVersionMutation = {
+  deleteFormVersion:  {
+    __typename: "FormVersion",
+    id: string,
+    accountId: string,
+    formId: string,
+    ownerId: string,
+    ownedBy:  {
+      __typename: "User",
+      id: string,
+      ownerId: string | null,
+      accountId: string | null,
+      email: string,
+      userGroup: string,
+      given_name: string,
+      family_name: string,
+      phone_number: string | null,
+      createdAt: string | null,
+      updatedAt: string | null,
+      isDeleted: number | null,
+      numForms: number | null,
+    },
+    createdAt: string | null,
+    displayName: string,
+    notes: string | null,
+    formData: string,
+  },
+};
+
 export type AddFormEntryMutationVariables = {
   input: AddFormEntryInput,
 };
 
 export type AddFormEntryMutation = {
   addFormEntry:  {
-    __typename: "FormEntry",
+    __typename: "FormEntrySansData",
     id: string,
     formId: string,
-    form:  {
-      __typename: "Form",
-      id: string,
-      ownerId: string,
-      name: string,
-      description: string,
-      versionId: string | null,
-      accountId: string,
-      createdAt: string,
-      updatedAt: string | null,
-      startDate: string | null,
-      endDate: string | null,
-      isPaused: number | null,
-      isDeleted: number | null,
-      redirectNotStarted: string | null,
-      redirectHasEnded: string | null,
-    },
-    data: string,
     createdAt: string,
   },
 };
@@ -1819,6 +1968,7 @@ export type GetAccountQuery = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -2053,6 +2203,7 @@ export type GetFormQuery = {
     name: string,
     description: string,
     versionId: string | null,
+    versionActivatedDate: string | null,
     version:  {
       __typename: "FormVersion",
       id: string,
@@ -2060,6 +2211,7 @@ export type GetFormQuery = {
       formId: string,
       ownerId: string,
       createdAt: string | null,
+      displayName: string,
       notes: string | null,
       formData: string,
     } | null,
@@ -2108,6 +2260,7 @@ export type GetFormQuery = {
       formId: string,
       ownerId: string,
       createdAt: string | null,
+      displayName: string,
       notes: string | null,
       formData: string,
     } | null > | null,
@@ -2167,6 +2320,7 @@ export type GetFormVersionQuery = {
       numForms: number | null,
     },
     createdAt: string | null,
+    displayName: string,
     notes: string | null,
     formData: string,
   } | null,
@@ -2245,6 +2399,7 @@ export type GetIntegrationQuery = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -2285,6 +2440,7 @@ export type GetFormEntryQuery = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -2384,6 +2540,7 @@ export type ListAccountsQuery = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -2564,6 +2721,7 @@ export type ListFormsQuery = {
     name: string,
     description: string,
     versionId: string | null,
+    versionActivatedDate: string | null,
     version:  {
       __typename: "FormVersion",
       id: string,
@@ -2571,6 +2729,7 @@ export type ListFormsQuery = {
       formId: string,
       ownerId: string,
       createdAt: string | null,
+      displayName: string,
       notes: string | null,
       formData: string,
     } | null,
@@ -2619,6 +2778,7 @@ export type ListFormsQuery = {
       formId: string,
       ownerId: string,
       createdAt: string | null,
+      displayName: string,
       notes: string | null,
       formData: string,
     } | null > | null,
@@ -2680,6 +2840,7 @@ export type ListFormVersionsQuery = {
       numForms: number | null,
     },
     createdAt: string | null,
+    displayName: string,
     notes: string | null,
     formData: string,
   } | null > | null,
@@ -2762,6 +2923,7 @@ export type ListIntegrationsQuery = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -2803,6 +2965,7 @@ export type ListFormEntriesQuery = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,
@@ -2836,6 +2999,7 @@ export type ListFormEntriesByTimeQuery = {
       name: string,
       description: string,
       versionId: string | null,
+      versionActivatedDate: string | null,
       accountId: string,
       createdAt: string,
       updatedAt: string | null,

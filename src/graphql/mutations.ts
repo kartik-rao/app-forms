@@ -142,6 +142,7 @@ export const addIntegration = `mutation AddIntegration($input: AddIntegrationInp
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
@@ -173,12 +174,14 @@ export const addForm = `mutation AddForm($input: AddFormInput!) {
     name
     description
     versionId
+    versionActivatedDate
     version {
       id
       accountId
       formId
       ownerId
       createdAt
+      displayName
       notes
       formData
     }
@@ -224,6 +227,7 @@ export const addForm = `mutation AddForm($input: AddFormInput!) {
       formId
       ownerId
       createdAt
+      displayName
       notes
       formData
     }
@@ -261,12 +265,14 @@ export const addFormVersion = `mutation AddFormVersion($input: AddFormVersionInp
     name
     description
     versionId
+    versionActivatedDate
     version {
       id
       accountId
       formId
       ownerId
       createdAt
+      displayName
       notes
       formData
     }
@@ -312,6 +318,7 @@ export const addFormVersion = `mutation AddFormVersion($input: AddFormVersionInp
       formId
       ownerId
       createdAt
+      displayName
       notes
       formData
     }
@@ -338,6 +345,53 @@ export const addFormVersion = `mutation AddFormVersion($input: AddFormVersionInp
       formId
       data
       createdAt
+    }
+  }
+}
+`;
+export const attachFormVersion = `mutation AttachFormVersion($input: AttachFormVersionInput!) {
+  attachFormVersion(input: $input) {
+    id
+    ownerId
+    name
+    description
+    versionId
+    versionActivatedDate
+    version {
+      id
+      accountId
+      formId
+      ownerId
+      createdAt
+      displayName
+      notes
+      formData
+    }
+    ownedBy {
+      id
+      email
+      given_name
+      family_name
+    }
+    accountId
+    account {
+      id
+      name
+    }
+    createdAt
+    updatedAt
+    startDate
+    endDate
+    isPaused
+    isDeleted
+    redirectNotStarted
+    redirectHasEnded
+    versions {
+      id
+      ownedBy {email given_name family_name}
+      createdAt
+      displayName
+      notes
     }
   }
 }
@@ -496,6 +550,7 @@ export const updateAccount = `mutation UpdateAccount($input: UpdateAccountInput)
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
@@ -581,6 +636,7 @@ export const updateAccountPlan = `mutation UpdateAccountPlan($input: AddPlanInpu
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
@@ -697,6 +753,7 @@ export const updateIntegration = `mutation UpdateIntegration($input: UpdateInteg
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
@@ -728,12 +785,14 @@ export const updateForm = `mutation UpdateForm($input: UpdateFormInput) {
     name
     description
     versionId
+    versionActivatedDate
     version {
       id
       accountId
       formId
       ownerId
       createdAt
+      displayName
       notes
       formData
     }
@@ -776,25 +835,29 @@ export const updateForm = `mutation UpdateForm($input: UpdateFormInput) {
       formId
       ownerId
       createdAt
+      displayName
       notes
       ownedBy {email given_name family_name}
     }
+
   }
 }
 `;
-export const deleteForm = `mutation DeleteForm($input: DeleteFormInput) {
+export const deleteForm = `mutation DeleteForm($input: DeleteFormInput!) {
   deleteForm(input: $input) {
     id
     ownerId
     name
     description
     versionId
+    versionActivatedDate
     version {
       id
       accountId
       formId
       ownerId
       createdAt
+      displayName
       notes
       formData
     }
@@ -840,6 +903,7 @@ export const deleteForm = `mutation DeleteForm($input: DeleteFormInput) {
       formId
       ownerId
       createdAt
+      displayName
       notes
       formData
     }
@@ -1024,6 +1088,7 @@ export const deleteAccount = `mutation DeleteAccount($accountId: ID!) {
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
@@ -1140,6 +1205,7 @@ export const deleteIntegration = `mutation DeleteIntegration($integrationId: ID!
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
@@ -1164,27 +1230,37 @@ export const deleteIntegration = `mutation DeleteIntegration($integrationId: ID!
   }
 }
 `;
+export const deleteFormVersion = `mutation DeleteFormVersion($input: DeleteFormVersionInput!) {
+  deleteFormVersion(input: $input) {
+    id
+    accountId
+    formId
+    ownerId
+    ownedBy {
+      id
+      ownerId
+      accountId
+      email
+      userGroup
+      given_name
+      family_name
+      phone_number
+      createdAt
+      updatedAt
+      isDeleted
+      numForms
+    }
+    createdAt
+    displayName
+    notes
+    formData
+  }
+}
+`;
 export const addFormEntry = `mutation AddFormEntry($input: AddFormEntryInput!) {
   addFormEntry(input: $input) {
     id
     formId
-    form {
-      id
-      ownerId
-      name
-      description
-      versionId
-      accountId
-      createdAt
-      updatedAt
-      startDate
-      endDate
-      isPaused
-      isDeleted
-      redirectNotStarted
-      redirectHasEnded
-    }
-    data
     createdAt
   }
 }

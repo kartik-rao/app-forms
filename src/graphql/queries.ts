@@ -73,6 +73,7 @@ export const getAccount = `query GetAccount($accountId: ID!) {
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
@@ -102,6 +103,7 @@ export const getUser = `query GetUser($userId: ID!) {
       createdAt
       updatedAt
       isDeleted
+      numForms
     }
     accountId
     account {
@@ -114,7 +116,6 @@ export const getUser = `query GetUser($userId: ID!) {
       createdAt
       updatedAt
       active
-      numUsers
     }
     email
     userGroup
@@ -124,6 +125,7 @@ export const getUser = `query GetUser($userId: ID!) {
     createdAt
     updatedAt
     isDeleted
+    numForms
   }
 }
 `;
@@ -270,12 +272,14 @@ export const getForm = `query GetForm($formId: String!) {
     name
     description
     versionId
+    versionActivatedDate
     version {
       id
       accountId
       formId
       ownerId
       createdAt
+      displayName
       notes
       formData
     }
@@ -306,6 +310,7 @@ export const getForm = `query GetForm($formId: String!) {
       id
       ownedBy {given_name family_name email}
       createdAt
+      displayName
       notes
     }
   }
@@ -332,6 +337,7 @@ export const getFormVersion = `query GetFormVersion($versionId: String!) {
       numForms
     }
     createdAt
+    displayName
     notes
     formData
   }
@@ -396,6 +402,7 @@ export const getIntegration = `query GetIntegration($integrationId: String!) {
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
@@ -430,6 +437,7 @@ export const getFormEntry = `query GetFormEntry($formEntryId: String!) {
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
@@ -521,6 +529,7 @@ export const listAccounts = `query ListAccounts(
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
@@ -552,6 +561,7 @@ export const listUsers = `query ListUsers(
       createdAt
       updatedAt
       isDeleted
+      numForms
     }
     accountId
     account {
@@ -677,6 +687,12 @@ export const listForms = `query ListForms(
     name
     description
     versionId
+    versionActivatedDate
+    version {
+      id
+      createdAt
+      displayName
+    }
     ownedBy {
       id
       email
@@ -717,6 +733,7 @@ export const listFormVersions = `query ListFormVersions(
       family_name
     }
     createdAt
+    displayName
     notes
     formData
   }
@@ -793,6 +810,7 @@ export const listIntegrations = `query ListIntegrations(
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
@@ -827,6 +845,7 @@ export const listFormEntries = `query ListFormEntries($offsetLimit: OffsetLimit,
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
@@ -860,6 +879,7 @@ export const listFormEntriesByTime = `query ListFormEntriesByTime(
       name
       description
       versionId
+      versionActivatedDate
       accountId
       createdAt
       updatedAt
