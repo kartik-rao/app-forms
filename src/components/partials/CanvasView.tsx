@@ -13,7 +13,7 @@ import AddFormVersionView from "./AddFormVersionView";
 
 export interface ICanvasViewProps {
     accountId: string;
-    formId: string
+    formId: string;
 }
 
 const Canvas = React.lazy(() => import(/* webpackChunkName: "app-canvas" */ "@kartikrao/lib-forms/lib/components/canvas/Canvas").then((module) => {return {default: module.Canvas}}));
@@ -39,7 +39,7 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
             localStore.showAddVersion = false;
         },
         onClose: function() {
-            history.push(`/account/${match.params.accountId}/forms`)
+            history.push(`/account/${match.params.accountId}/forms/${match.params.formId}`)
         }
     }));
 
@@ -69,7 +69,7 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
                 <Canvas onSave={() => {localStore.showAddVersion = true}} onClose={localStore.onClose}/>
             </React.Suspense>
             {localStore.showAddVersion && <AddFormVersionView formId={localStore.formId}
-                tenant={localStore.form.accountId}
+                tenantId={localStore.form.accountId}
                 formData={localStore.formStore.form.asPlainObject}
                 onSave={localStore.onSaveComplete}
                 onCancel={localStore.onCancel}/>}

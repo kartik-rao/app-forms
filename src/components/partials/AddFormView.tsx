@@ -70,7 +70,7 @@ export const AddFormView : React.FC<IAddFormViewProps> = (props: IAddFormViewPro
                     })(<DatePicker showTime={true}/>)}
                 </Form.Item>
                 <Form.Item style={{marginTop: "20px"}}>
-                    <Button style={{float: "right", marginRight: "10px"}} type="primary" htmlType="submit">Submit</Button>
+                    <Button style={{float: "right", marginRight: "10px"}} type="primary" htmlType="submit">Create</Button>
                 </Form.Item>
             </Form>
         </Row>

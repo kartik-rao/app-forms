@@ -21,7 +21,6 @@ export const AllAccountsView : React.FC<any> = () => {
         },
         setSelectedItems(selectedItems) {
             this.selectedItems = selectedItems;
-            console.log(selectedItems);
         },
         get hasSelectedItems() {
             return this.selectedItems.length > 0;

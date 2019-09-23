@@ -15,7 +15,8 @@ export interface ITableWrapperColumn {
 
 export interface ITableWrapperProps {
     columns: ITableWrapperColumn[]
-    data: any[]
+    data: any[];
+    title?: () => React.ReactNode;
     bordered?: boolean;
     pagination?: PaginationConfig | false;
     size?: TableSize;
@@ -23,6 +24,9 @@ export interface ITableWrapperProps {
     actions?: React.ReactFragment;
     errors: any[];
     onSelection?: any;
+    expandedRowRender?: any;
+    expandedRowKeys?: any;
+    emptyText?: string;
 }
 
 export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapperProps) => {
@@ -37,7 +41,7 @@ export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapper
         size : props.size || 'middle',
         actions : props.actions,
         debug : store.config.debug,
-        errors : props.errors || [],
+        errors : props.errors ? props.errors : [],
         onSelection : props.onSelection,
         searchText: null as string,
         searchInput: null as any,
@@ -109,7 +113,7 @@ export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapper
     }));
 
     const ErrorList = (
-        local.debug ? <List>
+        local.debug && local.errors ? <List>
             {local.errors.map((e, i) => {
                 return <List.Item key={e.errorType}>{e.message}</List.Item>
             })}
@@ -118,10 +122,10 @@ export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapper
 
     return useObserver(() => {
         return <div>
-        {!local.isEmpty && !local.hasErrors && <Table rowSelection={{selectedRowKeys : local.selectedRowKeys, onChange : local.onSelectChange }}
-            dataSource={local.data} bordered={local.bordered} rowKey={local.rowKey} size={local.size}
-            pagination={local.pagination} columns={local.columns}/>}
-        {local.isEmpty && !local.hasErrors && <Card><Empty/></Card>}
+        {!local.isEmpty && !local.hasErrors && <Table useFixedHeader title={props.title} rowSelection={{selectedRowKeys : local.selectedRowKeys, onChange : local.onSelectChange }}
+            dataSource={local.data} bordered={local.bordered} rowKey={local.rowKey} size={local.size} pagination={local.pagination} 
+            columns={local.columns} expandedRowRender={props.expandedRowRender} expandedRowKeys={props.expandedRowKeys||[]}/>}
+        {local.isEmpty && !local.hasErrors && <Card><Empty description={props.emptyText}/></Card>}
         {local.hasErrors &&
             <Result
             status="error"

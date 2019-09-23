@@ -21,11 +21,10 @@ export interface AccountViewProps {
     accountId: string;
 }
 
-export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (props) => {
+export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = ({match}) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
     const now = dayjs();
-
     const localStore = useLocalStore(() => ({
         account: {} as any,
         errors: [] as any[],
@@ -56,17 +55,19 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = (pr
             localStore.loading = true;
             store.view.setLoading({show: true, message: "Loading account", status: "active", type : "line", percent: 100});
             try {
-                let args = {accountId: props.match.params.accountId};
+                let args = {accountId: match.params.accountId};
                 let account: any = await API.graphql(graphqlOperation(queries.getAccount, args));
-                localStore.account = account.data.getAccount;
-                localStore.loading = false;
+                account = account.data.getAccount;
+                store.view.idNameMap[match.params.accountId] = account.name;
+                localStore.account = account;
             } catch (errorResponse) {
                 localStore.errors = errorResponse.errors;
             }
+            localStore.loading = false;
             store.view.resetLoading();
         }
         fetch();
-    }, [])
+    }, []);
 
     return useObserver(() => {
         return  <Row>

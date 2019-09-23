@@ -36,6 +36,20 @@ export const createAuthStore = () => {
                 }
             });
         },
+        withSession: async function(endpoint: string, method: string, body?: any) {
+            let session: CognitoUserSession = await Auth.currentSession();
+            let token = session.getIdToken().getJwtToken()
+
+            let response = await fetch(endpoint, {
+                    method: method,
+                    headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                    },
+                    body: body ? JSON.stringify(body) : null
+            });
+            return response.json();
+        },
         signUp: async function (signupEndpoint: string, signupData: any) {
             let session: CognitoUserSession = await Auth.currentSession();
             let token = session.getIdToken().getJwtToken()
@@ -50,9 +64,14 @@ export const createAuthStore = () => {
             });
             return response.json();
         },
+        changePassword: async function(oldPassword: string, newPassword: string) {
+            return Auth.changePassword(this.user, oldPassword, newPassword);
+        },
         signOut: function () {
+            console.log("Sign Out Called");
+            let self = this;
             Auth.signOut().then(() => {
-                this.setAuthState('signIn');
+                self.resetAuth();
             }).catch(e => {
                 console.error(e);
             });

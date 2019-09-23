@@ -46,23 +46,26 @@ export interface AppConfig {
 
 const _config = {
     development: {
-    auth : {
-        userPoolId: 'ap-northeast-1_Q798Nsl33',
-        userPoolWebClientId: "7pvdgcaflsg9juob60mosafi9d",
-        region: __REGION__,
-        mandatorySignIn: true
-    },
-    api : {
-            graph : {
-                'aws_appsync_region': __REGION__,
-                'aws_appsync_graphqlEndpoint': 'https://ugn2kqey75aolcnah6vtnbuydi.appsync-api.ap-northeast-1.amazonaws.com/graphql',
-                'aws_appsync_authenticationType': 'AMAZON_COGNITO_USER_POOLS'
-            },
-            rest : {
-                endpoint: 'dev-api.forms.li'
+        auth : {
+            userPoolId: 'ap-northeast-1_Q798Nsl33',
+            userPoolWebClientId: "7pvdgcaflsg9juob60mosafi9d",
+            region: __REGION__,
+            mandatorySignIn: true
+        },
+        api : {
+                graph : {
+                    'aws_appsync_region': __REGION__,
+                    'aws_appsync_graphqlEndpoint': 'https://ugn2kqey75aolcnah6vtnbuydi.appsync-api.ap-northeast-1.amazonaws.com/graphql',
+                    'aws_appsync_authenticationType': 'AMAZON_COGNITO_USER_POOLS'
+                },
+                rest : {
+                    endpoint: 'https://dev-api.forms.li',
+                    signUp  : 'https://dev-api.forms.li/invite',
+                    createStream: 'https://dev-api.forms.li/stream',
+                    entry : 'https://dev-api.forms.lu/form/entry/',
+                }
             }
-        }
-    },
+        },
     staging: null,
     production: null
 }
