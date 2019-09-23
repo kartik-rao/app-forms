@@ -1,17 +1,14 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
+import { Badge, Button, Card, Col, Divider, Drawer, Icon, List, notification, PageHeader, Popconfirm, Popover, Row, Skeleton, Tag, Typography } from "antd";
+import dayjs from 'dayjs';
+import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
-import {PageHeader, Row, Col, Card, Skeleton, Badge, Button, Popconfirm, Tag, Divider, Typography, Statistic, Timeline, notification, Icon, Drawer, List, Popover} from "antd";
 import { Link, RouteComponentProps } from "react-router-dom";
 import * as mutations from '../../graphql/mutations';
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
-import dayjs from 'dayjs';
-import { useLocalStore, useObserver } from "mobx-react-lite";
 import { TableWrapper } from "../common/TableWrapper";
-import  EditFormView from "./EditFormView";
-import moment from "moment";
-import { BadgeProps } from "antd/lib/badge";
-import { autorun } from "mobx";
+import EditFormView from "./EditFormView";
 
 export interface FormViewProps {
     accountId: string;
@@ -86,15 +83,11 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             try {
                 store.view.setLoading({show: true, message: "Deleting Version", status: "active", type : "line", percent: 100});
                 await API.graphql(graphqlOperation(mutations.deleteFormVersion, {input:{accountId: match.params.accountId, formId: match.params.formId, versionId: versionId}}));
-                // TODO: View is not refreshing after delete
-                if (localStore.form.versions) {
-                    localStore.form.versions = localStore.form.versions.filter((version) => {
-                        return version.id != versionId;
-                    });
-                }
-
+                let index = localStore.form.versions.findIndex((v) => {
+                    return v.id == versionId;
+                });
+                localStore.form.versions.splice(index, 1);
                 notification.success({message: `Version deleted successfully`});
-                localStore.refresh = !localStore.refresh;
             } catch (errorResponse) {
                 console.error("activateVersion - queries.deleteVersion", errorResponse);
                 this.errors = errorResponse.errors;
@@ -119,20 +112,17 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             return this.form && this.form.version && this.form.version.errorRedirect ? this.form.version.errorRedirect : null;
         },
         get expectedSubmitResult() : {error: ExpectedSubmitResult, success: ExpectedSubmitResult} {
+            let version : any = localStore.form.version;
             return {
-                error: localStore.form.successRedirect ? "Redirect" : localStore.form.submitErrorMessage ? "Show Configured Message" : "Show Default Message",
-                success: localStore.form.errorRedirect ? "Redirect" : localStore.form.submitSuccessMessage ? "Show Configured Message" : "Show Default Message"
+                error: version.successRedirect ? "Redirect" : version.submitErrorMessage ? "Show Configured Message" : "Show Default Message",
+                success: version.errorRedirect ? "Redirect" : version.submitSuccessMessage ? "Show Configured Message" : "Show Default Message"
             }
         },
         get inactiveVersions() : any[] {
-            if(this.form && this.form.versions) {
-                let self = this;
-                return (this.form.versions as any[]).filter((v) => {
-                    return v.id != self.form.versionId;
-                })
-            } else {
-                return [];
-            }
+            let self = this;
+            return this.form && this.form.versions ? (this.form.versions as any[]).filter((v) => {
+                return v.id != self.form.versionId;
+            }) : [];
         }
     }));
 
@@ -162,6 +152,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     }, [localStore.refresh]);
 
     const columns = [
+        {title: "Name", key: "name", dataIndex: "displayName", render: (text, record) => <><p>{text}</p><p><small>{record.id}</small></p></>},
         {title: "Detail", key: "notes", dataIndex: "notes", render:(text, record) => <p style={{whiteSpace: "pre-line"}}>{text}</p>},
         {title: "Created", key: "createdAt", dataIndex: "createdAt", render: (text, record) => {return <span>{dayjs(text).format('DD MMM YY hh:mm a')}</span>}},
         {title: "By", key: "owner", dataIndex: "ownedBy", render: (text, record) => {return <span>{record.ownedBy.given_name} {record.ownedBy.family_name}</span>}},
@@ -201,7 +192,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                 })}
             </List> : <></>
         })
-        
+
     };
 
     const FormStatus : React.FC<any> = () => {
@@ -223,10 +214,10 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             <PageHeader onBack={() => history.push(`/account/${match.params.accountId}/forms`)} title={localStore.form.name} subTitle={<FormStatus />} extra={<FormActions/>}>
             <Typography.Paragraph>{localStore.form.description}</Typography.Paragraph>
             <Row>
-                {localStore.form.version && 
+                {localStore.form.version &&
                     <Col span={6}>
-                        
-                        
+
+
                 </Col>}
             </Row>
             <Row>
@@ -239,7 +230,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                 <Card title={<span>{localStore.form.name} Version History</span>} style={{padding: 0}} bodyStyle={{padding:0}} extra={<Link to={`/account/${match.params.accountId}/canvas/${match.params.formId}`}>
                     <Button size="small" className="fl-right-margin-ten"><Icon type="plus"/>Add Version</Button>
                 </Link>}>
-                <TableWrapper size="small" emptyText='No versions, click "Add version" to create one.' errors={localStore.errors} data={localStore.inactiveVersions} columns={columns} 
+                <TableWrapper size="small" emptyText='No versions, click "Add version" to create one.' errors={localStore.errors} data={localStore.inactiveVersions} columns={columns}
                 bordered={true} rowKey="id" pagination={ localStore.inactiveVersions.length > 5 ? {pageSize: 5, position: "top"} : false} />
                 </Card>
                 </Col>
