@@ -2,6 +2,9 @@ import { observable } from 'mobx';
 import { ProgressViewProps } from '../components/partials/ProgressView';
 
 let withFirstUpper = function(str: string) : string {
+    if(!str) {
+        return "";
+    }
     return str[0].toUpperCase() + str.substring(1);
 }
 
@@ -42,7 +45,7 @@ export const createViewStore = () => {
             if(path.lastIndexOf("/") == path.length -1) {
                 path = path.substring(0, path.length -1)
             }
-    
+
             let segments = path.split("/");
             if(segments[0] == "account") {
                 // In account pages
