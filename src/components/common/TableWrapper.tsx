@@ -1,7 +1,6 @@
-import { Button, Card, Empty, Icon, Input, List, Table, Result } from "antd";
+import { Button, Card, Empty, Icon, Input, List, Result, Table } from "antd";
 import { PaginationConfig, TableSize } from "antd/lib/table";
-import { useLocalStore } from "mobx-react-lite";
-import { useObserver } from "mobx-react-lite";
+import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { appStoreContext } from "../../stores/AppStoreProvider";
 
@@ -34,7 +33,6 @@ export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapper
     if(!store) throw new Error("Store is null");
 
     const local = useLocalStore(() => ({
-        data : props.data as any[],
         rowKey : props.rowKey as string,
         pagination : props.pagination || false as PaginationConfig | false,
         bordered : props.bordered || false,
@@ -108,7 +106,7 @@ export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapper
             return this.errors && this.errors.length > 0;
         },
         get isEmpty() {
-            return !this.data || this.data.length == 0;
+            return !props.data || props.data.length == 0;
         }
     }));
 
@@ -123,7 +121,7 @@ export const TableWrapper : React.FC<ITableWrapperProps> = (props: ITableWrapper
     return useObserver(() => {
         return <div>
         {!local.isEmpty && !local.hasErrors && <Table useFixedHeader title={props.title} rowSelection={{selectedRowKeys : local.selectedRowKeys, onChange : local.onSelectChange }}
-            dataSource={local.data} bordered={local.bordered} rowKey={local.rowKey} size={local.size} pagination={local.pagination} 
+            dataSource={props.data} bordered={local.bordered} rowKey={local.rowKey} size={local.size} pagination={local.pagination}
             columns={local.columns} expandedRowRender={props.expandedRowRender} expandedRowKeys={props.expandedRowKeys||[]}/>}
         {local.isEmpty && !local.hasErrors && <Card><Empty description={props.emptyText}/></Card>}
         {local.hasErrors &&
