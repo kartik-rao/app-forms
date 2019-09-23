@@ -9,6 +9,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 const env = process.env.NODE_ENV || 'development';
 const isDevelopment = env == 'development';
+const ASSET_PATH = process.env.ASSET_PATH || '/';
 
 module.exports = {
     mode: env,
@@ -87,6 +88,7 @@ module.exports = {
     plugins: [
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en-au/),
         new webpack.DefinePlugin({
+            __ASSET_PATH: JSON.stringify(ASSET_PATH),
             __ENV__     : JSON.stringify(env),
             __DEBUG__   : JSON.stringify(isDevelopment ? true : false),
             __VERSION__ : JSON.stringify(require("./package.json").version),
