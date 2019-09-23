@@ -83,6 +83,7 @@ export const getAccount = `query GetAccount($accountId: ID!) {
       isDeleted
       redirectNotStarted
       redirectHasEnded
+      numEntries
     }
   }
 }
@@ -116,6 +117,8 @@ export const getUser = `query GetUser($userId: ID!) {
       createdAt
       updatedAt
       active
+      numForms
+      numUsers
     }
     email
     userGroup
@@ -430,6 +433,7 @@ export const getIntegration = `query GetIntegration($integrationId: String!) {
 export const getFormEntry = `query GetFormEntry($formEntryId: String!) {
   getFormEntry(formEntryId: $formEntryId) {
     id
+    accountId
     formId
     form {
       id
@@ -692,6 +696,7 @@ export const listForms = `query ListForms(
       id
       createdAt
       displayName
+      notes
     }
     ownedBy {
       id
@@ -835,43 +840,14 @@ export const listIntegrations = `query ListIntegrations(
   }
 }
 `;
-export const listFormEntries = `query ListFormEntries($offsetLimit: OffsetLimit, $formId: String!) {
-  listFormEntries(offsetLimit: $offsetLimit, formId: $formId) {
-    id
-    formId
-    form {
-      id
-      ownerId
-      name
-      description
-      versionId
-      versionActivatedDate
-      accountId
-      createdAt
-      updatedAt
-      startDate
-      endDate
-      isPaused
-      isDeleted
-      redirectNotStarted
-      redirectHasEnded
-    }
-    data
-    createdAt
-  }
-}
-`;
-export const listFormEntriesByTime = `query ListFormEntriesByTime(
+export const listFormEntries = `query ListFormEntries(
   $offsetLimit: OffsetLimit
-  $formId: String!
-  $timestampPrefix: String!
+  $filter: FormEntryFilterInput
+  $sort: FormEntrySortInput
 ) {
-  listFormEntriesByTime(
-    offsetLimit: $offsetLimit
-    formId: $formId
-    timestampPrefix: $timestampPrefix
-  ) {
+  listFormEntries(offsetLimit: $offsetLimit, filter: $filter, sort: $sort) {
     id
+    accountId
     formId
     form {
       id

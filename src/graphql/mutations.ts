@@ -839,7 +839,6 @@ export const updateForm = `mutation UpdateForm($input: UpdateFormInput) {
       notes
       ownedBy {email given_name family_name}
     }
-
   }
 }
 `;

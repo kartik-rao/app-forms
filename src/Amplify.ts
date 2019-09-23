@@ -131,6 +131,8 @@ export type DeleteFormVersionInput = {
 };
 
 export type AddFormEntryInput = {
+  id: string,
+  accountId: string,
   formId: string,
   data: string,
 };
@@ -357,6 +359,17 @@ export type IntegrationSortInput = {
   sortBy?: Array< IntegrationSortInput > | null,
 };
 
+export type FormEntryFilterInput = {
+  formId?: StringFilter | null,
+  createdAt?: DateFilter | null,
+  accountId?: StringFilter | null,
+  criteria?: Array< FormEntryFilterInput > | null,
+};
+
+export type FormEntrySortInput = {
+  createdAt?: SortOrder | null,
+};
+
 export type AddPlanTypeMutationVariables = {
   input?: AddPlanTypeInput | null,
 };
@@ -536,6 +549,7 @@ export type AddIntegrationMutation = {
       isDeleted: number | null,
       redirectNotStarted: string | null,
       redirectHasEnded: string | null,
+      numEntries: number | null,
     },
     active: number,
     authType: string | null,
@@ -643,9 +657,11 @@ export type AddFormMutation = {
       updatedAt: string | null,
       isDeleted: number | null,
     } | null > | null,
+    numEntries: number | null,
     entries:  Array< {
       __typename: "FormEntry",
       id: string,
+      accountId: string,
       formId: string,
       data: string,
       createdAt: string,
@@ -745,9 +761,11 @@ export type AddFormVersionMutation = {
       updatedAt: string | null,
       isDeleted: number | null,
     } | null > | null,
+    numEntries: number | null,
     entries:  Array< {
       __typename: "FormEntry",
       id: string,
+      accountId: string,
       formId: string,
       data: string,
       createdAt: string,
@@ -847,9 +865,11 @@ export type AttachFormVersionMutation = {
       updatedAt: string | null,
       isDeleted: number | null,
     } | null > | null,
+    numEntries: number | null,
     entries:  Array< {
       __typename: "FormEntry",
       id: string,
+      accountId: string,
       formId: string,
       data: string,
       createdAt: string,
@@ -1045,6 +1065,7 @@ export type UpdateAccountMutation = {
       isDeleted: number | null,
       redirectNotStarted: string | null,
       redirectHasEnded: string | null,
+      numEntries: number | null,
     } | null > | null,
   },
 };
@@ -1141,6 +1162,7 @@ export type UpdateAccountPlanMutation = {
       isDeleted: number | null,
       redirectNotStarted: string | null,
       redirectHasEnded: string | null,
+      numEntries: number | null,
     } | null > | null,
   },
 };
@@ -1279,6 +1301,7 @@ export type UpdateIntegrationMutation = {
       isDeleted: number | null,
       redirectNotStarted: string | null,
       redirectHasEnded: string | null,
+      numEntries: number | null,
     },
     active: number,
     authType: string | null,
@@ -1386,9 +1409,11 @@ export type UpdateFormMutation = {
       updatedAt: string | null,
       isDeleted: number | null,
     } | null > | null,
+    numEntries: number | null,
     entries:  Array< {
       __typename: "FormEntry",
       id: string,
+      accountId: string,
       formId: string,
       data: string,
       createdAt: string,
@@ -1488,9 +1513,11 @@ export type DeleteFormMutation = {
       updatedAt: string | null,
       isDeleted: number | null,
     } | null > | null,
+    numEntries: number | null,
     entries:  Array< {
       __typename: "FormEntry",
       id: string,
+      accountId: string,
       formId: string,
       data: string,
       createdAt: string,
@@ -1687,6 +1714,7 @@ export type DeleteAccountMutation = {
       isDeleted: number | null,
       redirectNotStarted: string | null,
       redirectHasEnded: string | null,
+      numEntries: number | null,
     } | null > | null,
   },
 };
@@ -1825,6 +1853,7 @@ export type DeleteIntegrationMutation = {
       isDeleted: number | null,
       redirectNotStarted: string | null,
       redirectHasEnded: string | null,
+      numEntries: number | null,
     },
     active: number,
     authType: string | null,
@@ -1978,6 +2007,7 @@ export type GetAccountQuery = {
       isDeleted: number | null,
       redirectNotStarted: string | null,
       redirectHasEnded: string | null,
+      numEntries: number | null,
     } | null > | null,
   } | null,
 };
@@ -2283,9 +2313,11 @@ export type GetFormQuery = {
       updatedAt: string | null,
       isDeleted: number | null,
     } | null > | null,
+    numEntries: number | null,
     entries:  Array< {
       __typename: "FormEntry",
       id: string,
+      accountId: string,
       formId: string,
       data: string,
       createdAt: string,
@@ -2409,6 +2441,7 @@ export type GetIntegrationQuery = {
       isDeleted: number | null,
       redirectNotStarted: string | null,
       redirectHasEnded: string | null,
+      numEntries: number | null,
     },
     active: number,
     authType: string | null,
@@ -2432,6 +2465,7 @@ export type GetFormEntryQuery = {
   getFormEntry:  {
     __typename: "FormEntry",
     id: string,
+    accountId: string,
     formId: string,
     form:  {
       __typename: "Form",
@@ -2450,6 +2484,7 @@ export type GetFormEntryQuery = {
       isDeleted: number | null,
       redirectNotStarted: string | null,
       redirectHasEnded: string | null,
+      numEntries: number | null,
     },
     data: string,
     createdAt: string,
@@ -2550,6 +2585,7 @@ export type ListAccountsQuery = {
       isDeleted: number | null,
       redirectNotStarted: string | null,
       redirectHasEnded: string | null,
+      numEntries: number | null,
     } | null > | null,
   } | null > | null,
 };
@@ -2801,9 +2837,11 @@ export type ListFormsQuery = {
       updatedAt: string | null,
       isDeleted: number | null,
     } | null > | null,
+    numEntries: number | null,
     entries:  Array< {
       __typename: "FormEntry",
       id: string,
+      accountId: string,
       formId: string,
       data: string,
       createdAt: string,
@@ -2933,6 +2971,7 @@ export type ListIntegrationsQuery = {
       isDeleted: number | null,
       redirectNotStarted: string | null,
       redirectHasEnded: string | null,
+      numEntries: number | null,
     },
     active: number,
     authType: string | null,
@@ -2950,13 +2989,15 @@ export type ListIntegrationsQuery = {
 
 export type ListFormEntriesQueryVariables = {
   offsetLimit?: OffsetLimit | null,
-  formId: string,
+  filter?: FormEntryFilterInput | null,
+  sort?: FormEntrySortInput | null,
 };
 
 export type ListFormEntriesQuery = {
   listFormEntries:  Array< {
     __typename: "FormEntry",
     id: string,
+    accountId: string,
     formId: string,
     form:  {
       __typename: "Form",
@@ -2975,40 +3016,7 @@ export type ListFormEntriesQuery = {
       isDeleted: number | null,
       redirectNotStarted: string | null,
       redirectHasEnded: string | null,
-    },
-    data: string,
-    createdAt: string,
-  } | null > | null,
-};
-
-export type ListFormEntriesByTimeQueryVariables = {
-  offsetLimit?: OffsetLimit | null,
-  formId: string,
-  timestampPrefix: string,
-};
-
-export type ListFormEntriesByTimeQuery = {
-  listFormEntriesByTime:  Array< {
-    __typename: "FormEntry",
-    id: string,
-    formId: string,
-    form:  {
-      __typename: "Form",
-      id: string,
-      ownerId: string,
-      name: string,
-      description: string,
-      versionId: string | null,
-      versionActivatedDate: string | null,
-      accountId: string,
-      createdAt: string,
-      updatedAt: string | null,
-      startDate: string | null,
-      endDate: string | null,
-      isPaused: number | null,
-      isDeleted: number | null,
-      redirectNotStarted: string | null,
-      redirectHasEnded: string | null,
+      numEntries: number | null,
     },
     data: string,
     createdAt: string,
