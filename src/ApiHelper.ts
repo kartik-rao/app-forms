@@ -8,7 +8,7 @@ export interface TypedGraphQLResult<T> {
     };
 }
 
-export const withGraphQl = async <T>(queryOrMutation: any, variables: any) : Promise<TypedGraphQLResult<T>> => {
+export const withGraphQl = async <T>(queryOrMutation: string, variables?: any) : Promise<TypedGraphQLResult<T>> => {
     return new Promise(async (resolve, reject) => {
         try {
             let response = await API.graphql(graphqlOperation(queryOrMutation, variables));
