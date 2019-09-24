@@ -1,5 +1,5 @@
 var path = require('path');
-
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const webpack = require('webpack');
 const tsImportPluginFactory = require('ts-import-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -95,6 +95,7 @@ module.exports = {
             __REGION__  : JSON.stringify(process.env.REGION ? process.env.REGION : "ap-northeast-1") ,
             __HOSTNAME__: JSON.stringify(process.env.APP_HOST ? process.env.APP_HOST : "localhost")
         }),
+        new HardSourceWebpackPlugin(),
         new CheckerPlugin(),
         new MiniCssExtractPlugin({
             filename: '[name].css',
