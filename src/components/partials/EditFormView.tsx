@@ -1,9 +1,10 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
-import { Button, Col, DatePicker, Form, Input, Row, Card, notification } from "antd";
+import { IUpdateFormMutation } from "@kartikrao/lib-forms-api";
+import { Button, DatePicker, Form, Input, notification } from "antd";
 import { FormComponentProps } from "antd/lib/form";
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import moment from "moment";
 import * as React from "react";
+import { withGraphQl } from "../../ApiHelper";
 import * as mutations from '../../graphql/mutations';
 import { appStoreContext } from '../../stores/AppStoreProvider';
 
@@ -64,7 +65,7 @@ const EditFormView : React.FC<EditFormViewProps> = (props: EditFormViewProps) =>
 
             try {
                 store.view.setLoading({show: true, message: `Saving ${this.onSubmitAction} configuration`, status: "active", type : "line", percent: 25});
-                let ufResponse = await API.graphql(graphqlOperation(mutations.updateForm, {input: {id: editForm.id, ...editFormPayload}}));
+                let ufResponse = await withGraphQl<IUpdateFormMutation>(mutations.updateForm, {input: {id: editForm.id, ...editFormPayload}});
                 this.isDirty = false;
                 notification.success({message: `Form activation settings edited successfully`});
                 props.onUpdate(ufResponse.data.updateForm);
@@ -102,7 +103,7 @@ const EditFormView : React.FC<EditFormViewProps> = (props: EditFormViewProps) =>
                     {
                     getFieldDecorator('endDate', {
                         initialValue: editForm.endDate ? moment(editForm.endDate, moment.ISO_8601) : null,
-                    })(<DatePicker showTime  format="YYYY-MM-DDTHH:mm:ss[Z]" 
+                    })(<DatePicker showTime  format="YYYY-MM-DDTHH:mm:ss[Z]"
                             onChange={(e) => localStore.onChange('endDate', e)}
                             style={{width: '225px'}}
                             disabledDate={(current) => {return localStore.startDate ? current.isBefore(localStore.startDate): false}} />)

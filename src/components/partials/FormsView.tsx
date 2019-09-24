@@ -1,6 +1,6 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
-import { EmptyForm, IFormProps } from "@kartikrao/lib-forms-core";
-import { Button, Card, Col, Drawer, Dropdown, Icon, Menu, Row, Skeleton, Tag, Table } from "antd";
+// import API, { graphqlOperation } from "@aws-amplify/api";
+import { EmptyForm } from "@kartikrao/lib-forms-core";
+import { Button, Card, Col, Drawer, Dropdown, Icon, Menu, Row, Skeleton, Tag } from "antd";
 import Typography from "antd/lib/typography";
 import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
@@ -11,7 +11,8 @@ import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
 import AddFormView from "./AddFormView";
-import { toJS } from "mobx";
+import { withGraphQl } from "../../ApiHelper";
+import { IListFormsQuery, IForm, IAddFormMutation, IGetFormQuery, IAddFormVersionMutation } from "@kartikrao/lib-forms-api";
 
 export interface FormsViewProps {
     accountId: string;
@@ -23,7 +24,7 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
 
     const now = dayjs();
     const localStore = useLocalStore(() => ({
-        forms: [],
+        forms: [] as Partial<IForm>[],
         errors: [] as any[],
         showAdd: false,
         selectedItems: [] as any[],
@@ -31,21 +32,21 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
         handleClone: async function (formId: string) {
             try {
                 store.view.setLoading({show: true, message: "Loading source form", status: "active", type : "line", percent: 10});
-                let response = await API.graphql(graphqlOperation(queries.getForm, {formId: formId}));
-                let sourceForm = response['data']['getForm'];
-                let addFormResponse = await API.graphql(graphqlOperation(mutations.addForm, {input: {
+                let response = await withGraphQl<IGetFormQuery>(queries.getForm, {formId: formId});
+                let sourceForm = response.data.getForm;
+                let addFormResponse = await withGraphQl<IAddFormMutation>(mutations.addForm, {input: {
                     name : `Copy of ${sourceForm.name}`,
                     description: sourceForm.description,
                     accountId: sourceForm.accountId
-                }}));
+                }});
                 store.view.setLoading({show: true, message: "Saving copy", status: "active", type : "line", percent: 30});
-                let addFormVersionResponse = await API.graphql(graphqlOperation(mutations.addFormVersion, {input: {
+                let addFormVersionResponse = await withGraphQl<IAddFormVersionMutation>(mutations.addFormVersion, {input: {
                     formId: addFormResponse['data']['addForm'].id,
                     accountId: sourceForm.accountId,
                     notes: `Copied ${sourceForm.name}`,
                     formData: sourceForm.version && sourceForm.version.formData ? sourceForm.version.formData : JSON.stringify({...EmptyForm})
-                }}));
-                this.forms.push(addFormVersionResponse['data']['addFormVersion']);
+                }});
+                this.forms.push(addFormVersionResponse.data.addFormVersion);
             } catch (errorResponse) {
                 console.error(errorResponse);
                 this.errors = errorResponse.errors;
@@ -53,10 +54,9 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
             store.view.resetLoading();
         },
         handleAdd: async function (values: any) {
-            let addFormResponse;
             store.view.setLoading({show: true, message: "Creating new form", status: "active", type : "line", percent: 100});
             try {
-                addFormResponse = await API.graphql(graphqlOperation(mutations.addForm, {input: values}));
+                let addFormResponse = await withGraphQl<IAddFormMutation>(mutations.addForm, {input: values});
                 if (addFormResponse.errors) {
                     this.errors = addFormResponse.errors;
                 }
@@ -166,7 +166,7 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
             localStore.loading = true;
             try {
                 store.view.setLoading({show: true, message: "Loading forms", status: "active", type : "line", percent: 100});
-                let response = await API.graphql(graphqlOperation(queries.listForms, {filter: {criteria: [{accountId: {expression: "eq", value: [match.params.accountId]}}]}}));
+                let response = await withGraphQl<IListFormsQuery>(queries.listForms, {filter: {criteria: [{accountId: {expression: "eq", value: [match.params.accountId]}}]}});
                 localStore.forms = response.data.listForms;
             } catch (errorResponse) {
                 console.error("queries.getAccount.forms", errorResponse);

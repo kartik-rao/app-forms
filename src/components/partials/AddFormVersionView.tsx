@@ -1,16 +1,17 @@
-import * as React from "react";
-import {Modal, Form, Input, notification, Button} from "antd";
-import { FormComponentProps } from "antd/lib/form";
-import { useLocalStore, useObserver } from "mobx-react-lite";
-import { appStoreContext } from "../../stores/AppStoreProvider";
-import * as mutations from '../../graphql/mutations';
-import API, { graphqlOperation } from "@aws-amplify/api";
-import { toJS } from "mobx";
-import { IFormProps } from "@kartikrao/lib-forms-core";
 import { editorStoreContext } from "@kartikrao/lib-forms";
+import { IAddFormVersionMutation, IForm } from "@kartikrao/lib-forms-api";
+import { IFormProps } from "@kartikrao/lib-forms-core";
+import { Button, Form, Input, Modal, notification } from "antd";
+import { FormComponentProps } from "antd/lib/form";
+import { toJS } from "mobx";
+import { useLocalStore, useObserver } from "mobx-react-lite";
+import * as React from "react";
+import { withGraphQl } from "../../ApiHelper";
+import * as mutations from '../../graphql/mutations';
+import { appStoreContext } from "../../stores/AppStoreProvider";
 
 export interface AddFormVersionViewProps extends FormComponentProps{
-    onSave: (response: IFormProps) => void;
+    onSave: (response: Partial<IForm>) => void;
     onCancel: () => void;
     tenantId: string;
     formData: any;
@@ -42,9 +43,9 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
                         formData: JSON.stringify(toJS(formData))
                     }
                 }
-                let response = await API.graphql(graphqlOperation(mutations.addFormVersion, payload));
+                let response = await withGraphQl<IAddFormVersionMutation>(mutations.addFormVersion, payload);
                 notification.success({message: `Form version created successfully`});
-                props.onSave(response);
+                props.onSave(response.data.addFormVersion);
             } catch (error) {
                 notification.error({message: "There was an error creating a version"});
             }

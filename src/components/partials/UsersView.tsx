@@ -1,3 +1,4 @@
+import { withGraphQl } from "../../ApiHelper";
 import API, { graphqlOperation } from "@aws-amplify/api";
 import { Button, Card, Col, Drawer, Row, Skeleton, Tag } from "antd";
 import Typography from "antd/lib/typography";
@@ -6,11 +7,12 @@ import { useLocalStore, useObserver } from "mobx-react-lite";
 import dayjs from 'dayjs';
 import * as React from "react";
 import { RouteComponentProps } from "react-router-dom";
-import { StringFilterExpression, UserFilterInput } from "../../Amplify";
+// import { StringFilterExpression, UserFilterInput } from "../../Amplify";
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
 import InviteUserView from "./InviteUserView";
+import { IUserFilterInput, IStringFilterExpression, IListUsersQuery, IUser } from "@kartikrao/lib-forms-api";
 
 export interface IUsersViewProps {
     accountId: string;
@@ -24,7 +26,7 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
     const config = store.config.envConfig;
     const localStore = useLocalStore(() => ({
         errors: [] as any[],
-        users : [] as any[],
+        users : [] as IUser[],
         showAdd:  false,
         selectedItems : [] as any[],
         loading: true,
@@ -135,13 +137,13 @@ export const UsersView: React.FC<RouteComponentProps<IUsersViewProps>> = ({match
             let query = "";
             try {
                 if (store.auth.isAdmin == true) {
-                    let filter : UserFilterInput;
+                    let filter : IUserFilterInput;
                     if (match.params.accountId) {
-                        filter = {criteria:[{"accountId":{expression: StringFilterExpression.eq, value: [match.params.accountId]}}]}
+                        filter = {criteria:[{"accountId":{expression: IStringFilterExpression.Eq, value: [match.params.accountId]}}]}
                     }
                     query = "ListUsers";
-                    let response = await API.graphql(graphqlOperation(queries.listUsers, {filter : filter}));
-                    localStore.users = response['data']['listUsers']
+                    let response = await withGraphQl<IListUsersQuery>(queries.listUsers, {filter: filter});
+                    localStore.users = response.data.listUsers;
                 } else {
                     query = "GetAccount";
                     let response = await API.graphql(graphqlOperation(queries.getAccount, {"$accountId": store.auth.tenant}));

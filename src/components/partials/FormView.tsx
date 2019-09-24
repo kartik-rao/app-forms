@@ -1,9 +1,11 @@
 import API, { graphqlOperation } from "@aws-amplify/api";
+import { IAttachFormVersionMutation, IGetFormQuery, IUpdateFormMutation } from "@kartikrao/lib-forms-api";
 import { Badge, Button, Card, Col, Divider, Drawer, Icon, List, notification, PageHeader, Popconfirm, Popover, Row, Skeleton, Tag, Typography } from "antd";
 import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
+import { withGraphQl } from "../../ApiHelper";
 import * as mutations from '../../graphql/mutations';
 import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
@@ -55,7 +57,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                         return;
                     }
                 }
-                let response = await API.graphql(graphqlOperation(mutations.updateForm, {input: {id: match.params.formId, isPaused: this.form.isPaused == 0 ? 1 : 0}}));
+                let response = await withGraphQl<IUpdateFormMutation>(mutations.updateForm, {input: {id: match.params.formId, isPaused: this.form.isPaused == 0 ? 1 : 0}});
                 this.form.isPaused = response.data.updateForm.isPaused;
             } catch (errorResponse) {
                 console.error("toggleFormPause - queries.updateForm", errorResponse);
@@ -66,13 +68,13 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         activateVersion: async function(versionId: string) {
             try {
                 store.view.setLoading({show: true, message: "Activating Version", status: "active", type : "line", percent: 100});
-                let response = await API.graphql(graphqlOperation(mutations.attachFormVersion, {input:{formId: match.params.formId, accountId: match.params.accountId, versionId: versionId}}));
-                response = response.data.attachFormVersion;
-                if(response.version.formData) {
-                    response.version.formData = JSON.parse(response.version.formData);
+                let response = await withGraphQl<IAttachFormVersionMutation>(mutations.attachFormVersion, {input:{formId: match.params.formId, accountId: match.params.accountId, versionId: versionId}});
+                let form = response.data.attachFormVersion;
+                if(form.version.formData) {
+                    form.version.formData = JSON.parse(form.version.formData);
                 }
                 notification.success({message: `Active version changed successfully`});
-                localStore.form = response;
+                localStore.form = form;
             } catch (errorResponse) {
                 console.error("activateVersion - queries.attachFormVersion", errorResponse);
                 this.errors = errorResponse.errors;
@@ -106,10 +108,10 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             store.view.resetLoading();
         },
         get successRedirect() : string {
-            return this.form && this.form.version && this.form.version.successRedirect ? this.form.version.successRedirect : null;
+            return this.hasVersion && this.form.version.successRedirect ? this.form.version.successRedirect : null;
         },
         get errorRedirect() : string {
-            return this.form && this.form.version && this.form.version.errorRedirect ? this.form.version.errorRedirect : null;
+            return this.hasVersion && this.form.version.errorRedirect ? this.form.version.errorRedirect : null;
         },
         get expectedSubmitResult() : {error: ExpectedSubmitResult, success: ExpectedSubmitResult} {
             let version : any = localStore.form.version;
@@ -118,9 +120,12 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                 success: version.errorRedirect ? "Redirect" : version.submitSuccessMessage ? "Show Configured Message" : "Show Default Message"
             }
         },
+        get hasVersion() : boolean {
+            return this.form && this.form.version;
+        },
         get inactiveVersions() : any[] {
             let self = this;
-            return this.form && this.form.versions ? (this.form.versions as any[]).filter((v) => {
+            return this.hasVersion ? (this.form.versions as any[]).filter((v) => {
                 return v.id != self.form.versionId;
             }) : [];
         }
@@ -131,13 +136,13 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             localStore.loading = true;
             try {
                 store.view.setLoading({show: true, message: "Loading form", status: "active", type : "line", percent: 100});
-                let response = await API.graphql(graphqlOperation(queries.getForm, {formId: match.params.formId}));
-                response = response.data.getForm;
-                if(response.version && response.version.formData) {
-                    response.version.formData = JSON.parse(response.version.formData);
+                let response = await withGraphQl<IGetFormQuery>(queries.getForm, {formId: match.params.formId});
+                let form = response.data.getForm;
+                if(form.version && form.version.formData) {
+                    form.version.formData = JSON.parse(form.version.formData);
                 }
-                store.view.idNameMap[match.params.formId] = response.name;
-                localStore.form = response;
+                store.view.idNameMap[match.params.formId] = form.name;
+                localStore.form = form;
             } catch (errorResponse) {
                 console.error("queries.getAccount.forms", errorResponse);
                 localStore.errors = errorResponse.errors;
@@ -186,7 +191,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
 
     const ChangeList : React.FC<any> = () => {
         return useObserver(() => {
-            return localStore.form.version.notes ? <List>
+            return localStore.hasVersion && localStore.form.version.notes ? <List>
                 {localStore.form.version.notes.split("\n").map((line, i) => {
                     return <List.Item key={`c-${i}`}>{line}</List.Item>
                 })}
@@ -198,8 +203,8 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     const FormStatus : React.FC<any> = () => {
         return useObserver(() => {
             return <>
-            {localStore.form.version && <Popover content={<ChangeList />}>{localStore.form.version.displayName}</Popover>}
-            <span className="fl-left-margin-ten">{localStore.form.isPaused ? <BadgeText status="warning" text="Paused"/> : <BadgeText status="processing" text="Running"/>}</span>
+            {localStore.hasVersion && <Popover content={<ChangeList />}>{localStore.form.version.displayName}</Popover>}
+            <span className="fl-left-margin-ten">{localStore.hasVersion ? (localStore.form.isPaused ? <BadgeText status="warning" text="Paused"/> : <BadgeText status="processing" text="Running"/>) : <BadgeText status="error" text="No Content"/>}</span>
             {localStore.form.startDate && <span className="fl-left-margin-ten">From<Tag style={{marginLeft: '5px'}}>{dayjs(localStore.form.startDate).format(DATE_FORMAT)}</Tag></span>}
             {localStore.form.endDate && <span>-<Tag style={{marginLeft: '5px'}}>{dayjs(localStore.form.endDate).format(DATE_FORMAT)}</Tag></span>}
             </>
@@ -213,17 +218,10 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             </Drawer>
             <PageHeader onBack={() => history.push(`/account/${match.params.accountId}/forms`)} title={localStore.form.name} subTitle={<FormStatus />} extra={<FormActions/>}>
             <Typography.Paragraph>{localStore.form.description}</Typography.Paragraph>
-            <Row>
-                {localStore.form.version &&
-                    <Col span={6}>
-
-
-                </Col>}
-            </Row>
-            <Row>
+            {localStore.hasVersion && <Row>
                 <Col span={6}>On Success <Tag>{localStore.expectedSubmitResult.success}</Tag>{localStore.successRedirect ? <a href={localStore.successRedirect} target="_blank">Preview</a>: ""}</Col>
                 <Col span={6}>On Error <Tag>{localStore.expectedSubmitResult.error}</Tag>{localStore.errorRedirect ? <a href={localStore.errorRedirect} target="_blank">Preview</a>: ""}</Col>
-            </Row>
+            </Row>}
             <Divider />
             <Row type="flex">
                 <Col span={24} >
