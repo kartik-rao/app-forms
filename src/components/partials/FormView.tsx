@@ -1,13 +1,10 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
-import { IAttachFormVersionMutation, IGetFormQuery, IUpdateFormMutation } from "@kartikrao/lib-forms-api";
+import { AttachFormVersion, DeleteForm, DeleteFormVersion, GetForm, IAttachFormVersionMutation, IDeleteFormMutation, IDeleteFormVersionMutation, IGetFormQuery, IUpdateFormMutation, UpdateForm } from "@kartikrao/lib-forms-api";
 import { Badge, Button, Card, Col, Divider, Drawer, Icon, List, notification, PageHeader, Popconfirm, Popover, Row, Skeleton, Tag, Typography } from "antd";
 import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 import { withGraphQl } from "../../ApiHelper";
-import * as mutations from '../../graphql/mutations';
-import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
 import EditFormView from "./EditFormView";
@@ -38,7 +35,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
 
     const localStore = useLocalStore(() => ({
         loading: true,
-        form: null as any,
+        form: null as IGetFormQuery["getForm"],
         errors: [] as any[],
         showEditForm: false as boolean,
         refresh: false as boolean,
@@ -57,7 +54,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                         return;
                     }
                 }
-                let response = await withGraphQl<IUpdateFormMutation>(mutations.updateForm, {input: {id: match.params.formId, isPaused: this.form.isPaused == 0 ? 1 : 0}});
+                let response = await withGraphQl<IUpdateFormMutation>(UpdateForm, {input: {id: match.params.formId, isPaused: this.form.isPaused == 0 ? 1 : 0}});
                 this.form.isPaused = response.data.updateForm.isPaused;
             } catch (errorResponse) {
                 console.error("toggleFormPause - queries.updateForm", errorResponse);
@@ -68,13 +65,14 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         activateVersion: async function(versionId: string) {
             try {
                 store.view.setLoading({show: true, message: "Activating Version", status: "active", type : "line", percent: 100});
-                let response = await withGraphQl<IAttachFormVersionMutation>(mutations.attachFormVersion, {input:{formId: match.params.formId, accountId: match.params.accountId, versionId: versionId}});
+                let response = await withGraphQl<IAttachFormVersionMutation>(AttachFormVersion, {input:{formId: match.params.formId, accountId: match.params.accountId, versionId: versionId}});
                 let form = response.data.attachFormVersion;
                 if(form.version.formData) {
                     form.version.formData = JSON.parse(form.version.formData);
                 }
                 notification.success({message: `Active version changed successfully`});
-                localStore.form = form;
+                localStore.form.versionId = form.versionId;
+                localStore.form.version = form.version;
             } catch (errorResponse) {
                 console.error("activateVersion - queries.attachFormVersion", errorResponse);
                 this.errors = errorResponse.errors;
@@ -84,7 +82,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         deleteVersion: async function(versionId: string) {
             try {
                 store.view.setLoading({show: true, message: "Deleting Version", status: "active", type : "line", percent: 100});
-                await API.graphql(graphqlOperation(mutations.deleteFormVersion, {input:{accountId: match.params.accountId, formId: match.params.formId, versionId: versionId}}));
+                await withGraphQl<IDeleteFormVersionMutation>(DeleteFormVersion, {input:{accountId: match.params.accountId, formId: match.params.formId, versionId: versionId}});
                 let index = localStore.form.versions.findIndex((v) => {
                     return v.id == versionId;
                 });
@@ -99,7 +97,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         deleteForm: async function() {
             try {
                 store.view.setLoading({show: true, message: "Deleting form", status: "active", type : "line", percent: 100});
-                await API.graphql(graphqlOperation(mutations.deleteForm, {input: {id: match.params.formId, accountId: match.params.accountId}}))
+                await withGraphQl<IDeleteFormMutation>(DeleteForm, {input: {id: match.params.formId, accountId: match.params.accountId}});
                 history.push(`/account/${match.params.accountId}/forms`)
             } catch (errorResponse) {
                 console.error("deleteForm - queries.deleteForm", errorResponse);
@@ -136,7 +134,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             localStore.loading = true;
             try {
                 store.view.setLoading({show: true, message: "Loading form", status: "active", type : "line", percent: 100});
-                let response = await withGraphQl<IGetFormQuery>(queries.getForm, {formId: match.params.formId});
+                let response = await withGraphQl<IGetFormQuery>(GetForm, {formId: match.params.formId});
                 let form = response.data.getForm;
                 if(form.version && form.version.formData) {
                     form.version.formData = JSON.parse(form.version.formData);

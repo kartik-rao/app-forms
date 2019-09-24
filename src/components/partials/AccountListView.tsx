@@ -1,12 +1,10 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
-import { Form, Icon, Select, Skeleton } from "antd";
+import { IListAccountsQuery, ListAccounts } from "@kartikrao/lib-forms-api";
+import { Form, Select, Skeleton } from "antd";
 import { FormComponentProps } from 'antd/lib/form/Form';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
-import * as queries from '../../graphql/queries';
-import { appStoreContext } from "../../stores/AppStoreProvider";
-import { IAccount, IListAccountsQuery } from "@kartikrao/lib-forms-api";
 import { withGraphQl } from "../../ApiHelper";
+import { appStoreContext } from "../../stores/AppStoreProvider";
 
 const AccountListView: React.FC<FormComponentProps> = (props) => {
     const store = React.useContext(appStoreContext);
@@ -16,7 +14,7 @@ const AccountListView: React.FC<FormComponentProps> = (props) => {
         loading: true,
         errors: [] as any[],
         context: null as string,
-        accounts: [] as Partial<IAccount>[],
+        accounts: [] as IListAccountsQuery["listAccounts"],
         setContext: function(contextId: string) {
             this.context = contextId;
             let contextName = localStore.accounts.filter((a) => {return a.id == contextId})[0].name
@@ -30,7 +28,7 @@ const AccountListView: React.FC<FormComponentProps> = (props) => {
             localStore.loading = true;
             store.view.setLoading({show: true, message: "Loading accounts", status: "active", type : "line", percent: 100});
             try {
-                let allAccounts = await withGraphQl<IListAccountsQuery>(queries.listAccounts);
+                let allAccounts = await withGraphQl<IListAccountsQuery>(ListAccounts);
                 localStore.accounts = allAccounts.data.listAccounts;
             } catch (errorResponse) {
                 console.error(errorResponse);

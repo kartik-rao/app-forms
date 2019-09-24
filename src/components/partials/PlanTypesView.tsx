@@ -1,10 +1,10 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
 import { Card, Col, Row, Skeleton, Tag, Typography } from "antd";
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
-import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
+import { withGraphQl } from "../../ApiHelper";
+import { IListPlanTypesQuery, ListPlanTypes } from "@kartikrao/lib-forms-api";
 
 export const PlanTypesView: React.FC<any> = () => {
     const store = React.useContext(appStoreContext);
@@ -26,19 +26,6 @@ export const PlanTypesView: React.FC<any> = () => {
         },
         get hasSelectedItems() {
             return this.selectedItems.length > 0;
-        },
-        fetch : async function() {
-            try {
-                let planTypes = await API.graphql(graphqlOperation(queries.listPlanTypes));
-                this.planTypes = planTypes["data"]["listPlanTypes"];
-            }  catch (errorResponse) {
-                console.error(errorResponse);
-                this.errors = errorResponse.errors;
-            }
-            if (!this.planTypes) {
-                this.planTypes = [];
-            }
-            this.loading = false;
         }
     }));
 
@@ -84,8 +71,8 @@ export const PlanTypesView: React.FC<any> = () => {
     React.useEffect(() => {
         let fetch = async () => {
             try {
-                let planTypes = await API.graphql(graphqlOperation(queries.listPlanTypes));
-                localStore.planTypes = planTypes["data"]["listPlanTypes"];
+                let planTypes = await withGraphQl<IListPlanTypesQuery>(ListPlanTypes);
+                localStore.planTypes = planTypes.data.listPlanTypes;
             }  catch (errorResponse) {
                 console.error(errorResponse);
                 localStore.errors = errorResponse.errors;

@@ -1,5 +1,5 @@
 import { editorStoreContext } from "@kartikrao/lib-forms";
-import { IAddFormVersionMutation, IForm } from "@kartikrao/lib-forms-api";
+import { IAddFormVersionMutation, IForm, AddFormVersion } from "@kartikrao/lib-forms-api";
 import { IFormProps } from "@kartikrao/lib-forms-core";
 import { Button, Form, Input, Modal, notification } from "antd";
 import { FormComponentProps } from "antd/lib/form";
@@ -7,11 +7,10 @@ import { toJS } from "mobx";
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { withGraphQl } from "../../ApiHelper";
-import * as mutations from '../../graphql/mutations';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 
 export interface AddFormVersionViewProps extends FormComponentProps{
-    onSave: (response: Partial<IForm>) => void;
+    onSave: (response: IAddFormVersionMutation["addFormVersion"]) => void;
     onCancel: () => void;
     tenantId: string;
     formData: any;
@@ -43,7 +42,7 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
                         formData: JSON.stringify(toJS(formData))
                     }
                 }
-                let response = await withGraphQl<IAddFormVersionMutation>(mutations.addFormVersion, payload);
+                let response = await withGraphQl<IAddFormVersionMutation>(AddFormVersion, payload);
                 notification.success({message: `Form version created successfully`});
                 props.onSave(response.data.addFormVersion);
             } catch (error) {

@@ -1,11 +1,10 @@
-import { IUpdateFormMutation } from "@kartikrao/lib-forms-api";
+import { IUpdateFormMutation, UpdateForm } from "@kartikrao/lib-forms-api";
 import { Button, DatePicker, Form, Input, notification } from "antd";
 import { FormComponentProps } from "antd/lib/form";
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import moment from "moment";
 import * as React from "react";
 import { withGraphQl } from "../../ApiHelper";
-import * as mutations from '../../graphql/mutations';
 import { appStoreContext } from '../../stores/AppStoreProvider';
 
 export interface EditFormViewProps extends FormComponentProps {
@@ -65,7 +64,7 @@ const EditFormView : React.FC<EditFormViewProps> = (props: EditFormViewProps) =>
 
             try {
                 store.view.setLoading({show: true, message: `Saving ${this.onSubmitAction} configuration`, status: "active", type : "line", percent: 25});
-                let ufResponse = await withGraphQl<IUpdateFormMutation>(mutations.updateForm, {input: {id: editForm.id, ...editFormPayload}});
+                let ufResponse = await withGraphQl<IUpdateFormMutation>(UpdateForm, {input: {id: editForm.id, ...editFormPayload}});
                 this.isDirty = false;
                 notification.success({message: `Form activation settings edited successfully`});
                 props.onUpdate(ufResponse.data.updateForm);

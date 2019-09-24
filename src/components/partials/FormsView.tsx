@@ -1,4 +1,4 @@
-// import API, { graphqlOperation } from "@aws-amplify/api";
+import { IAddFormMutation, IAddFormVersionMutation, IGetFormQuery, IListFormsQuery, AddFormVersion, GetForm, AddForm, ListForms } from "@kartikrao/lib-forms-api";
 import { EmptyForm } from "@kartikrao/lib-forms-core";
 import { Button, Card, Col, Drawer, Dropdown, Icon, Menu, Row, Skeleton, Tag } from "antd";
 import Typography from "antd/lib/typography";
@@ -6,13 +6,10 @@ import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
-import * as mutations from '../../graphql/mutations';
-import * as queries from '../../graphql/queries';
+import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
 import AddFormView from "./AddFormView";
-import { withGraphQl } from "../../ApiHelper";
-import { IListFormsQuery, IForm, IAddFormMutation, IGetFormQuery, IAddFormVersionMutation } from "@kartikrao/lib-forms-api";
 
 export interface FormsViewProps {
     accountId: string;
@@ -24,7 +21,7 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
 
     const now = dayjs();
     const localStore = useLocalStore(() => ({
-        forms: [] as Partial<IForm>[],
+        forms: [] as IListFormsQuery["listForms"],
         errors: [] as any[],
         showAdd: false,
         selectedItems: [] as any[],
@@ -32,15 +29,15 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
         handleClone: async function (formId: string) {
             try {
                 store.view.setLoading({show: true, message: "Loading source form", status: "active", type : "line", percent: 10});
-                let response = await withGraphQl<IGetFormQuery>(queries.getForm, {formId: formId});
+                let response = await withGraphQl<IGetFormQuery>(GetForm, {formId: formId});
                 let sourceForm = response.data.getForm;
-                let addFormResponse = await withGraphQl<IAddFormMutation>(mutations.addForm, {input: {
+                let addFormResponse = await withGraphQl<IAddFormMutation>(AddForm, {input: {
                     name : `Copy of ${sourceForm.name}`,
                     description: sourceForm.description,
                     accountId: sourceForm.accountId
                 }});
                 store.view.setLoading({show: true, message: "Saving copy", status: "active", type : "line", percent: 30});
-                let addFormVersionResponse = await withGraphQl<IAddFormVersionMutation>(mutations.addFormVersion, {input: {
+                let addFormVersionResponse = await withGraphQl<IAddFormVersionMutation>(AddFormVersion, {input: {
                     formId: addFormResponse['data']['addForm'].id,
                     accountId: sourceForm.accountId,
                     notes: `Copied ${sourceForm.name}`,
@@ -56,7 +53,7 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
         handleAdd: async function (values: any) {
             store.view.setLoading({show: true, message: "Creating new form", status: "active", type : "line", percent: 100});
             try {
-                let addFormResponse = await withGraphQl<IAddFormMutation>(mutations.addForm, {input: values});
+                let addFormResponse = await withGraphQl<IAddFormMutation>(AddForm, {input: values});
                 if (addFormResponse.errors) {
                     this.errors = addFormResponse.errors;
                 }
@@ -166,7 +163,7 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
             localStore.loading = true;
             try {
                 store.view.setLoading({show: true, message: "Loading forms", status: "active", type : "line", percent: 100});
-                let response = await withGraphQl<IListFormsQuery>(queries.listForms, {filter: {criteria: [{accountId: {expression: "eq", value: [match.params.accountId]}}]}});
+                let response = await withGraphQl<IListFormsQuery>(ListForms, {filter: {criteria: [{accountId: {expression: "eq", value: [match.params.accountId]}}]}});
                 localStore.forms = response.data.listForms;
             } catch (errorResponse) {
                 console.error("queries.getAccount.forms", errorResponse);

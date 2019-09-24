@@ -1,12 +1,11 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
+import { GetAccount, IGetAccountQuery } from "@kartikrao/lib-forms-api";
 import { Icon, Menu, Tag } from 'antd';
-import { useObserver, useLocalStore } from 'mobx-react-lite';
+import { useLocalStore, useObserver } from 'mobx-react-lite';
 import * as React from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
-import * as queries from '../../graphql/queries';
+import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from '../../stores/AppStoreProvider';
 import { ProgressView } from '../partials/ProgressView';
-
 
 export const NavigationView: React.FC<RouteComponentProps<any>> = ({history, match, location}) => {
     const store = React.useContext(appStoreContext);
@@ -42,7 +41,7 @@ export const NavigationView: React.FC<RouteComponentProps<any>> = ({history, mat
 
     let fetch = async function(accountId: string) {
         try {
-            let account: any = await API.graphql(graphqlOperation(queries.getAccount, {accountId: accountId}));
+            let account: any = await withGraphQl<IGetAccountQuery>(GetAccount, {accountId: accountId});
             localStore.account = account.data.getAccount;
         } catch (error) {
             localStore.account = null;

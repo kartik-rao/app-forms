@@ -1,12 +1,12 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
+import { GetUser, IGetUserQuery } from "@kartikrao/lib-forms-api";
 import { Col, PageHeader, Row, Skeleton, Tag } from "antd";
+import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import short from 'short-uuid';
-import * as queries from '../../graphql/queries';
+import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
-import dayjs from 'dayjs';
 
 let transform = short();
 export interface IUsersViewProps {
@@ -28,7 +28,7 @@ export const ProfileView: React.FC<RouteComponentProps<any>> = ({match, history}
 
     const localStore = useLocalStore(() => ({
         loading: true,
-        user: null as any,
+        user: null as IGetUserQuery["getUser"],
         errors: [] as any[],
         get groupColor() : string {
             if (this.user) {
@@ -51,15 +51,13 @@ export const ProfileView: React.FC<RouteComponentProps<any>> = ({match, history}
         async function fetch () {
             localStore.loading = true;
             store.view.setLoading({show: true, message: "Loading profile", status: "active", type : "line", percent: 100});
-            let query = "";
             try {
-                query = "GetAccount";
-                let response = await API.graphql(graphqlOperation(queries.getUser, {"userId": match.params.userId}));
-                let user = response['data']['getUser'];
+                let response = await withGraphQl<IGetUserQuery>(GetUser, {"userId": match.params.userId});
+                let user = response.data.getUser;
                 store.view.idNameMap[match.params.userId] = `${user.given_name} ${user.family_name}`;
                 localStore.user = user;
             } catch (errorResponse) {
-                console.log(query, errorResponse.errors);
+                console.log("GetUser", errorResponse.errors);
                 localStore.errors = errorResponse.errors;
             }
             store.view.resetLoading();
@@ -81,7 +79,7 @@ export const ProfileView: React.FC<RouteComponentProps<any>> = ({match, history}
                         <Description term="ID">{localStore.user.id}</Description>
                         <Description term="SFTP User Name">{transform.fromUUID(localStore.user.id)}</Description>
                         <Description term="Created"> {dayjs(localStore.user.createdAt).format('D MMM YY hh:mm a')}</Description>
-                        <Description term="Updated"> {localStore.user.updateAt ? dayjs(localStore.user.updateAt).format('D MMM YY hh:mm a'): "-"}</Description>
+                        <Description term="Updated"> {localStore.user.updatedAt ? dayjs(localStore.user.updatedAt).format('D MMM YY hh:mm a'): "-"}</Description>
                     </Row>
                 </div>
                 </PageHeader>

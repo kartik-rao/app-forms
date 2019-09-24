@@ -1,12 +1,12 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
 import { Logger } from "@kartikrao/lib-logging";
 import { Menu } from "antd";
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { ProgressView } from "../partials/ProgressView";
+import { withGraphQl } from "../../ApiHelper";
+import { IGetAccountQuery, GetAccount } from "@kartikrao/lib-forms-api";
 
 const logger = Logger.getInstance(['HeaderView'], Logger.severity.info);
 
@@ -38,7 +38,7 @@ const Header : React.FC<RouteComponentProps<any>> = ({match, location, history})
         let fetchAccount = async function() {
             localStore.loading = true;
             try {
-                let account: any = await API.graphql(graphqlOperation(queries.getAccount, {accountId: localStore.accountId}));
+                let account = await withGraphQl<IGetAccountQuery>(GetAccount, {accountId: localStore.accountId});
                 store.view.idNameMap[localStore.accountId] = account.data.getAccount.name;
             } catch (error) {
                 logger.error(`Header.useEffect.getAccount(${localStore.accountId})`, error);

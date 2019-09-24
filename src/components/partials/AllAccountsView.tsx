@@ -1,18 +1,18 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
-import { Card, Col, Row, Typography, Skeleton } from "antd";
+import { IListAccountsQuery, ListAccounts } from "@kartikrao/lib-forms-api";
+import { Card, Col, Row, Skeleton, Typography } from "antd";
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
-import * as queries from '../../graphql/queries';
+import { Link } from "react-router-dom";
+import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
-import { Link } from "react-router-dom";
 
 export const AllAccountsView : React.FC<any> = () => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
     const localStore = useLocalStore(() => ({
-        accounts: [] as any[],
+        accounts: [] as IListAccountsQuery["listAccounts"],
         loading: true,
         errors: [] as any[],
         selectedItems : [] as any[],
@@ -57,8 +57,8 @@ export const AllAccountsView : React.FC<any> = () => {
             localStore.loading = true;
             store.view.setLoading({show: true, message: "Loading accounts", status: "active", type : "line", percent: 100});
             try {
-                let allAccounts = await API.graphql(graphqlOperation(queries.listAccounts));
-                localStore.accounts = allAccounts['data']['listAccounts'];
+                let allAccounts = await withGraphQl<IListAccountsQuery>(ListAccounts);
+                localStore.accounts = allAccounts.data.listAccounts;
             } catch (errorResponse) {
                 console.error(errorResponse);
                 localStore.errors = errorResponse.errors;

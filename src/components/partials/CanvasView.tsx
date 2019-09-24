@@ -1,15 +1,14 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
 import { EditorStoreProvider } from "@kartikrao/lib-forms";
+import { GetForm, IGetFormQuery } from "@kartikrao/lib-forms-api";
 import { createFormStore, EmptyForm, Factory, IFormProps } from "@kartikrao/lib-forms-core";
 import "@kartikrao/lib-forms/lib/forms.editors.m.css";
 import { Layout } from "antd";
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { RouteComponentProps } from "react-router-dom";
-import * as queries from '../../graphql/queries';
+import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import AddFormVersionView from "./AddFormVersionView";
-
 
 export interface ICanvasViewProps {
     accountId: string;
@@ -48,8 +47,8 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
         let fetch = async function () {
             try {
                 store.view.setLoading({show: true, message: "Loading form data", status: "active", type : "line", percent: 100});
-                let response = await API.graphql(graphqlOperation(queries.getForm, {formId: match.params.formId}));
-                let form = response['data']['getForm'];
+                let response = await withGraphQl<IGetFormQuery>(GetForm, {formId: match.params.formId});
+                let form = response.data.getForm;
                 localStore.form = form;
                 localStore.formData = form.version && form.version.formData ? JSON.parse(form.version.formData) : {...EmptyForm}
                 localStore.formStore.setForm(Factory.makeForm(localStore.formStore, localStore.formData))

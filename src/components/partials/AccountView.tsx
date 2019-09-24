@@ -1,12 +1,13 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
+
 import { Col, Row, Skeleton, Menu } from "antd";
 import PageHeader from "antd/lib/page-header";
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import dayjs from 'dayjs';
 import * as React from "react";
 import { RouteComponentProps } from "react-router-dom";
-import * as queries from '../../graphql/queries';
 import { appStoreContext } from "../../stores/AppStoreProvider";
+import { withGraphQl } from "../../ApiHelper";
+import { IGetAccountQuery, GetAccount } from "@kartikrao/lib-forms-api";
 
 const Description = ({ term, children, span = 12 }) => (
     <Col span={span}>
@@ -26,7 +27,7 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = ({m
     if(!store) throw new Error("Store is null");
     const now = dayjs();
     const localStore = useLocalStore(() => ({
-        account: {} as any,
+        account: {} as IGetAccountQuery["getAccount"],
         errors: [] as any[],
         loading: true,
         get showErrors() {
@@ -56,8 +57,8 @@ export const AccountView : React.FC<RouteComponentProps<AccountViewProps>> = ({m
             store.view.setLoading({show: true, message: "Loading account", status: "active", type : "line", percent: 100});
             try {
                 let args = {accountId: match.params.accountId};
-                let account: any = await API.graphql(graphqlOperation(queries.getAccount, args));
-                account = account.data.getAccount;
+                let response = await withGraphQl<IGetAccountQuery>(GetAccount, args);
+                let account = response.data.getAccount;
                 store.view.idNameMap[match.params.accountId] = account.name;
                 localStore.account = account;
             } catch (errorResponse) {
