@@ -55,7 +55,7 @@ const _config = {
         api : {
                 graph : {
                     'aws_appsync_region': __REGION__,
-                    'aws_appsync_graphqlEndpoint': 'https://ugn2kqey75aolcnah6vtnbuydi.appsync-api.ap-northeast-1.amazonaws.com/graphql',
+                    'aws_appsync_graphqlEndpoint': 'https://dev-graph.forms.li/graphql',
                     'aws_appsync_authenticationType': 'AMAZON_COGNITO_USER_POOLS'
                 },
                 rest : {
