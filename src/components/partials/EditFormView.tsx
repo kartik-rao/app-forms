@@ -1,4 +1,4 @@
-import { IUpdateFormMutation, UpdateForm } from "@kartikrao/lib-forms-api";
+import { IUpdateFormMutation, UpdateForm, IGetFormQuery } from "@kartikrao/lib-forms-api";
 import { Button, DatePicker, Form, Input, notification } from "antd";
 import { FormComponentProps } from "antd/lib/form";
 import { useLocalStore, useObserver } from "mobx-react-lite";
@@ -8,8 +8,8 @@ import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from '../../stores/AppStoreProvider';
 
 export interface EditFormViewProps extends FormComponentProps {
-    editForm: any;
-    onUpdate: (data: any) => void;
+    editForm: IGetFormQuery["getForm"]|IUpdateFormMutation["updateForm"];
+    onUpdate: (data: IUpdateFormMutation["updateForm"]) => void;
 }
 
 const formItemLayout = {
@@ -42,6 +42,8 @@ const EditFormView : React.FC<EditFormViewProps> = (props: EditFormViewProps) =>
 
     let {editForm} = props;
     const localStore = useLocalStore(() => ({
+        name               : editForm.name,
+        descriptions       : editForm.description,
         redirectNotStarted : editForm.redirectNotStarted as string,
         redirectHasEnded   : editForm.redirectHasEnded as string,
         startDate          : editForm.startDate as any,
@@ -56,10 +58,12 @@ const EditFormView : React.FC<EditFormViewProps> = (props: EditFormViewProps) =>
             e.stopPropagation();
             let values = props.form.getFieldsValue();
             let editFormPayload : any = {
+                name               : values.name,
+                description        : values.description,
                 redirectNotStarted : values.redirectNotStarted,
-                redirectHasEnded : values.redirectHasEnded,
-                startDate        : values.startDate ? values.startDate.format() : null,
-                endDate          : values.endDate ? values.endDate.format() : null
+                redirectHasEnded   : values.redirectHasEnded,
+                startDate          : values.startDate ? values.startDate.format() : null,
+                endDate            : values.endDate ? values.endDate.format() : null
             };
 
             try {
@@ -80,6 +84,20 @@ const EditFormView : React.FC<EditFormViewProps> = (props: EditFormViewProps) =>
 
     return useObserver(() => {
         return <Form onSubmit={localStore.handleSubmit}  {...formItemLayout} layout={"horizontal"}>
+            <Form.Item label="Name" help="">
+                {
+                    getFieldDecorator('name', {
+                        initialValue: editForm.name,
+                    })(<Input onChange={(e) => localStore.onChange('name', e.target.value)}/>)
+                }
+            </Form.Item>
+            <Form.Item label="Description" help="">
+                {
+                    getFieldDecorator('description', {
+                        initialValue: editForm.description,
+                    })(<Input onChange={(e) => localStore.onChange('description', e.target.value)}/>)
+                }
+            </Form.Item>
             <Form.Item label="Start Date" help="Schedule form activation">
                 {
                     getFieldDecorator('startDate', {

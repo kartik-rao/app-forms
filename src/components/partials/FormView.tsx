@@ -39,8 +39,9 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         errors: [] as any[],
         showEditForm: false as boolean,
         refresh: false as boolean,
-        onUpdateComplete : function () {
+        onUpdateComplete : function (form: IUpdateFormMutation["updateForm"]) {
             this.showEditForm = false;
+            this.form = form;
         },
         toggleFormPause : async function() {
             try {
@@ -49,7 +50,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                     let createStreamURL = `${config.api.rest.endpoint}/stream/${match.params.formId}?tenantId=${match.params.accountId}`;
                     let streamResponse = await store.auth.withSession(createStreamURL, "put");
                     if(streamResponse.message != "OK") {
-                        notification.error({message: `Unable to active Form - ${streamResponse.message}`});
+                        notification.error({message: `Unable to activate Form - ${streamResponse.message}`});
                         store.view.resetLoading();
                         return;
                     }
@@ -211,7 +212,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
 
     return useObserver(() => {
         return localStore.loading ? <Skeleton active />: <>
-            <Drawer bodyStyle={{overflow: 'hidden'}} placement="right" visible={localStore.showEditForm} width={600} title={"Form settings"} closable maskClosable onClose={() => localStore.onUpdateComplete()}>
+            <Drawer bodyStyle={{overflow: 'hidden'}} placement="right" visible={localStore.showEditForm} width={600} title={"Form settings"} closable maskClosable onClose={() => localStore.showEditForm = false}>
                 <Row><Col span={24}><EditFormView editForm={localStore.form} onUpdate={localStore.onUpdateComplete}/></Col></Row>
             </Drawer>
             <PageHeader onBack={() => history.push(`/account/${match.params.accountId}/forms`)} title={localStore.form.name} subTitle={<FormStatus />} extra={<FormActions/>}>
