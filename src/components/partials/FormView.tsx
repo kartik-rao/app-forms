@@ -1,5 +1,5 @@
-import { AttachFormVersion, DeleteForm, DeleteFormVersion, GetForm, IAttachFormVersionMutation, IDeleteFormMutation, IDeleteFormVersionMutation, IGetFormQuery, IUpdateFormMutation, UpdateForm } from "@kartikrao/lib-forms-api";
-import { Badge, Button, Card, Col, Divider, Drawer, Icon, List, notification, PageHeader, Popconfirm, Popover, Row, Skeleton, Tag, Typography } from "antd";
+import { AttachFormVersion, DeleteForm, DeleteFormVersion, GetForm, IAttachFormVersionMutation, IDeleteFormMutation, IDeleteFormVersionMutation, IGetFormQuery, IUpdateFormMutation, UpdateForm, IAddFormVersionMutation } from "@kartikrao/lib-forms-api";
+import { Badge, Button, Card, Col, Divider, Drawer, Icon, List, notification, PageHeader, Popconfirm, Popover, Row, Skeleton, Tag, Typography, Tabs, Empty, Timeline, Statistic } from "antd";
 import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
@@ -8,6 +8,8 @@ import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
 import EditFormView from "./EditFormView";
+import { ErrorBoundary } from "../common/ErrorBoundary";
+import AddFormVersionView from "./AddFormVersionView";
 
 export interface FormViewProps {
     accountId: string;
@@ -38,14 +40,21 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         form: null as IGetFormQuery["getForm"],
         errors: [] as any[],
         showEditForm: false as boolean,
+        showAddVersion: false as boolean,
         refresh: false as boolean,
         onUpdateComplete : function (form: IUpdateFormMutation["updateForm"]) {
             this.showEditForm = false;
-            this.form = form;
+            console.log("Got Form", form)
+            try {
+                this.form = form;
+            } catch (error) {
+                console.log("update error", error);
+            }
+
         },
         toggleFormPause : async function() {
             try {
-                store.view.setLoading({show: true, message: this.form.isPaused ? "Activating Form" : "Pausing Form", status: "active", type : "line", percent: 100});
+                store.view.setLoading({show: true, message: this.form.isPaused ? "Starting Form" : "Pausing Form", status: "active", type : "line", percent: 100});
                 if (this.form.isPaused) {
                     let createStreamURL = `${config.api.rest.endpoint}/stream/${match.params.formId}?tenantId=${match.params.accountId}`;
                     let streamResponse = await store.auth.withSession(createStreamURL, "put");
@@ -62,6 +71,9 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                 this.errors = errorResponse.errors;
             }
             store.view.resetLoading();
+        },
+        newVersionFrom : async function(sourceVersionId: string, displayName: string, notes: string) {
+
         },
         activateVersion: async function(versionId: string) {
             try {
@@ -127,6 +139,13 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             return this.hasVersion ? (this.form.versions as any[]).filter((v) => {
                 return v.id != self.form.versionId;
             }) : [];
+        },
+        toggleShowAddVersion: function() {
+            this.showAddVersion = !this.showAddVersion;
+        },
+        onAddFormVersion: function(version: IAddFormVersionMutation["addFormVersion"]) {
+            this.form.versions.unshift(version);
+            this.showAddVersion = false;
         }
     }));
 
@@ -157,7 +176,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
 
     const columns = [
         {title: "Name", key: "name", dataIndex: "displayName", render: (text, record) => <><p>{text}</p><p><small>{record.id}</small></p></>},
-        {title: "Detail", key: "notes", dataIndex: "notes", render:(text, record) => <p style={{whiteSpace: "pre-line"}}>{text}</p>},
+        {title: "Notes", key: "notes", dataIndex: "notes", render:(text, record) => <p style={{whiteSpace: "pre-line"}}>{text}</p>},
         {title: "Created", key: "createdAt", dataIndex: "createdAt", render: (text, record) => {return <span>{dayjs(text).format('DD MMM YY hh:mm a')}</span>}},
         {title: "By", key: "owner", dataIndex: "ownedBy", render: (text, record) => {return <span>{record.ownedBy.given_name} {record.ownedBy.family_name}</span>}},
         {title: "Actions", key: "actions", render: (text, record) => {return <span>
@@ -171,9 +190,10 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         return useObserver(() => {
             return <span> {
                 localStore.form ? <>
-                    <Button size="small" className="fl-right-margin-ten" onClick={() => {localStore.showEditForm = true}}>Settings</Button>
-                    <Popconfirm title={localStore.form.isPaused == 1 ? "Activate & start accepting entries ?" : "Pause & stop accepting entries ?"} onConfirm={() => localStore.toggleFormPause()}>
-                        <Button className="fl-right-margin-ten" size="small" disabled={!localStore.form.versions || localStore.form.versions.length == 0} type={localStore.form.isPaused == 1 ? "primary" : "danger"}>{localStore.form.isPaused == 1 ? "Activate" : "Pause"}</Button>
+                    {/* <Button size="small" className="fl-right-margin-ten" onClick={() => {localStore.showEditForm = true}}>Settings</Button> */}
+                    <Button size="small" className="fl-right-margin-ten" onClick={localStore.toggleShowAddVersion}><Icon type="plus"/>Add Version</Button>
+                    <Popconfirm title={localStore.form.isPaused == 1 ? "Start accepting entries ?" : "Stop accepting entries ?"} onConfirm={() => localStore.toggleFormPause()}>
+                        <Button className="fl-right-margin-ten" size="small" disabled={!localStore.form.versions || localStore.form.versions.length == 0} type={localStore.form.isPaused == 1 ? "primary" : "danger"}>{localStore.form.isPaused == 1 ? "Start" : "Pause"}</Button>
                     </Popconfirm>
                     <Popconfirm title={"This will delete the form and all versions. Are you sure ?"} onConfirm={() => localStore.deleteForm()}>
                         <Button className="fl-right-margin-ten" size="small" type="danger">Delete</Button>
@@ -190,13 +210,12 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
 
     const ChangeList : React.FC<any> = () => {
         return useObserver(() => {
-            return localStore.hasVersion && localStore.form.version.notes ? <List>
+            return localStore.hasVersion && localStore.form.version.notes ? <Timeline>
                 {localStore.form.version.notes.split("\n").map((line, i) => {
-                    return <List.Item key={`c-${i}`}>{line}</List.Item>
+                    return <Timeline.Item key={`c-${i}`}>{line}</Timeline.Item>
                 })}
-            </List> : <></>
+            </Timeline> : <></>
         })
-
     };
 
     const FormStatus : React.FC<any> = () => {
@@ -211,27 +230,50 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     };
 
     return useObserver(() => {
-        return localStore.loading ? <Skeleton active />: <>
-            <Drawer bodyStyle={{overflow: 'hidden'}} placement="right" visible={localStore.showEditForm} width={600} title={"Form settings"} closable maskClosable onClose={() => localStore.showEditForm = false}>
-                <Row><Col span={24}><EditFormView editForm={localStore.form} onUpdate={localStore.onUpdateComplete}/></Col></Row>
-            </Drawer>
+        return localStore.loading ? <Skeleton active />:<>
+            {localStore.showAddVersion && <AddFormVersionView onSave={localStore.onAddFormVersion} sourceForm={localStore.form} onCancel={localStore.toggleShowAddVersion}/>}
             <PageHeader onBack={() => history.push(`/account/${match.params.accountId}/forms`)} title={localStore.form.name} subTitle={<FormStatus />} extra={<FormActions/>}>
-            <Typography.Paragraph>{localStore.form.description}</Typography.Paragraph>
-            {localStore.hasVersion && <Row>
-                <Col span={6}>On Success <Tag>{localStore.expectedSubmitResult.success}</Tag>{localStore.successRedirect ? <a href={localStore.successRedirect} target="_blank">Preview</a>: ""}</Col>
-                <Col span={6}>On Error <Tag>{localStore.expectedSubmitResult.error}</Tag>{localStore.errorRedirect ? <a href={localStore.errorRedirect} target="_blank">Preview</a>: ""}</Col>
-            </Row>}
-            <Divider />
-            <Row type="flex">
-                <Col span={24} >
-                <Card title={<span>{localStore.form.name} Version History</span>} style={{padding: 0}} bodyStyle={{padding:0}} extra={<Link to={`/account/${match.params.accountId}/canvas/${match.params.formId}`}>
-                    <Button size="small" className="fl-right-margin-ten"><Icon type="plus"/>Add Version</Button>
-                </Link>}>
-                <TableWrapper size="small" emptyText='No versions, click "Add version" to create one.' errors={localStore.errors} data={localStore.inactiveVersions} columns={columns}
-                bordered={true} rowKey="id" pagination={ localStore.inactiveVersions.length > 5 ? {pageSize: 5, position: "top"} : false} />
-                </Card>
-                </Col>
-            </Row>
+                <Typography.Paragraph>{localStore.form.description}</Typography.Paragraph>
+                <Card bordered={false} bodyStyle={{padding: '0px'}}>
+                <br/>
+                    <Tabs defaultActiveKey="activeVersion">
+                    <Tabs.TabPane key="activeVersion" tab="Active Version">
+                        { localStore.hasVersion ? <>
+                            <Row>
+                                <Col span={2}><Statistic title="Entries" value={localStore.form.numEntries} valueStyle={{fontSize: '14px'}}></Statistic></Col>
+                                <Col span={2}><Statistic title="On Success" value={localStore.expectedSubmitResult.success} valueStyle={{fontSize: '14px'}}></Statistic></Col>
+                                <Col span={2}><Statistic title="On Failure" value={localStore.expectedSubmitResult.error} valueStyle={{fontSize: '14px'}}></Statistic></Col>
+                            </Row>
+                            <br/>
+                            <Row>
+                                <Col span={8}>
+                                    <Card title={localStore.form.version.displayName} extra={
+                                        <span><Tag>{dayjs(localStore.form.version.createdAt).format('DD MMM YY hh:mma')}</Tag><Tag>{localStore.form.version.ownedBy.given_name} {localStore.form.version.ownedBy.family_name}</Tag></span>
+                                    }>
+                                        <ChangeList />
+                                    </Card>
+                                </Col>
+                            </Row></> : <Empty description="No content versions, click Add Version"/>
+                        }
+                    </Tabs.TabPane>
+                    <Tabs.TabPane key="pastVersions" tab="Version History">
+                        <Row type="flex">
+                            <Col span={24} >
+                                <Card title={<span>{localStore.form.name} Version History</span>} style={{padding: 0}} bodyStyle={{padding:0}}>
+                                <TableWrapper size="small" emptyText='No versions, click "Add version" to create one.' errors={localStore.errors} data={localStore.inactiveVersions} columns={columns}
+                                bordered={true} rowKey="id" pagination={ localStore.inactiveVersions.length > 5 ? {pageSize: 5, position: "top"} : false} />
+                                </Card>
+                            </Col>
+                        </Row>
+                    </Tabs.TabPane>
+                    <Tabs.TabPane key="settings" tab="Settings">
+                        <Row>
+                            <Col span={14}>
+                                <EditFormView editForm={localStore.form} onUpdate={localStore.onUpdateComplete}/>
+                            </Col>
+                        </Row>
+                    </Tabs.TabPane>
+                </Tabs></Card>
         </PageHeader>
     </>
     })

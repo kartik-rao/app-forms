@@ -18,10 +18,10 @@ const FormView = React.lazy(() => import(/* webpackChunkName: "app-form" */ "./F
 const ProfileView = React.lazy(() => import(/* webpackChunkName: "app-profile" */ "./ProfileView").then((module) => {return {default: module.ProfileView}}));
 
 const AllPaths = [
-    "/", 
-    "/profile", 
-    "/admin", 
-    "/accounts", 
+    "/",
+    "/profile",
+    "/admin",
+    "/accounts",
     "/users",
     "/profile/:userId",
     "/account/:accountId",
@@ -46,15 +46,15 @@ export const MainView: React.FC<any> = () => {
                     <Layout style={{height: '100%', backgroundColor: "#ffff"}} hasSider={true}>
                         <Route component={SiderNavView} exact={true} path={AllPaths} />
                         <Layout.Content style={{borderLeft: "1px solid gray"}}>
-                            <Route exact={true} path="/accounts"                 component={AllAccountsView} key="allaccountsview"/>
-                            <Route exact={true} path="/admin"                    component={AdminView}   key="adminview"/>
-                            <Route exact={true} path="/users"                    component={UsersView}   key="allusersview"/>
-                            <Route exact path="/account/:accountId"              component={AccountView} key="accountview"/>
-                            <Route exact={true} path="/account/:accountId/forms" component={FormsView}   key="formsview"/>
-                            <Route path="/account/:accountId/users"              component={UsersView}   key="usersview"/>
-                            <Route path="/profile/:userId"                       component={ProfileView} key="profileview"/>
-                            <Route path="/account/:accountId/forms/:formId"      component={FormView}    key="formview"/>
-                            <Route path="/account/:accountId/canvas/:formId"     component={CanvasView}  key="canvasview"/>
+                            <Route exact={true} path="/accounts"                    component={AllAccountsView} key="allaccountsview"/>
+                            <Route exact={true} path="/admin"                       component={AdminView}   key="adminview"/>
+                            <Route exact={true} path="/users"                       component={UsersView}   key="allusersview"/>
+                            <Route exact path="/account/:accountId"                 component={AccountView} key="accountview"/>
+                            <Route exact={true} path="/account/:accountId/forms"    component={FormsView}   key="formsview"/>
+                            <Route path="/account/:accountId/users"                 component={UsersView}   key="usersview"/>
+                            <Route path="/profile/:userId"                          component={ProfileView} key="profileview"/>
+                            <Route path="/account/:accountId/forms/:formId"         component={FormView}    key="formview"/>
+                            <Route path="/account/:accountId/canvas/:formId"        component={CanvasView}  key="canvasview"/>
                             <Route exact path="/" render={() => (
                                 !store.auth.isAdmin ? <Redirect to={`/account/${store.auth.tenant}`}/> : <Redirect to={`/accounts`}/>
                             )}/>

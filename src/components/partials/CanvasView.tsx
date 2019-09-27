@@ -8,7 +8,7 @@ import * as React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
-import AddFormVersionView from "./AddFormVersionView";
+import SaveFormVersionView from "./SaveFormVersionView";
 
 export interface ICanvasViewProps {
     accountId: string;
@@ -67,7 +67,7 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
             <React.Suspense fallback="Loading...">
                 <Canvas onSave={() => {localStore.showAddVersion = true}} onClose={localStore.onClose}/>
             </React.Suspense>
-            {localStore.showAddVersion && <AddFormVersionView formId={localStore.formId}
+            {localStore.showAddVersion && <SaveFormVersionView formId={localStore.formId}
                 tenantId={localStore.form.accountId}
                 formData={localStore.formStore.form.asPlainObject}
                 onSave={localStore.onSaveComplete}

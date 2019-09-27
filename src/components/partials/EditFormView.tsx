@@ -1,5 +1,5 @@
 import { IUpdateFormMutation, UpdateForm, IGetFormQuery } from "@kartikrao/lib-forms-api";
-import { Button, DatePicker, Form, Input, notification } from "antd";
+import { Button, DatePicker, Form, Input, notification, Card } from "antd";
 import { FormComponentProps } from "antd/lib/form";
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import moment from "moment";
@@ -67,7 +67,7 @@ const EditFormView : React.FC<EditFormViewProps> = (props: EditFormViewProps) =>
             };
 
             try {
-                store.view.setLoading({show: true, message: `Saving ${this.onSubmitAction} configuration`, status: "active", type : "line", percent: 25});
+                store.view.setLoading({show: true, message: `Saving "${props.editForm.name}" settings`, status: "active", type : "line", percent: 50});
                 let ufResponse = await withGraphQl<IUpdateFormMutation>(UpdateForm, {input: {id: editForm.id, ...editFormPayload}});
                 this.isDirty = false;
                 notification.success({message: `Form activation settings edited successfully`});
@@ -83,7 +83,8 @@ const EditFormView : React.FC<EditFormViewProps> = (props: EditFormViewProps) =>
     let {getFieldDecorator} = props.form;
 
     return useObserver(() => {
-        return <Form onSubmit={localStore.handleSubmit}  {...formItemLayout} layout={"horizontal"}>
+        return <Form onSubmit={localStore.handleSubmit}  {...formItemLayout} layout={"vertical"}>
+            <Card size="small" title="Edit Form settings" extra={<Button size="small" htmlType="submit" type="primary" disabled={!localStore.isDirty}>Save</Button>} bodyStyle={{padding: '30px'}}>
             <Form.Item label="Name" help="">
                 {
                     getFieldDecorator('name', {
@@ -134,9 +135,7 @@ const EditFormView : React.FC<EditFormViewProps> = (props: EditFormViewProps) =>
                     })(<Input onChange={(e) => localStore.onChange('redirectHasEnded', e)}/>)
                 }
             </Form.Item>
-            <Form.Item style={{marginTop: '15px'}} {...tailFormItemLayout}>
-                <Button htmlType="submit" type="primary" disabled={!localStore.isDirty}>Apply</Button>
-            </Form.Item>
+            </Card>
         </Form>
     })
 }
