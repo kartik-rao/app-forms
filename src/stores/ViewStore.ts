@@ -1,5 +1,5 @@
 import { observable } from 'mobx';
-import { ProgressViewProps } from '../components/partials/ProgressView';
+import { ProgressViewProps } from '../components/common/ProgressView';
 
 let withFirstUpper = function(str: string) : string {
     if(!str) {

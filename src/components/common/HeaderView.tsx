@@ -4,7 +4,7 @@ import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { appStoreContext } from "../../stores/AppStoreProvider";
-import { ProgressView } from "../partials/ProgressView";
+import { ProgressView } from "./ProgressView";
 import { withGraphQl } from "../../ApiHelper";
 import { IGetAccountQuery, GetAccount } from "@kartikrao/lib-forms-api";
 

@@ -2,20 +2,20 @@ import { Layout } from 'antd';
 import { useObserver } from 'mobx-react';
 import * as React from 'react';
 import { BrowserRouter, Route, Redirect } from "react-router-dom";
-import { appStoreContext } from '../../stores/AppStoreProvider';
-import { Footer } from "../common/FooterView";
-import Header from "../common/HeaderView";
-import { Loading } from "../common/Loading";
-import { CanvasView } from './CanvasView';
-import { SiderNavView } from './SiderNavView';
+import { appStoreContext } from '../stores/AppStoreProvider';
+import { Footer } from "./common/FooterView";
+import Header from "./common/HeaderView";
+import { Loading } from "./common/Loading";
+import { CanvasView } from './form/CanvasView';
+import { SiderNavView } from './common/SiderNavView';
 
-const AllAccountsView = React.lazy(() => import(/* webpackChunkName: "app-accounts" */ "./AllAccountsView").then((module) => {return {default: module.AllAccountsView}}));
-const FormsView = React.lazy(() => import(/* webpackChunkName: "app-forms" */ "./FormsView").then((module) => {return {default: module.FormsView}}));
-const AdminView = React.lazy(() => import(/* webpackChunkName: "app-admin" */ "./AdminView").then((module) => {return {default: module.AdminView}}));
-const UsersView = React.lazy(() => import(/* webpackChunkName: "app-users" */ "./UsersView").then((module) => {return {default: module.UsersView}}));
-const AccountView = React.lazy(() => import(/* webpackChunkName: "app-account" */ "./AccountView").then((module) => {return {default: module.AccountView}}));
-const FormView = React.lazy(() => import(/* webpackChunkName: "app-form" */ "./FormView").then((module) => {return {default: module.FormView}}));
-const ProfileView = React.lazy(() => import(/* webpackChunkName: "app-profile" */ "./ProfileView").then((module) => {return {default: module.ProfileView}}));
+const AllAccountsView = React.lazy(() => import(/* webpackChunkName: "app-accounts" */ "./account/AllAccountsView").then((module) => {return {default: module.AllAccountsView}}));
+const FormsView = React.lazy(() => import(/* webpackChunkName: "app-forms" */ "./form/FormsView").then((module) => {return {default: module.FormsView}}));
+const AdminView = React.lazy(() => import(/* webpackChunkName: "app-admin" */ "./admin/AdminView").then((module) => {return {default: module.AdminView}}));
+const UsersView = React.lazy(() => import(/* webpackChunkName: "app-users" */ "./user/UsersView").then((module) => {return {default: module.UsersView}}));
+const AccountView = React.lazy(() => import(/* webpackChunkName: "app-account" */ "./account/AccountView").then((module) => {return {default: module.AccountView}}));
+const FormView = React.lazy(() => import(/* webpackChunkName: "app-form" */ "./form/FormView").then((module) => {return {default: module.FormView}}));
+const ProfileView = React.lazy(() => import(/* webpackChunkName: "app-profile" */ "./user/ProfileView").then((module) => {return {default: module.ProfileView}}));
 
 const AllPaths = [
     "/",

@@ -5,7 +5,7 @@ import * as React from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from '../../stores/AppStoreProvider';
-import { ProgressView } from '../partials/ProgressView';
+import { ProgressView } from './ProgressView';
 
 export const NavigationView: React.FC<RouteComponentProps<any>> = ({history, match, location}) => {
     const store = React.useContext(appStoreContext);

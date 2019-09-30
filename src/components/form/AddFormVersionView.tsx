@@ -59,15 +59,19 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
         },
         onCancel: function() {
             props.onCancel();
+        },
+        get hasErrors() {
+            let errors = props.form.getFieldsError(['displayName', 'notes']);
+            return Object.values(errors).length > 0;
         }
     }));
     return useObserver(() => {
-        return <Modal visible={true} mask={true} onCancel={props.onCancel} onOk={localStore.onOk}
+        return <Modal visible={true} centered mask={true} onCancel={props.onCancel} onOk={localStore.onOk}
                 footer={[
                     <Button key="back" onClick={props.onCancel}>
                     Cancel
                     </Button>,
-                    <Button key="submit" type="primary" loading={localStore.loading} onClick={localStore.onOk}>
+                    <Button key="submit" type="primary" disabled={!localStore.notes || !localStore.name} loading={localStore.loading} onClick={localStore.onOk}>
                     Create
                     </Button>,
                 ]} width={800}>
@@ -100,7 +104,7 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
                         { props.form.getFieldDecorator('notes', {rules:[
                             {required: true, message: "Please provide notes for this version"}
                         ]})
-                        (<Input.TextArea style={{whiteSpace: "pre-wrap", height: 300}}  placeholder="Notes that describe the intended purpose" onChange={(e) => localStore.notes = e.target.value}/>)}
+                        (<Input.TextArea style={{whiteSpace: "pre-wrap", height: '6em'}}  placeholder="Notes that describe the intended changes" onChange={(e) => localStore.notes = e.target.value}/>)}
                     </Form.Item>
                 </Form>
         </Modal>

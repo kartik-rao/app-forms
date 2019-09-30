@@ -1,5 +1,5 @@
 import { AttachFormVersion, DeleteForm, DeleteFormVersion, GetForm, IAttachFormVersionMutation, IDeleteFormMutation, IDeleteFormVersionMutation, IGetFormQuery, IUpdateFormMutation, UpdateForm, IAddFormVersionMutation } from "@kartikrao/lib-forms-api";
-import { Badge, Button, Card, Col, Divider, Drawer, Icon, List, notification, PageHeader, Popconfirm, Popover, Row, Skeleton, Tag, Typography, Tabs, Empty, Timeline, Statistic } from "antd";
+import { Badge, Button, Card, Col, Divider, Drawer, Icon, List, notification, PageHeader, Popconfirm, Popover, Row, Skeleton, Tag, Typography, Tabs, Empty, Timeline, Statistic, Dropdown, Menu } from "antd";
 import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
@@ -180,11 +180,22 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         {title: "Created", key: "createdAt", dataIndex: "createdAt", render: (text, record) => {return <span>{dayjs(text).format('DD MMM YY hh:mm a')}</span>}},
         {title: "By", key: "owner", dataIndex: "ownedBy", render: (text, record) => {return <span>{record.ownedBy.given_name} {record.ownedBy.family_name}</span>}},
         {title: "Actions", key: "actions", render: (text, record) => {return <span>
-                <Button disabled={record.id == localStore.form.versionId} onClick={() => localStore.activateVersion(record.id)} type="primary" size="small" title="Activate" className="fl-right-margin-ten"><Icon type="check"/> Activate</Button>
-                <Button disabled={record.id == localStore.form.versionId} onClick={() => localStore.deleteVersion(record.id)} type="danger" size="small" title="Delete"><Icon type="delete"/> Delete</Button>
-            </span>
-        }},
+            <Dropdown overlay={<Menu>
+                <Menu.Item key="action-activate">
+                    <a onClick={() => localStore.activateVersion(record.id)} title="Activate"><Icon type="check"/> Activate</a>
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item key="action-delete" onClick={(e) => localStore.deleteVersion(record.id)}>
+                    <a onClick={() => localStore.deleteVersion(record.id)} title="Delete"><Icon type="delete"/> Delete</a>
+                </Menu.Item>
+            </Menu>}>
+                <a className="ant-dropdown-link" href="#">Actions <Icon type="down" /></a>
+            </Dropdown>
+        </span>
+        }}
     ]
+
+    
 
     const FormActions : React.FC<any> = () => {
         return useObserver(() => {
@@ -236,17 +247,17 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                 <Typography.Paragraph>{localStore.form.description}</Typography.Paragraph>
                 <Card bordered={false} bodyStyle={{padding: '0px'}}>
                 <br/>
-                    <Tabs defaultActiveKey="activeVersion">
-                    <Tabs.TabPane key="activeVersion" tab="Active Version">
+                    <Tabs defaultActiveKey="currentVersion">
+                    <Tabs.TabPane key="currentVersion" tab="Current Version">
                         { localStore.hasVersion ? <>
                             <Row>
-                                <Col span={2}><Statistic title="Entries" value={localStore.form.numEntries} valueStyle={{fontSize: '14px'}}></Statistic></Col>
-                                <Col span={2}><Statistic title="On Success" value={localStore.expectedSubmitResult.success} valueStyle={{fontSize: '14px'}}></Statistic></Col>
-                                <Col span={2}><Statistic title="On Failure" value={localStore.expectedSubmitResult.error} valueStyle={{fontSize: '14px'}}></Statistic></Col>
+                                <Col span={3}><Statistic title="Entries" value={localStore.form.numEntries} valueStyle={{fontSize: '14px'}}></Statistic></Col>
+                                <Col span={4}><Statistic title="On Success" value={localStore.expectedSubmitResult.success} valueStyle={{fontSize: '14px'}}></Statistic></Col>
+                                <Col span={4}><Statistic title="On Failure" value={localStore.expectedSubmitResult.error} valueStyle={{fontSize: '14px'}}></Statistic></Col>
                             </Row>
                             <br/>
                             <Row>
-                                <Col span={8}>
+                                <Col span={11}>
                                     <Card title={localStore.form.version.displayName} extra={
                                         <span><Tag>{dayjs(localStore.form.version.createdAt).format('DD MMM YY hh:mma')}</Tag><Tag>{localStore.form.version.ownedBy.given_name} {localStore.form.version.ownedBy.family_name}</Tag></span>
                                     }>

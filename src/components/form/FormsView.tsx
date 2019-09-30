@@ -142,12 +142,15 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
                         <span><Icon type="highlight"/>  Design</span>
                     </Link>
                 </Menu.Item>
+                <Menu.Divider key="d-clone"/>
                 <Menu.Item key="action-clone" onClick={(e) => localStore.handleClone(record.id)}>
                     <span><Icon type="copy"/>  Clone</span>
                 </Menu.Item>
+                <Menu.Divider key="d-pause"/>
                 <Menu.Item key="action-pause">
                     <span><Icon type="pause"/>  Pause</span>
                 </Menu.Item>
+                <Menu.Divider key="d-delete"/>
                 <Menu.Item key="action-delete">
                     <span><Icon type="delete"/>  Delete</span>
                 </Menu.Item>

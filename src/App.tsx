@@ -5,7 +5,7 @@ import { Authenticator, Greetings } from 'aws-amplify-react';
 import { useObserver } from "mobx-react-lite";
 import * as React from "react";
 import './app.css';
-import { MainView } from "./components/partials/MainView";
+import { MainView } from "./components/MainView";
 import { createAppStore } from './stores/AppStore';
 import { AppStoreProvider } from "./stores/AppStoreProvider";
 import { AppConfig } from "./config";
