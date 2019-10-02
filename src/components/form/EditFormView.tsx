@@ -23,19 +23,6 @@ const formItemLayout = {
     },
 };
 
-const tailFormItemLayout = {
-    wrapperCol: {
-      xs: {
-        span: 24,
-        offset: 20,
-      },
-      sm: {
-        span: 24,
-        offset: 20,
-      },
-    },
-};
-
 const EditFormView : React.FC<EditFormViewProps> = (props: EditFormViewProps) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
