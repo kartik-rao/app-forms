@@ -7,6 +7,7 @@ import { RouteComponentProps } from "react-router-dom";
 import short from 'short-uuid';
 import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
+import EditUserDetailsView from "./EditUserDetailsView";
 
 let transform = short();
 export interface IUsersViewProps {
@@ -44,6 +45,9 @@ export const ProfileView: React.FC<RouteComponentProps<any>> = ({match, history}
                 }
             }
             return ""
+        },
+        onUpdate : function () {
+
         }
     }));
 
@@ -82,6 +86,12 @@ export const ProfileView: React.FC<RouteComponentProps<any>> = ({match, history}
                         <Description term="Updated"> {localStore.user.updatedAt ? dayjs(localStore.user.updatedAt).format('D MMM YY hh:mm a'): "-"}</Description>
                     </Row>
                 </div>
+                <br/>
+                <Row>
+                    <Col span={11}>
+                        <EditUserDetailsView user={localStore.user} onUpdate={localStore.onUpdate}/>
+                    </Col>
+                </Row>
                 </PageHeader>
             }
         </Col>
