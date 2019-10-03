@@ -66,7 +66,7 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
         }
     }));
     return useObserver(() => {
-        return <Modal visible={true} centered mask={true} onCancel={props.onCancel} onOk={localStore.onOk}
+        return <Modal title="Create a version" visible={true} centered mask={true} onCancel={props.onCancel} onOk={localStore.onOk}
                 footer={[
                     <Button key="back" onClick={props.onCancel}>
                     Cancel
