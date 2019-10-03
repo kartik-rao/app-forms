@@ -3,7 +3,7 @@ import { Badge, Button, Card, Col, Dropdown, Empty, Icon, Menu, notification, Pa
 import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
-import { RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps, Link } from "react-router-dom";
 import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
@@ -171,10 +171,20 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         get hasVersion() : boolean {
             return this.form && this.form.version;
         },
-        get inactiveVersions() : any[] {
-            let self = this;
-            return this.hasVersion ? (this.form.versions as any[]).filter((v) => {
-                return v.id != self.form.versionId;
+        get allVersions() : any[] {
+            return this.hasVersion ? this.form.versions.slice().sort((first:IGetFormVersionQuery["getFormVersion"], second: IGetFormVersionQuery["getFormVersion"]) => {
+                if(first.id == this.form.versionId) {
+                    return -1;
+                } else if (second.id == this.form.versionId) {
+                    return 1;
+                } else {
+                    let d1 = dayjs(first.createdAt);
+                    let d2 = dayjs(second.createdAt);
+                    if (d1.isSame(d2)) {
+                        return 0;
+                    } 
+                    return d1.isBefore(d2) ? 1 : -1;
+                }
             }) : [];
         },
         toggleShowAddVersion: function() {
@@ -212,7 +222,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     }, [localStore.refresh]);
 
     const columns = [
-        {title: "Name", key: "name", dataIndex: "displayName", render: (text, record) => <><p>{text}</p><p><small>{record.id}</small></p></>},
+        {title: "Name", key: "name", dataIndex: "displayName", render: (text, record) => <><p>{text}{record.id == localStore.form.versionId ? <Tag className="fl-left-margin-ten">ACTIVE</Tag>:<></>}</p><p><small>{record.id}</small></p></>},
         {title: "Notes", key: "notes", dataIndex: "notes", render:(text, record) => <p style={{whiteSpace: "pre-line"}}>{text}</p>},
         {title: "Created", key: "createdAt", dataIndex: "createdAt", render: (text, record) => {return <span>{dayjs(text).format('DD MMM YY hh:mm a')}</span>}},
         {title: "By", key: "owner", dataIndex: "ownedBy", render: (text, record) => {return <span>{record.ownedBy.given_name} {record.ownedBy.family_name}</span>}},
@@ -220,6 +230,12 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             <Dropdown overlay={<Menu>
                 <Menu.Item key="action-rename">
                     <a onClick={() =>localStore.editVersion(record.id)} title="Rename"><Icon type="edit"/> Rename</a>
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item key="action-design">
+                    <Link to={`/account/${match.params.accountId}/canvas/${match.params.formId}/${record.id}`}>
+                        <a title="Design"><Icon type="highlight"/> Design</a>
+                    </Link>
                 </Menu.Item>
                 <Menu.Divider />
                 <Menu.Item key="action-activate">
@@ -240,10 +256,12 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         }}
     ];
 
+    const formUrl = `${config.api.rest.endpoint}/form/view/${match.params.formId}`;
     const FormActions : React.FC<any> = () => {
         return useObserver(() => {
             return <span> {
                 localStore.form ? <>
+                    <a className="fl-right-margin-ten" href={formUrl} target="_blank">Preview</a>
                     <Button size="small" className="fl-right-margin-ten" onClick={localStore.toggleShowAddVersion}><Icon type="plus"/>Add Version</Button>
                     <Popconfirm title={localStore.form.isPaused == 1 ? "Start accepting entries ?" : "Stop accepting entries ?"} onConfirm={() => localStore.toggleFormPause()}>
                         <Button className="fl-right-margin-ten" size="small" disabled={!localStore.form.versions || localStore.form.versions.length == 0} type={localStore.form.isPaused == 1 ? "primary" : "danger"}>{localStore.form.isPaused == 1 ? "Start" : "Pause"}</Button>
@@ -315,8 +333,8 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                         <Row type="flex">
                             <Col span={24} >
                                 <Card title={<span>{localStore.form.name} Version History</span>} style={{padding: 0}} bodyStyle={{padding:0}}>
-                                <TableWrapper size="small" emptyText='No versions, click "Add version" to create one.' errors={localStore.errors} data={localStore.inactiveVersions} columns={columns}
-                                bordered={true} rowKey="id" pagination={ localStore.inactiveVersions.length > 5 ? {pageSize: 5, position: "top"} : false} />
+                                <TableWrapper size="small" emptyText='No versions, click "Add version" to create one.' errors={localStore.errors} data={localStore.allVersions} columns={columns}
+                                bordered={true} rowKey="id" pagination={ localStore.allVersions.length > 5 ? {pageSize: 5, position: "top"} : false} />
                                 </Card>
                             </Col>
                         </Row>
