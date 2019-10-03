@@ -38,9 +38,9 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
                 }});
                 store.view.setLoading({show: true, message: "Saving copy", status: "active", type : "line", percent: 30});
                 let addFormVersionResponse = await withGraphQl<IAddFormVersionMutation>(AddFormVersion, {input: {
-                    formId: addFormResponse['data']['addForm'].id,
+                    formId: addFormResponse.data.addForm.id,
                     accountId: sourceForm.accountId,
-                    notes: `Copied ${sourceForm.name}`,
+                    notes: `Clone of ${sourceForm.name}`,
                     formData: sourceForm.version && sourceForm.version.formData ? sourceForm.version.formData : JSON.stringify({...EmptyForm})
                 }});
                 this.forms.push(addFormVersionResponse.data.addFormVersion);
