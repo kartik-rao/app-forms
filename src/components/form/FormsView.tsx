@@ -137,11 +137,6 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
         key: 'action',
         render: (text, record) => (
             <Dropdown overlay={<Menu>
-                <Menu.Item key="action-canvas">
-                    <Link to={`/account/${match.params.accountId}/canvas/${record.id}`}>
-                        <span><Icon type="highlight"/>  Design</span>
-                    </Link>
-                </Menu.Item>
                 <Menu.Divider key="d-clone"/>
                 <Menu.Item key="action-clone" onClick={(e) => localStore.handleClone(record.id)}>
                     <span><Icon type="copy"/>  Clone</span>
