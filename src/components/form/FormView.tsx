@@ -1,15 +1,16 @@
-import { AttachFormVersion, DeleteForm, DeleteFormVersion, GetForm, IAttachFormVersionMutation, IDeleteFormMutation, IDeleteFormVersionMutation, IGetFormQuery, IUpdateFormMutation, UpdateForm, IAddFormVersionMutation } from "@kartikrao/lib-forms-api";
-import { Badge, Button, Card, Col, Divider, Drawer, Icon, List, notification, PageHeader, Popconfirm, Popover, Row, Skeleton, Tag, Typography, Tabs, Empty, Timeline, Statistic, Dropdown, Menu } from "antd";
+import { AttachFormVersion, DeleteForm, IGetFormVersionQuery, DeleteFormVersion, GetForm, IAddFormVersionMutation, IAttachFormVersionMutation, IDeleteFormMutation, IDeleteFormVersionMutation, IGetFormQuery, IUpdateFormMutation, UpdateForm, AddFormVersion, IMutationAddFormVersionArgs, IUpdateFormVersionMutation } from "@kartikrao/lib-forms-api";
+import { Badge, Button, Card, Col, Dropdown, Empty, Icon, Menu, notification, PageHeader, Popconfirm, Popover, Row, Skeleton, Statistic, Tabs, Tag, Timeline, Typography } from "antd";
 import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
-import { Link, RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps } from "react-router-dom";
 import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
-import EditFormView from "./EditFormView";
-import { ErrorBoundary } from "../common/ErrorBoundary";
 import AddFormVersionView from "./AddFormVersionView";
+import EditFormVersionSettingsView from "./EditFormVersionSettingsView";
+
+import EditFormView from "./EditFormView";
 
 export interface FormViewProps {
     accountId: string;
@@ -39,7 +40,9 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         loading: true,
         form: null as IGetFormQuery["getForm"],
         errors: [] as any[],
+        selectedVersion: null as IGetFormVersionQuery["getFormVersion"],
         showEditForm: false as boolean,
+        showEditVersion: false as boolean,
         showAddVersion: false as boolean,
         refresh: false as boolean,
         onUpdateComplete : function (form: IUpdateFormMutation["updateForm"]) {
@@ -50,7 +53,6 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             } catch (error) {
                 console.log("update error", error);
             }
-
         },
         toggleFormPause : async function() {
             try {
@@ -72,8 +74,30 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             }
             store.view.resetLoading();
         },
-        newVersionFrom : async function(sourceVersionId: string, displayName: string, notes: string) {
+        newVersionFrom : async function(sourceVersionId: string) {
+            let versions = this.form.versions.filter((v) => {
+                return v.id == sourceVersionId;
+            });
 
+            let version = versions[0];
+            let variables: IMutationAddFormVersionArgs = {
+                input: {
+                    accountId: this.form.accountId,
+                    formId: this.form.id,
+                    displayName : `Clone of ${this.form.displayName}`,
+                    formData: version.formData,
+                    notes: version.notes
+                }
+            }
+            store.view.setLoading({show: true, message: "Creating Version", status: "active", type : "line", percent: 100});
+            try {
+                let response = await withGraphQl<IAddFormVersionMutation>(AddFormVersion, variables);
+                this.form.versions.unshift(response.data.addFormVersion);
+            } catch (errorResponse) {
+                console.error("newVersionFrom - mutation.addFormVersion", errorResponse);
+                this.errors = errorResponse.errors;
+            }
+            store.view.resetLoading();
         },
         activateVersion: async function(versionId: string) {
             try {
@@ -87,10 +111,23 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                 localStore.form.versionId = form.versionId;
                 localStore.form.version = form.version;
             } catch (errorResponse) {
-                console.error("activateVersion - queries.attachFormVersion", errorResponse);
+                console.error("activateVersion - mutation.attachFormVersion", errorResponse);
                 this.errors = errorResponse.errors;
             }
             store.view.resetLoading();
+        },
+        editVersion : async function(versionId: string) {
+            let versions = this.form.versions.filter((v) => {
+                return v.id == versionId
+            });
+
+            this.selectedVersion = versions[0];
+            this.showEditVersion = true;
+        },
+        onEditVersion : function(version: IUpdateFormVersionMutation["updateFormVersion"]) {
+            this.selectedVersion.displayName = version.displayName;
+            this.selectedVersion = null;
+            this.showEditVersion = false;
         },
         deleteVersion: async function(versionId: string) {
             try {
@@ -181,8 +218,16 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         {title: "By", key: "owner", dataIndex: "ownedBy", render: (text, record) => {return <span>{record.ownedBy.given_name} {record.ownedBy.family_name}</span>}},
         {title: "Actions", key: "actions", render: (text, record) => {return <span>
             <Dropdown overlay={<Menu>
+                <Menu.Item key="action-rename">
+                    <a onClick={() =>localStore.editVersion(record.id)} title="Rename"><Icon type="edit"/> Rename</a>
+                </Menu.Item>
+                <Menu.Divider />
                 <Menu.Item key="action-activate">
                     <a onClick={() => localStore.activateVersion(record.id)} title="Activate"><Icon type="check"/> Activate</a>
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item key="action-newversion">
+                    <a onClick={() =>localStore.newVersionFrom(record.id)} title="Clone"><Icon type="copy"/> Clone</a>
                 </Menu.Item>
                 <Menu.Divider />
                 <Menu.Item key="action-delete" onClick={(e) => localStore.deleteVersion(record.id)}>
@@ -193,15 +238,12 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             </Dropdown>
         </span>
         }}
-    ]
-
-    
+    ];
 
     const FormActions : React.FC<any> = () => {
         return useObserver(() => {
             return <span> {
                 localStore.form ? <>
-                    {/* <Button size="small" className="fl-right-margin-ten" onClick={() => {localStore.showEditForm = true}}>Settings</Button> */}
                     <Button size="small" className="fl-right-margin-ten" onClick={localStore.toggleShowAddVersion}><Icon type="plus"/>Add Version</Button>
                     <Popconfirm title={localStore.form.isPaused == 1 ? "Start accepting entries ?" : "Stop accepting entries ?"} onConfirm={() => localStore.toggleFormPause()}>
                         <Button className="fl-right-margin-ten" size="small" disabled={!localStore.form.versions || localStore.form.versions.length == 0} type={localStore.form.isPaused == 1 ? "primary" : "danger"}>{localStore.form.isPaused == 1 ? "Start" : "Pause"}</Button>
@@ -243,6 +285,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     return useObserver(() => {
         return localStore.loading ? <Skeleton active />:<>
             {localStore.showAddVersion && <AddFormVersionView onSave={localStore.onAddFormVersion} sourceForm={localStore.form} onCancel={localStore.toggleShowAddVersion}/>}
+            {localStore.showEditVersion && <EditFormVersionSettingsView version={localStore.selectedVersion} onSave={localStore.onEditVersion} onCancel={() => localStore.showEditVersion = false}/>}
             <PageHeader onBack={() => history.push(`/account/${match.params.accountId}/forms`)} title={localStore.form.name} subTitle={<FormStatus />} extra={<FormActions/>}>
                 <Typography.Paragraph>{localStore.form.description}</Typography.Paragraph>
                 <Card bordered={false} bodyStyle={{padding: '0px'}}>
@@ -259,7 +302,8 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                             <Row>
                                 <Col span={11}>
                                     <Card title={localStore.form.version.displayName} extra={
-                                        <span><Tag>{dayjs(localStore.form.version.createdAt).format('DD MMM YY hh:mma')}</Tag><Tag>{localStore.form.version.ownedBy.given_name} {localStore.form.version.ownedBy.family_name}</Tag></span>
+                                        <><span><Tag>{dayjs(localStore.form.version.createdAt).format('DD MMM YY hh:mma')}</Tag><Tag>{localStore.form.version.ownedBy.given_name} {localStore.form.version.ownedBy.family_name}</Tag></span>
+                                        <span><Button size="small" type="primary" onClick={() => {localStore.selectedVersion=localStore.form.version; localStore.showEditVersion=true;}}>Rename</Button></span></>
                                     }>
                                         <ChangeList />
                                     </Card>
