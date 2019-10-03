@@ -14,7 +14,7 @@ export interface AddFormVersionViewProps extends FormComponentProps {
 
 const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVersionViewProps) => {
     const localStore = useLocalStore(() => ({
-        name: null as string,
+        displayName: null as string,
         notes: null as string,
         sourceVersionId: props.sourceForm.version.id,
         loading: false,
@@ -44,7 +44,7 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
                     input: {
                         accountId: props.sourceForm.accountId,
                         formId   : props.sourceForm.id,
-                        displayName: this.name,
+                        displayName: this.displayName,
                         notes: this.notes,
                         formData: oldVersion.data.getFormVersion.formData
                     }
@@ -71,7 +71,7 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
                     <Button key="back" onClick={props.onCancel}>
                     Cancel
                     </Button>,
-                    <Button key="submit" type="primary" disabled={!localStore.notes || !localStore.name} loading={localStore.loading} onClick={localStore.onOk}>
+                    <Button key="submit" type="primary" disabled={!localStore.notes || !localStore.displayName} loading={localStore.loading} onClick={localStore.onOk}>
                     Create
                     </Button>,
                 ]} width={800}>
@@ -98,7 +98,7 @@ const AddFormVersionView : React.FC<AddFormVersionViewProps> = (props: AddFormVe
                         { props.form.getFieldDecorator('displayName', {rules:[
                             {required: true, message: "Please provide a name for this version"}
                         ]})
-                        (<Input onChange={(e) => localStore.name = e.target.value} placeholder="A name for this version"/>)}
+                        (<Input onChange={(e) => localStore.displayName = e.target.value} placeholder="A name for this version"/>)}
                     </Form.Item>
                     <Form.Item label="Notes">
                         { props.form.getFieldDecorator('notes', {rules:[
