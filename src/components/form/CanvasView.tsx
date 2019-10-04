@@ -1,5 +1,5 @@
 import { EditorStoreProvider } from "@kartikrao/lib-forms";
-import { GetForm, IGetFormQuery } from "@kartikrao/lib-forms-api";
+import { GetForm, IGetFormQuery, IGetFormVersionQuery, GetFormVersion, IQueryGetFormVersionArgs } from "@kartikrao/lib-forms-api";
 import { createFormStore, EmptyForm, Factory, IFormProps } from "@kartikrao/lib-forms-core";
 import "@kartikrao/lib-forms/lib/forms.editors.m.css";
 import { Layout } from "antd";
@@ -11,8 +11,9 @@ import { appStoreContext } from "../../stores/AppStoreProvider";
 import SaveFormVersionView from "./SaveFormVersionView";
 
 export interface ICanvasViewProps {
+    formId   : string;
     accountId: string;
-    formId: string;
+    versionId?: string;
 }
 
 const Canvas = React.lazy(() => import(/* webpackChunkName: "app-canvas" */ "@kartikrao/lib-forms/lib/components/canvas/Canvas").then((module) => {return {default: module.Canvas}}));
@@ -22,20 +23,18 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
     if(!store) throw new Error("Store is null");
 
     const localStore = useLocalStore(() => ({
-        formId: match.params.formId as string,
-        accountId: match.params.accountId as string,
-        form: {} as any,
+        version: null as IGetFormVersionQuery["getFormVersion"],
         formData: null as IFormProps,
         errors: null as any,
         showCanvas: false as boolean,
         formStore: createFormStore(),
-        showAddVersion: false,
+        showSaveVersion: false,
         onSaveComplete : function(response) {
-            console.log("onSave Complete", response);
-            localStore.showAddVersion = false;
+            console.log("CanvasView.onSave Complete", response);
+            localStore.showSaveVersion = false;
         },
         onCancel: function() {
-            localStore.showAddVersion = false;
+            localStore.showSaveVersion = false;
         },
         onClose: function() {
             history.push(`/account/${match.params.accountId}/forms/${match.params.formId}`)
@@ -47,10 +46,11 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
         let fetch = async function () {
             try {
                 store.view.setLoading({show: true, message: "Loading form data", status: "active", type : "line", percent: 100});
-                let response = await withGraphQl<IGetFormQuery>(GetForm, {formId: match.params.formId});
-                let form = response.data.getForm;
-                localStore.form = form;
-                localStore.formData = form.version && form.version.formData ? JSON.parse(form.version.formData) : {...EmptyForm}
+                let response = await withGraphQl<IGetFormVersionQuery>(GetFormVersion, {versionId: match.params.versionId} as IQueryGetFormVersionArgs);
+                let version = response.data.getFormVersion;
+                store.view.idNameMap[version.id] = version.displayName;
+                localStore.version = version;
+                localStore.formData = version.formData ? JSON.parse(version.formData) : {...EmptyForm}
                 localStore.formStore.setForm(Factory.makeForm(localStore.formStore, localStore.formData))
                 store.view.resetLoading();
                 localStore.showCanvas = true;
@@ -58,17 +58,25 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
                 this.errors = error;
             }
         };
-        fetch();
+        if(match.params.versionId) {
+            fetch();
+        } else {
+            localStore.formData = EmptyForm
+            localStore.formStore.setForm(Factory.makeForm(localStore.formStore, localStore.formData))
+            localStore.showCanvas = true;
+        }
     }, []);
 
     return useObserver(() => {
         return <Layout style={{height: '100%', overflow: 'hidden'}}>
         {localStore.showCanvas && <EditorStoreProvider formStore={localStore.formStore}>
             <React.Suspense fallback="Loading...">
-                <Canvas onSave={() => {localStore.showAddVersion = true}} onClose={localStore.onClose}/>
+                <Canvas onSave={() => {localStore.showSaveVersion = true}} onClose={localStore.onClose}/>
             </React.Suspense>
-            {localStore.showAddVersion && <SaveFormVersionView formId={localStore.formId}
-                tenantId={localStore.form.accountId}
+            {localStore.showSaveVersion && <SaveFormVersionView formId={match.params.formId}
+                sourceVersionId={match.params.versionId}
+                tenantId={match.params.accountId}
+                versionName={localStore.version ? localStore.version.displayName : "New Version"}
                 formData={localStore.formStore.form.asPlainObject}
                 onSave={localStore.onSaveComplete}
                 onCancel={localStore.onCancel}/>}

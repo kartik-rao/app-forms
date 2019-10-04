@@ -1,15 +1,14 @@
-import { AttachFormVersion, DeleteForm, IGetFormVersionQuery, DeleteFormVersion, GetForm, IAddFormVersionMutation, IAttachFormVersionMutation, IDeleteFormMutation, IDeleteFormVersionMutation, IGetFormQuery, IUpdateFormMutation, UpdateForm, AddFormVersion, IMutationAddFormVersionArgs, IUpdateFormVersionMutation } from "@kartikrao/lib-forms-api";
-import { Badge, Button, Card, Col, Dropdown, Empty, Icon, Menu, notification, PageHeader, Popconfirm, Popover, Row, Skeleton, Statistic, Tabs, Tag, Timeline, Typography } from "antd";
+import { AddFormVersion, AttachFormVersion, DeleteForm, DeleteFormVersion, GetForm, IAddFormVersionMutation, IAttachFormVersionMutation, IDeleteFormMutation, IDeleteFormVersionMutation, IGetFormQuery, IGetFormVersionQuery, IMutationAddFormVersionArgs, IUpdateFormMutation, IUpdateFormVersionMutation, UpdateForm } from "@kartikrao/lib-forms-api";
+import { Badge, Button, Card, Col, Dropdown, Empty, Icon, Menu, notification, PageHeader, Popconfirm, Popover, Row, Skeleton, Statistic, Tabs, Tag, Timeline, Typography, Divider } from "antd";
 import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
-import { RouteComponentProps, Link } from "react-router-dom";
+import { Link, RouteComponentProps } from "react-router-dom";
 import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { TableWrapper } from "../common/TableWrapper";
-import AddFormVersionView from "./AddFormVersionView";
+import SelectFormVersionView from "./SelectFormVersionView";
 import EditFormVersionSettingsView from "./EditFormVersionSettingsView";
-
 import EditFormView from "./EditFormView";
 
 export interface FormViewProps {
@@ -20,15 +19,6 @@ export interface FormViewProps {
 const DATE_FORMAT = 'DD MMM YY hh:mm a';
 
 type ExpectedSubmitResult = "Redirect" | "Show Configured Message" | "Show Default Message";
-
-const Description = ({ term, children, span = 12 }) => (
-    <Col span={span}>
-        <div className="fl-pageheader-description">
-        <div className="fl-pageheader-term">{term}</div>
-        <div className="fl-pageheader-detail">{children}</div>
-        </div>
-    </Col>
-);
 
 export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, history}) => {
     const store = React.useContext(appStoreContext);
@@ -41,6 +31,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         form: null as IGetFormQuery["getForm"],
         errors: [] as any[],
         selectedVersion: null as IGetFormVersionQuery["getFormVersion"],
+        selectedVersionId: null as string,
         showEditForm: false as boolean,
         showEditVersion: false as boolean,
         showAddVersion: false as boolean,
@@ -182,12 +173,12 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                     let d2 = dayjs(second.createdAt);
                     if (d1.isSame(d2)) {
                         return 0;
-                    } 
+                    }
                     return d1.isBefore(d2) ? 1 : -1;
                 }
             }) : [];
         },
-        toggleShowAddVersion: function() {
+        toggleShowSelectVersion: function() {
             this.showAddVersion = !this.showAddVersion;
         },
         onAddFormVersion: function(version: IAddFormVersionMutation["addFormVersion"]) {
@@ -222,7 +213,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     }, [localStore.refresh]);
 
     const columns = [
-        {title: "Name", key: "name", dataIndex: "displayName", render: (text, record) => <><p>{text}{record.id == localStore.form.versionId ? <Tag className="fl-left-margin-ten">ACTIVE</Tag>:<></>}</p><p><small>{record.id}</small></p></>},
+        {title: "Name", key: "name", dataIndex: "displayName", render: (text, record) => <><p>{text}{record.id == localStore.form.versionId ? <Tag color="green" className="fl-left-margin-ten">ACTIVE</Tag>:<></>}</p></>},
         {title: "Notes", key: "notes", dataIndex: "notes", render:(text, record) => <p style={{whiteSpace: "pre-line"}}>{text}</p>},
         {title: "Created", key: "createdAt", dataIndex: "createdAt", render: (text, record) => {return <span>{dayjs(text).format('DD MMM YY hh:mm a')}</span>}},
         {title: "By", key: "owner", dataIndex: "ownedBy", render: (text, record) => {return <span>{record.ownedBy.given_name} {record.ownedBy.family_name}</span>}},
@@ -232,18 +223,8 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                     <a onClick={() =>localStore.editVersion(record.id)} title="Rename"><Icon type="edit"/> Rename</a>
                 </Menu.Item>
                 <Menu.Divider />
-                <Menu.Item key="action-design">
-                    <Link to={`/account/${match.params.accountId}/canvas/${match.params.formId}/${record.id}`}>
-                        <a title="Design"><Icon type="highlight"/> Design</a>
-                    </Link>
-                </Menu.Item>
-                <Menu.Divider />
                 <Menu.Item key="action-activate">
-                    <a onClick={() => localStore.activateVersion(record.id)} title="Activate"><Icon type="check"/> Activate</a>
-                </Menu.Item>
-                <Menu.Divider />
-                <Menu.Item key="action-newversion">
-                    <a onClick={() =>localStore.newVersionFrom(record.id)} title="Clone"><Icon type="copy"/> Clone</a>
+                    <a onClick={() => record.id != localStore.form.versionId && localStore.activateVersion(record.id)} title="Activate"><Icon type="check"/> Activate</a>
                 </Menu.Item>
                 <Menu.Divider />
                 <Menu.Item key="action-delete" onClick={(e) => localStore.deleteVersion(record.id)}>
@@ -261,8 +242,10 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         return useObserver(() => {
             return <span> {
                 localStore.form ? <>
-                    <a className="fl-right-margin-ten" href={formUrl} target="_blank">Preview</a>
-                    <Button size="small" className="fl-right-margin-ten" onClick={localStore.toggleShowAddVersion}><Icon type="plus"/>Add Version</Button>
+                    <Button className="fl-right-margin-ten"  size="small">
+                        <a href={formUrl} target="_blank">Preview</a>
+                    </Button>
+                    <Button size="small" className="fl-right-margin-ten" onClick={localStore.toggleShowSelectVersion}>Add Version</Button>
                     <Popconfirm title={localStore.form.isPaused == 1 ? "Start accepting entries ?" : "Stop accepting entries ?"} onConfirm={() => localStore.toggleFormPause()}>
                         <Button className="fl-right-margin-ten" size="small" disabled={!localStore.form.versions || localStore.form.versions.length == 0} type={localStore.form.isPaused == 1 ? "primary" : "danger"}>{localStore.form.isPaused == 1 ? "Start" : "Pause"}</Button>
                     </Popconfirm>
@@ -300,30 +283,42 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         })
     };
 
+    const getCanvasUrl = (versionId: string) => {
+        return `/account/${match.params.accountId}/forms/${match.params.formId}/canvas/${versionId}`;
+    };
+
     return useObserver(() => {
         return localStore.loading ? <Skeleton active />:<>
-            {localStore.showAddVersion && <AddFormVersionView onSave={localStore.onAddFormVersion} sourceForm={localStore.form} onCancel={localStore.toggleShowAddVersion}/>}
+            {localStore.showAddVersion && <SelectFormVersionView onVersionSelected={(id: string) => {history.push(getCanvasUrl(id))}} sourceForm={localStore.form} onCancel={localStore.toggleShowSelectVersion}/>}
             {localStore.showEditVersion && <EditFormVersionSettingsView version={localStore.selectedVersion} onSave={localStore.onEditVersion} onCancel={() => localStore.showEditVersion = false}/>}
             <PageHeader onBack={() => history.push(`/account/${match.params.accountId}/forms`)} title={localStore.form.name} subTitle={<FormStatus />} extra={<FormActions/>}>
-                <Typography.Paragraph>{localStore.form.description}</Typography.Paragraph>
+                <h5>{localStore.form.description}</h5>
                 <Card bordered={false} bodyStyle={{padding: '0px'}}>
                 <br/>
-                    <Tabs defaultActiveKey="currentVersion">
+                    <Tabs defaultActiveKey="pastVersions">
                     <Tabs.TabPane key="currentVersion" tab="Current Version">
                         { localStore.hasVersion ? <>
                             <Row>
-                                <Col span={3}><Statistic title="Entries" value={localStore.form.numEntries} valueStyle={{fontSize: '14px'}}></Statistic></Col>
+                                <Col span={3}><Statistic title="Entries" value={localStore.form.numEntries} ></Statistic></Col>
                                 <Col span={4}><Statistic title="On Success" value={localStore.expectedSubmitResult.success} valueStyle={{fontSize: '14px'}}></Statistic></Col>
                                 <Col span={4}><Statistic title="On Failure" value={localStore.expectedSubmitResult.error} valueStyle={{fontSize: '14px'}}></Statistic></Col>
                             </Row>
                             <br/>
+                            <Divider/>
                             <Row>
-                                <Col span={11}>
+                                <Col span={24}>
                                     <Card title={localStore.form.version.displayName} extra={
                                         <><span><Tag>{dayjs(localStore.form.version.createdAt).format('DD MMM YY hh:mma')}</Tag><Tag>{localStore.form.version.ownedBy.given_name} {localStore.form.version.ownedBy.family_name}</Tag></span>
                                         <span><Button size="small" type="primary" onClick={() => {localStore.selectedVersion=localStore.form.version; localStore.showEditVersion=true;}}>Rename</Button></span></>
-                                    }>
-                                        <ChangeList />
+                                        }>
+                                        <Row>
+                                            <Col span={4}>
+                                                <div style={{padding: "25px"}}><ChangeList /></div>
+                                            </Col>
+                                            <Col span={18} offset={2}>
+                                                <iframe src={formUrl} style={{width: "100%", minHeight: "calc(100vh - 600px)", border: "none"}}></iframe>
+                                            </Col>
+                                        </Row>
                                     </Card>
                                 </Col>
                             </Row></> : <Empty description="No content versions, click Add Version"/>

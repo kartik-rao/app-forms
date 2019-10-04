@@ -46,20 +46,28 @@ export const createViewStore = () => {
                 path = path.substring(0, path.length -1)
             }
 
+
             let segments = path.split("/");
+
             if(segments[0] == "account") {
                 // In account pages
                 // Account home page
+                let parts = path.match(/([\-|\w]+)/gi);
+
                 if (segments.length == 2) {
                     return segments[0];
                 } else if(segments.length == 3) {
-                    // entity index page
-                    let parts = path.match(/(account)\/([\w-]+)\/([\w]+)/)
+                    // /forms | /users
+                    // let parts = path.match(/(account)\/([\w-]+)\/([\w]+)/)
                     return parts[parts.length - 1];
-                } else if(segments.length > 3){
-                    // entity etail page
-                    let parts = path.match(/(account)\/([\w-]+)\/([\w]+)\/([\w-]+)/)
+                } else if(segments.length == 3){
+                    // entity detail page
+                    // /account/e618b451-9686-4773-9b75-161b768ea763/forms/eef306bd-045d-4b7b-9ad7-07ee1fc744f3
                     return parts[parts.length - 2];
+                } else {
+                    // canvas
+                    // /account/e618b451-9686-4773-9b75-161b768ea763/forms/eef306bd-045d-4b7b-9ad7-07ee1fc744f3/canvas/0460ffd1-f07d-424f-bb1a-c1b608f42ae2
+                    return parts[parts.length - 1];
                 }
             } else {
                 return segments[0];

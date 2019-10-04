@@ -25,10 +25,10 @@ const AllPaths = [
     "/users",
     "/profile/:userId",
     "/account/:accountId",
-    "/account/:accountId/forms",
     "/account/:accountId/users",
+    "/account/:accountId/forms",
     "/account/:accountId/forms/:formId",
-    "/account/:accountId/canvas/:formId"
+    "/account/:accountId/forms/:formId/canvas/:versionId?"
 ]
 
 export const MainView: React.FC<any> = () => {
@@ -50,11 +50,11 @@ export const MainView: React.FC<any> = () => {
                             <Route exact={true} path="/admin"                       component={AdminView}   key="adminview"/>
                             <Route exact={true} path="/users"                       component={UsersView}   key="allusersview"/>
                             <Route exact path="/account/:accountId"                 component={AccountView} key="accountview"/>
-                            <Route exact={true} path="/account/:accountId/forms"    component={FormsView}   key="formsview"/>
                             <Route path="/account/:accountId/users"                 component={UsersView}   key="usersview"/>
                             <Route path="/profile/:userId"                          component={ProfileView} key="profileview"/>
-                            <Route path="/account/:accountId/forms/:formId"         component={FormView}    key="formview"/>
-                            <Route path="/account/:accountId/canvas/:formId"        component={CanvasView}  key="canvasview"/>
+                            <Route exact={true} path="/account/:accountId/forms"    component={FormsView}   key="formsview"/>
+                            <Route exact={true} path="/account/:accountId/forms/:formId"       component={FormView}    key="formview"/>
+                            <Route path="/account/:accountId/forms/:formId/canvas/:versionId?" component={CanvasView}  key="canvasview"/>
                             <Route exact path="/" render={() => (
                                 !store.auth.isAdmin ? <Redirect to={`/account/${store.auth.tenant}`}/> : <Redirect to={`/accounts`}/>
                             )}/>
