@@ -315,9 +315,6 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                                             <Col span={4}>
                                                 <div style={{padding: "25px"}}><ChangeList /></div>
                                             </Col>
-                                            <Col span={18} offset={2}>
-                                                <iframe src={formUrl} style={{width: "100%", minHeight: "calc(100vh - 600px)", border: "none"}}></iframe>
-                                            </Col>
                                         </Row>
                                     </Card>
                                 </Col>
