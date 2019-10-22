@@ -5,7 +5,6 @@ import { BrowserRouter, Route, Redirect } from "react-router-dom";
 import { appStoreContext } from '../stores/AppStoreProvider';
 import { Footer } from "./common/FooterView";
 import Header from "./common/HeaderView";
-import { Loading } from "./common/Loading";
 import { CanvasView } from './form/CanvasView';
 import { SiderNavView } from './common/SiderNavView';
 
@@ -42,7 +41,7 @@ export const MainView: React.FC<any> = () => {
                     <Route component={Header} exact={true} path={AllPaths} />
                 </Layout.Header>
                 <Layout.Content className="fl-content">
-                    <React.Suspense fallback={<Loading />}>
+                    <React.Suspense fallback="">
                     <Layout style={{height: '100%', backgroundColor: "#ffff"}} hasSider={true}>
                         <Route component={SiderNavView} exact={true} path={AllPaths} />
                         <Layout.Content style={{borderLeft: "1px solid gray"}}>
