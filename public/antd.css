@@ -1,6 +1,6 @@
 /*!
  * 
- * antd v3.23.5
+ * antd v3.24.0
  * 
  * Copyright 2015-present, Alipay, Inc.
  * All rights reserved.
@@ -3565,7 +3565,6 @@ textarea.ant-input {
 }
 .ant-input-search-enter-button + .ant-input-group-addon .ant-input-search-button,
 .ant-input-search-enter-button input + .ant-input-group-addon .ant-input-search-button {
-  width: 100%;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
@@ -6530,6 +6529,14 @@ a.ant-btn-sm {
       -ms-transform-origin: 0 0;
           transform-origin: 0 0;
 }
+.ant-dropdown-menu-submenu-popup ul,
+.ant-dropdown-menu-submenu-popup li {
+  list-style: none;
+}
+.ant-dropdown-menu-submenu-popup ul {
+  margin-right: 0.3em;
+  margin-left: 0.3em;
+}
 .ant-dropdown-menu-item,
 .ant-dropdown-menu-submenu-title {
   clear: both;
@@ -6544,10 +6551,11 @@ a.ant-btn-sm {
   -webkit-transition: all 0.3s;
   transition: all 0.3s;
 }
-.ant-dropdown-menu-item > .anticon:first-child,
-.ant-dropdown-menu-submenu-title > .anticon:first-child {
+.ant-dropdown-menu-item > span > .anticon:first-child,
+.ant-dropdown-menu-submenu-title > span > .anticon:first-child {
   min-width: 12px;
   margin-right: 8px;
+  font-size: 12px;
 }
 .ant-dropdown-menu-item > a,
 .ant-dropdown-menu-submenu-title > a {
@@ -12941,7 +12949,7 @@ span.ant-radio + * {
 }
 .ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
   right: 16px;
-  left: initial;
+  left: auto;
 }
 .ant-collapse-anim-active {
   -webkit-transition: height 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
@@ -19531,19 +19539,23 @@ textarea.ant-mentions {
   -webkit-font-feature-settings: 'tnum';
           font-feature-settings: 'tnum';
   position: relative;
-  padding: 24px;
+  padding: 16px 24px;
+  background-color: #fff;
+}
+.ant-page-header-ghost {
+  background-color: inherit;
 }
 .ant-page-header.has-breadcrumb {
   padding-top: 12px;
 }
 .ant-page-header.has-footer {
-  padding-bottom: 16px;
+  padding-bottom: 0;
 }
 .ant-page-header-back {
   float: left;
-  margin: 6px 0;
+  margin: 8px 0;
   margin-right: 16px;
-  font-size: 20px;
+  font-size: 16px;
   line-height: 1;
 }
 .ant-page-header-back-button {
@@ -19581,7 +19593,7 @@ textarea.ant-mentions {
   padding-right: 12px;
   color: rgba(0, 0, 0, 0.85);
   font-weight: 600;
-  font-size: 24px;
+  font-size: 20px;
   line-height: 32px;
 }
 .ant-page-header-heading .ant-avatar {
@@ -19610,7 +19622,7 @@ textarea.ant-mentions {
   margin-left: 0;
 }
 .ant-page-header-content {
-  padding-top: 16px;
+  padding-top: 12px;
   overflow: hidden;
 }
 .ant-page-header-footer {
@@ -20363,7 +20375,6 @@ textarea.ant-mentions {
   width: 14px;
   height: 14px;
   margin-top: -5px;
-  margin-left: -7px;
   background-color: #fff;
   border: solid 2px #91d5ff;
   border-radius: 50%;
@@ -21369,6 +21380,9 @@ textarea.ant-mentions {
   border-collapse: separate;
   border-spacing: 0;
 }
+.ant-table-layout-fixed table {
+  table-layout: fixed;
+}
 .ant-table-thead > tr > th {
   color: rgba(0, 0, 0, 0.85);
   font-weight: 500;
@@ -21492,6 +21506,7 @@ textarea.ant-mentions {
 }
 .ant-table-thead > tr > th .ant-table-header-column {
   display: inline-block;
+  max-width: 100%;
   vertical-align: top;
 }
 .ant-table-thead > tr > th .ant-table-header-column .ant-table-column-sorters {
@@ -21625,6 +21640,7 @@ textarea.ant-mentions {
 .ant-table-thead > tr > th,
 .ant-table-tbody > tr > td {
   padding: 16px 16px;
+  overflow-wrap: break-word;
 }
 .ant-table-expand-icon-th,
 .ant-table-row-expand-icon-cell {
@@ -21742,9 +21758,6 @@ textarea.ant-mentions {
 .ant-table-filter-dropdown .ant-dropdown-menu-item {
   overflow: hidden;
 }
-.ant-table-filter-dropdown .ant-checkbox-wrapper + span {
-  padding-left: 8px;
-}
 .ant-table-filter-dropdown > .ant-dropdown-menu > .ant-dropdown-menu-item:last-child,
 .ant-table-filter-dropdown > .ant-dropdown-menu > .ant-dropdown-menu-submenu:last-child .ant-dropdown-menu-submenu-title {
   border-radius: 0;
@@ -21848,6 +21861,19 @@ textarea.ant-mentions {
 .ant-table-row-spaced::after {
   content: '.';
 }
+.ant-table-row-cell-ellipsis,
+.ant-table-row-cell-ellipsis .ant-table-column-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ant-table-row-cell-ellipsis .ant-table-column-title {
+  display: block;
+}
+.ant-table-row-cell-break-word {
+  word-wrap: break-word;
+  word-break: break-word;
+}
 tr.ant-table-expanded-row,
 tr.ant-table-expanded-row:hover {
   background: #fbfbfb;
@@ -21863,7 +21889,6 @@ tr.ant-table-expanded-row td > .ant-table-wrapper {
   overflow-x: hidden;
 }
 .ant-table-scroll table {
-  width: auto;
   min-width: 100%;
 }
 .ant-table-scroll table .ant-table-fixed-columns-in-body {
@@ -21985,6 +22010,10 @@ tr.ant-table-expanded-row td > .ant-table-wrapper {
 }
 .ant-table-row[class*='ant-table-row-level-0'] .ant-table-selection-column > span {
   display: inline-block;
+}
+.ant-table-filter-dropdown .ant-checkbox-wrapper + span,
+.ant-table-filter-dropdown-submenu .ant-checkbox-wrapper + span {
+  padding-left: 8px;
 }
 /**
 * Another fix of Firefox:
@@ -23979,6 +24008,12 @@ div.ant-typography-edit-content {
 .ant-upload-list::after {
   clear: both;
 }
+.ant-upload-list-item-list-type-text:hover .ant-upload-list-item-name-icon-count-1 {
+  padding-right: 14px;
+}
+.ant-upload-list-item-list-type-text:hover .ant-upload-list-item-name-icon-count-2 {
+  padding-right: 28px;
+}
 .ant-upload-list-item {
   position: relative;
   height: 22px;
@@ -23992,6 +24027,23 @@ div.ant-typography-edit-content {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.ant-upload-list-item-name-icon-count-1 {
+  padding-right: 14px;
+}
+.ant-upload-list-item-card-actions {
+  position: absolute;
+  right: 0;
+  opacity: 0;
+}
+.ant-upload-list-item-card-actions.picture {
+  top: 25px;
+  line-height: 1;
+  opacity: 1;
+}
+.ant-upload-list-item-card-actions .anticon {
+  padding-right: 5px;
+  color: rgba(0, 0, 0, 0.45);
 }
 .ant-upload-list-item-info {
   height: 100%;
@@ -24040,14 +24092,20 @@ div.ant-typography-edit-content {
 .ant-upload-list-item:hover .anticon-close {
   opacity: 1;
 }
+.ant-upload-list-item:hover .ant-upload-list-item-card-actions {
+  opacity: 1;
+}
 .ant-upload-list-item-error,
 .ant-upload-list-item-error .anticon-paper-clip,
 .ant-upload-list-item-error .ant-upload-list-item-name {
   color: #f5222d;
 }
-.ant-upload-list-item-error .anticon-close {
-  color: #f5222d !important;
+.ant-upload-list-item-error .ant-upload-list-item-card-actions {
   opacity: 1;
+}
+.ant-upload-list-item-error .ant-upload-list-item-card-actions .anticon {
+  padding-right: 5px;
+  color: #f5222d;
 }
 .ant-upload-list-item-progress {
   position: absolute;
@@ -24134,6 +24192,14 @@ div.ant-typography-edit-content {
   -webkit-transition: all 0.3s;
   transition: all 0.3s;
 }
+.ant-upload-list-picture .ant-upload-list-item-name-icon-count-1,
+.ant-upload-list-picture-card .ant-upload-list-item-name-icon-count-1 {
+  padding-right: 18px;
+}
+.ant-upload-list-picture .ant-upload-list-item-name-icon-count-2,
+.ant-upload-list-picture-card .ant-upload-list-item-name-icon-count-2 {
+  padding-right: 36px;
+}
 .ant-upload-list-picture .ant-upload-list-item-uploading .ant-upload-list-item-name,
 .ant-upload-list-picture-card .ant-upload-list-item-uploading .ant-upload-list-item-name {
   line-height: 28px;
@@ -24195,6 +24261,7 @@ div.ant-typography-edit-content {
   transition: all 0.3s;
 }
 .ant-upload-list-picture-card .ant-upload-list-item-actions .anticon-eye-o,
+.ant-upload-list-picture-card .ant-upload-list-item-actions .anticon-download,
 .ant-upload-list-picture-card .ant-upload-list-item-actions .anticon-delete {
   z-index: 10;
   width: 16px;
@@ -24206,6 +24273,7 @@ div.ant-typography-edit-content {
   transition: all 0.3s;
 }
 .ant-upload-list-picture-card .ant-upload-list-item-actions .anticon-eye-o:hover,
+.ant-upload-list-picture-card .ant-upload-list-item-actions .anticon-download:hover,
 .ant-upload-list-picture-card .ant-upload-list-item-actions .anticon-delete:hover {
   color: #fff;
 }
