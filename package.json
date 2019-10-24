@@ -16,9 +16,9 @@
     "preversion": "npm test",
     "version": "npm run build && git add -A lib",
     "postversion": "git push && git push --tags",
-    "release": "npm version patch && npm publish",
-    "release:minor": "npm version minor && npm publish",
-    "release:major": "npm version major && npm publish"
+    "release": "npm version patch",
+    "release:minor": "npm version minor",
+    "release:major": "npm version major"
   },
   "author": "Kartik Rao",
   "license": "UNLICENSED",
@@ -79,6 +79,7 @@
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^4.0.0-beta.8",
     "jasmine": "^3.3.1",
+    "jasmine-core": "^3.5.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^2.0.1",
     "karma-mocha-reporter": "^2.2.5",
