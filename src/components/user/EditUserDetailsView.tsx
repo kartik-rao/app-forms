@@ -52,11 +52,11 @@ const EditUserDetailsView : React.FC<EditUserDetailsViewProps> = (props: EditUse
                 store.view.setLoading({show: true, message: `Saving Profile`, status: "active", type : "line", percent: 50});
                 let response = await withGraphQl<IUpdateUserMutation>(UpdateUser, editUserPayload);
                 this.isDirty = false;
-                notification.success({message: `Profile edited successfully`});
+                notification.success({message: `Profile saved successfully`});
                 props.onUpdate(response.data.updateUser);
             } catch (errorResponse) {
                 notification.error({message: `Error updating profile`});
-                console.error("EditFormView.handleSubmit - queries.updateForm", errorResponse);
+                console.error("EditUserDetailsView.handleSubmit - queries.updateUser", errorResponse);
                 this.errors = errorResponse.errors;
             }
             store.view.resetLoading();

@@ -1,4 +1,4 @@
-import { GetUser, IGetUserQuery } from "@kartikrao/lib-forms-api";
+import { GetUser, IGetUserQuery, IUser } from "@kartikrao/lib-forms-api";
 import { Col, PageHeader, Row, Skeleton, Tag } from "antd";
 import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
@@ -46,8 +46,8 @@ export const ProfileView: React.FC<RouteComponentProps<any>> = ({match, history}
             }
             return ""
         },
-        onUpdate : function () {
-
+        onUpdate : function (user: IGetUserQuery["getUser"]) {
+            this.user = user;
         }
     }));
 
@@ -74,7 +74,7 @@ export const ProfileView: React.FC<RouteComponentProps<any>> = ({match, history}
         return <Row>
         <Col span={24} style={{padding:"25px"}}>
             {
-                localStore.loading ? <Skeleton active />: <PageHeader 
+                localStore.loading ? <Skeleton active />: <PageHeader
                     title={`${localStore.user.given_name} ${localStore.user.family_name}`} onBack={() => history.goBack()}
                     subTitle={<Tag color={localStore.groupColor}>{localStore.user.userGroup}</Tag>}>
                     <div className="fl-pageheader-wrap">
