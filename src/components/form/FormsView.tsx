@@ -26,6 +26,7 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
         showAdd: false,
         selectedItems: [] as any[],
         loading: true,
+
         handleClone: async function (formId: string) {
             try {
                 store.view.setLoading({show: true, message: "Loading source form", status: "active", type : "line", percent: 10});
@@ -137,7 +138,6 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
         key: 'action',
         render: (text, record) => (
             <Dropdown overlay={<Menu>
-                <Menu.Divider key="d-clone"/>
                 <Menu.Item key="action-clone" onClick={(e) => localStore.handleClone(record.id)}>
                     <span><Icon type="copy"/>  Clone</span>
                 </Menu.Item>
