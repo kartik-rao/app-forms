@@ -47,8 +47,8 @@ export interface AppConfig {
 const _config = {
     development: {
         auth : {
-            userPoolId: 'ap-northeast-1_Q798Nsl33',
-            userPoolWebClientId: "7pvdgcaflsg9juob60mosafi9d",
+            userPoolId: 'ap-northeast-1_0wTBnqAhr',
+            userPoolWebClientId: "1b2a2sceie5tm0g78as48d0n38",
             region: __REGION__,
             mandatorySignIn: true
         },
