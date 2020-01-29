@@ -36,7 +36,7 @@ export const createAuthStore = () => {
                 }
             });
         },
-        withSession: async function(endpoint: string, method: string, body?: any) {
+        withSession: async function(endpoint: string, method: string, body?: any, contentType: string = "application/json") {
             let session: CognitoUserSession = await Auth.currentSession();
             let token = session.getIdToken().getJwtToken()
 
@@ -44,25 +44,29 @@ export const createAuthStore = () => {
                     method: method,
                     headers: {
                     'Authorization': token,
-                    'Content-Type': 'application/json'
+                    'Content-Type': contentType
                     },
                     body: body ? JSON.stringify(body) : null
             });
-            return response.json();
+            return contentType == "application/json" ? response.json() : response.text();
         },
         signUp: async function (signupEndpoint: string, signupData: any) {
             let session: CognitoUserSession = await Auth.currentSession();
             let token = session.getIdToken().getJwtToken()
-
-            let response = await fetch(signupEndpoint, {
+            try {
+                let response = await fetch(signupEndpoint, {
                     method: 'POST',
                     headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(signupData)
-            });
-            return response.json();
+                });
+                return response.json();
+            } catch (error) {
+                console.log(error);
+                throw error;
+            }
         },
         changePassword: async function(oldPassword: string, newPassword: string) {
             return Auth.changePassword(this.user, oldPassword, newPassword);
