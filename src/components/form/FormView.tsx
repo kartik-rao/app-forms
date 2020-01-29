@@ -10,6 +10,7 @@ import { TableWrapper } from "../common/TableWrapper";
 import SelectFormVersionView from "./SelectFormVersionView";
 import EditFormVersionSettingsView from "./EditFormVersionSettingsView";
 import EditFormView from "./EditFormView";
+import { FormVersionPreview } from "./FormVersionPreview";
 
 export interface FormViewProps {
     accountId: string;
@@ -35,7 +36,22 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         showEditForm: false as boolean,
         showEditVersion: false as boolean,
         showAddVersion: false as boolean,
+        showVersionPreview: false as boolean,
         refresh: false as boolean,
+        selectVersion : function(versionId: string) {
+            this.selectedVersionId = versionId;
+            let versions = this.form.versions.filter((v) => {
+                return v.id == versionId
+            });
+            this.selectedVersion = versions[0];
+            this.showVersionPreview = true;
+        },
+        hideVersionPreview: function() {
+            this.showVersionPreview = false;
+            this.selectedVersionId = null;
+            this.selectedVersion = null;
+
+        },
         onUpdateComplete : function (form: IUpdateFormMutation["updateForm"]) {
             this.showEditForm = false;
             console.log("Got Form", form)
@@ -219,6 +235,10 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         {title: "By", key: "owner", dataIndex: "ownedBy", render: (text, record) => {return <span>{record.ownedBy.given_name} {record.ownedBy.family_name}</span>}},
         {title: "Actions", key: "actions", render: (text, record) => {return <span>
             <Dropdown overlay={<Menu>
+                <Menu.Item key="action-preview">
+                    <a onClick={() =>localStore.selectVersion(record.id)} title="Preview"><Icon type="search"/> Preview</a>
+                </Menu.Item>
+                <Menu.Divider />
                 <Menu.Item key="action-rename">
                     <a onClick={() =>localStore.editVersion(record.id)} title="Rename"><Icon type="edit"/> Rename</a>
                 </Menu.Item>
@@ -324,10 +344,13 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                     <Tabs.TabPane key="pastVersions" tab="Version History">
                         <Row type="flex">
                             <Col span={24} >
-                                <Card title={<span>{localStore.form.name} Version History</span>} style={{padding: 0}} bodyStyle={{padding:0}}>
+                            {!localStore.showVersionPreview && <Card title={<span>{localStore.form.name} Version History</span>} style={{padding: 0}} bodyStyle={{padding:0}}>
                                 <TableWrapper size="small" emptyText='No versions, click "Add version" to create one.' errors={localStore.errors} data={localStore.allVersions} columns={columns}
                                 bordered={true} rowKey="id" pagination={ localStore.allVersions.length > 5 ? {pageSize: 5, position: "top"} : false} />
-                                </Card>
+                                </Card>}
+                                {localStore.showVersionPreview && <Card title={<span>Preview - {localStore.selectedVersion.displayName}</span>} extra={<Button onClick={() => {localStore.hideVersionPreview()}} size="small">Close</Button>}>
+                                    <FormVersionPreview accountId={localStore.form.accountId} formId={localStore.form.id} versionId={localStore.selectedVersionId}/>
+                                </Card>}
                             </Col>
                         </Row>
                     </Tabs.TabPane>
