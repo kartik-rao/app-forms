@@ -91,7 +91,6 @@ export const App : React.FC<IAppProps> = (props: IAppProps) => {
                 <AppStoreProvider store={store}>
                     <Authenticator signUpConfig={signUpConfig}
                         authState="signIn"
-                        mandatorySignIn={true}
                         authData={store.auth.user}
                         onStateChange={(authState) => console.log(`Authenticator.authStateChange [${authState}]`)}
                         hide={[Greetings]}>

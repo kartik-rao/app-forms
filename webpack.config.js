@@ -54,7 +54,7 @@ module.exports = {
     },
     devtool: 'source-map',
     resolve: {
-        extensions: ['.ts', '.js', '.jsx', '.tsx', '.css'],
+        extensions: ['.ts', '.mjs', '.js', '.jsx', '.tsx', '.css'],
         alias: {
             mobx: __dirname + "/node_modules/mobx/lib/mobx.es6.js"
         }
