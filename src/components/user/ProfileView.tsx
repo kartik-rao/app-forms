@@ -48,6 +48,8 @@ export const ProfileView: React.FC<RouteComponentProps<any>> = ({match, history}
         },
         onUpdate : function (user: IGetUserQuery["getUser"]) {
             this.user = user;
+            store.auth.attributes.family_name = user.family_name;
+            store.auth.attributes.given_name = user.given_name;
         }
     }));
 
