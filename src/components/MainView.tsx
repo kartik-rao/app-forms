@@ -1,7 +1,7 @@
 import { Layout } from 'antd';
 import { useObserver } from 'mobx-react';
 import * as React from 'react';
-import { BrowserRouter, Route, Redirect } from "react-router-dom";
+import { Router, Route, Redirect } from "react-router-dom";
 import { appStoreContext } from '../stores/AppStoreProvider';
 import { Footer } from "./common/FooterView";
 import Header from "./common/HeaderView";
@@ -36,7 +36,7 @@ export const MainView: React.FC<any> = () => {
 
     return useObserver(() => {
         return <Layout >
-            <BrowserRouter>
+            <Router history={store.router.history}>
                 <Layout.Header className="fl-header">
                     <Route component={Header} exact={true} path={AllPaths} />
                 </Layout.Header>
@@ -64,7 +64,7 @@ export const MainView: React.FC<any> = () => {
                 <Layout.Footer className="fl-footer">
                     <Footer />
                 </Layout.Footer>
-        </BrowserRouter>
+        </Router>
     </Layout>
     });
 }

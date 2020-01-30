@@ -3,13 +3,14 @@ import { useObserver, useLocalStore } from "mobx-react-lite";
 import * as React from "react";
 import { Link, RouteComponentProps, Redirect } from "react-router-dom";
 import { appStoreContext } from '../../stores/AppStoreProvider';
+import { stringify } from "querystring";
 
 export interface SiderNavViewProps {
     accountId: string;
 }
 
 
-export const SiderNavView : React.FC<RouteComponentProps<SiderNavViewProps>> = ({match, location, history}) => {
+export const SiderNavView : React.FC<RouteComponentProps<SiderNavViewProps>> = ({match, history}) => {
     const store = React.useContext(appStoreContext);
     if(!store) throw new Error("Store is null");
 
@@ -23,14 +24,12 @@ export const SiderNavView : React.FC<RouteComponentProps<SiderNavViewProps>> = (
 
             return [];
         },
-        get currentAccount() : string {
-            if (store.auth.isAdmin) {
-                return match.params.accountId;
-            } else {
-                return store.auth.attributes["custom:tenantId"];
-            }
-        }
+        currentAccount : store.auth.isAdmin ? match.params.accountId : store.auth.attributes["custom:tenantId"]
     }));
+
+    React.useEffect(() => {
+        localStore.currentAccount = match.params.accountId
+    }, [match.params.accountId]);
 
     return useObserver(() => {
         return <Layout.Sider theme="light" trigger={null} collapsible collapsed={store.view.collapseAccountMenu}>
