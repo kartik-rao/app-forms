@@ -11,6 +11,8 @@ import SelectFormVersionView from "./SelectFormVersionView";
 import EditFormVersionSettingsView from "./EditFormVersionSettingsView";
 import EditFormView from "./EditFormView";
 import { FormVersionPreview } from "./FormVersionPreview";
+import { ErrorBlock } from "../common/ErrorBlock";
+import { LoadingBlock } from "../common/LoadingBlock";
 
 export interface FormViewProps {
     accountId: string;
@@ -308,61 +310,66 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     };
 
     return useObserver(() => {
-        return localStore.loading ? <Skeleton active />:<>
-            {localStore.showAddVersion && <SelectFormVersionView onVersionSelected={(id: string) => {history.push(getCanvasUrl(id))}} sourceForm={localStore.form} onCancel={localStore.toggleShowSelectVersion}/>}
-            {localStore.showEditVersion && <EditFormVersionSettingsView version={localStore.selectedVersion} onSave={localStore.onEditVersion} onCancel={() => localStore.showEditVersion = false}/>}
-            <PageHeader onBack={() => history.push(`/account/${match.params.accountId}/forms`)} title={localStore.form.name} subTitle={<FormStatus />} extra={<FormActions/>}>
-                <h5>{localStore.form.description}</h5>
-                <Card bordered={false} bodyStyle={{padding: '0px'}}>
-                <br/>
-                    <Tabs defaultActiveKey="pastVersions">
-                    <Tabs.TabPane key="currentVersion" tab="Current Version">
-                        { localStore.hasVersion ? <>
-                            <Row>
-                                <Col span={3}><Statistic title="Entries" value={localStore.form.numEntries} ></Statistic></Col>
-                                <Col span={4}><Statistic title="On Success" value={localStore.expectedSubmitResult.success} valueStyle={{fontSize: '14px'}}></Statistic></Col>
-                                <Col span={4}><Statistic title="On Failure" value={localStore.expectedSubmitResult.error} valueStyle={{fontSize: '14px'}}></Statistic></Col>
-                            </Row>
-                            <br/>
-                            <Divider/>
-                            <Row>
-                                <Col span={24}>
-                                    <Card title={localStore.form.version.displayName} extra={
-                                        <><span><Tag>{dayjs(localStore.form.version.createdAt).format('DD MMM YY hh:mma')}</Tag><Tag>{localStore.form.version.ownedBy.given_name} {localStore.form.version.ownedBy.family_name}</Tag></span>
-                                        <span><Button size="small" type="primary" onClick={() => {localStore.selectedVersion=localStore.form.version; localStore.showEditVersion=true;}}>Rename</Button></span></>
-                                        }>
-                                        <Row>
-                                            <Col span={4}>
-                                                <div style={{padding: "25px"}}><ChangeList /></div>
-                                            </Col>
-                                        </Row>
-                                    </Card>
+        return <>
+            <LoadingBlock loading={localStore.loading} />
+            <ErrorBlock errors={localStore.errors} debug={store.view.debug} />
+            {localStore.errors.length == 0 && !localStore.loading && <>
+                {localStore.showAddVersion && <SelectFormVersionView onVersionSelected={(id: string) => {history.push(getCanvasUrl(id))}} sourceForm={localStore.form} onCancel={localStore.toggleShowSelectVersion}/>}
+                {localStore.showEditVersion && <EditFormVersionSettingsView version={localStore.selectedVersion} onSave={localStore.onEditVersion} onCancel={() => localStore.showEditVersion = false}/>}
+                <PageHeader onBack={() => history.push(`/account/${match.params.accountId}/forms`)} title={localStore.form.name} subTitle={<FormStatus />} extra={<FormActions/>}>
+                    <h5>{localStore.form.description}</h5>
+                    <Card bordered={false} bodyStyle={{padding: '0px'}}>
+                    <br/>
+                        <Tabs defaultActiveKey="pastVersions">
+                        <Tabs.TabPane key="currentVersion" tab="Current Version">
+                            { localStore.hasVersion ? <>
+                                <Row>
+                                    <Col span={3}><Statistic title="Entries" value={localStore.form.numEntries} ></Statistic></Col>
+                                    <Col span={4}><Statistic title="On Success" value={localStore.expectedSubmitResult.success} valueStyle={{fontSize: '14px'}}></Statistic></Col>
+                                    <Col span={4}><Statistic title="On Failure" value={localStore.expectedSubmitResult.error} valueStyle={{fontSize: '14px'}}></Statistic></Col>
+                                </Row>
+                                <br/>
+                                <Divider/>
+                                <Row>
+                                    <Col span={24}>
+                                        <Card title={localStore.form.version.displayName} extra={
+                                            <><span><Tag>{dayjs(localStore.form.version.createdAt).format('DD MMM YY hh:mma')}</Tag><Tag>{localStore.form.version.ownedBy.given_name} {localStore.form.version.ownedBy.family_name}</Tag></span>
+                                            <span><Button size="small" type="primary" onClick={() => {localStore.selectedVersion=localStore.form.version; localStore.showEditVersion=true;}}>Rename</Button></span></>
+                                            }>
+                                            <Row>
+                                                <Col span={4}>
+                                                    <div style={{padding: "25px"}}><ChangeList /></div>
+                                                </Col>
+                                            </Row>
+                                        </Card>
+                                    </Col>
+                                </Row></> : <Empty description="No content versions, click Add Version"/>
+                            }
+                        </Tabs.TabPane>
+                        <Tabs.TabPane key="pastVersions" tab="Version History">
+                            <Row type="flex">
+                                <Col span={24} >
+                                {!localStore.showVersionPreview && <Card title={<span>{localStore.form.name} Version History</span>} style={{padding: 0}} bodyStyle={{padding:0}}>
+                                    <TableWrapper size="small" emptyText='No versions, click "Add version" to create one.' errors={localStore.errors} data={localStore.allVersions} columns={columns}
+                                    bordered={true} rowKey="id" pagination={ localStore.allVersions.length > 5 ? {pageSize: 5, position: "top"} : false} />
+                                    </Card>}
+                                    {localStore.showVersionPreview && <Card title={<span>Preview - {localStore.selectedVersion.displayName}</span>} extra={<Button onClick={() => {localStore.hideVersionPreview()}} size="small">Close</Button>}>
+                                        <FormVersionPreview accountId={localStore.form.accountId} formId={localStore.form.id} versionId={localStore.selectedVersionId}/>
+                                    </Card>}
                                 </Col>
-                            </Row></> : <Empty description="No content versions, click Add Version"/>
-                        }
-                    </Tabs.TabPane>
-                    <Tabs.TabPane key="pastVersions" tab="Version History">
-                        <Row type="flex">
-                            <Col span={24} >
-                            {!localStore.showVersionPreview && <Card title={<span>{localStore.form.name} Version History</span>} style={{padding: 0}} bodyStyle={{padding:0}}>
-                                <TableWrapper size="small" emptyText='No versions, click "Add version" to create one.' errors={localStore.errors} data={localStore.allVersions} columns={columns}
-                                bordered={true} rowKey="id" pagination={ localStore.allVersions.length > 5 ? {pageSize: 5, position: "top"} : false} />
-                                </Card>}
-                                {localStore.showVersionPreview && <Card title={<span>Preview - {localStore.selectedVersion.displayName}</span>} extra={<Button onClick={() => {localStore.hideVersionPreview()}} size="small">Close</Button>}>
-                                    <FormVersionPreview accountId={localStore.form.accountId} formId={localStore.form.id} versionId={localStore.selectedVersionId}/>
-                                </Card>}
-                            </Col>
-                        </Row>
-                    </Tabs.TabPane>
-                    <Tabs.TabPane key="settings" tab="Settings">
-                        <Row>
-                            <Col span={14}>
-                                <EditFormView editForm={localStore.form} onUpdate={localStore.onUpdateComplete}/>
-                            </Col>
-                        </Row>
-                    </Tabs.TabPane>
-                </Tabs></Card>
-        </PageHeader>
+                            </Row>
+                        </Tabs.TabPane>
+                        <Tabs.TabPane key="settings" tab="Settings">
+                            <Row>
+                                <Col span={14}>
+                                    <EditFormView editForm={localStore.form} onUpdate={localStore.onUpdateComplete}/>
+                                </Col>
+                            </Row>
+                        </Tabs.TabPane>
+                    </Tabs></Card>
+               </PageHeader>
+            </>
+        }
     </>
-    })
+    });
 }
