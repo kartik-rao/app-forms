@@ -41,10 +41,11 @@ const Header : React.FC<RouteComponentProps<any>> = ({match, location, history})
             try {
                 let account = LocalCache.getItem(localStore.accountId);
                 if (!account) {
-                    account = await withGraphQl<IGetAccountQuery>(GetAccount, {accountId: localStore.accountId});
-                    LocalCache.setItem(localStore.accountId, account.data.getAccount, {priority: 4});
+                    let accountResponse = await withGraphQl<IGetAccountQuery>(GetAccount, {accountId: localStore.accountId});
+                    LocalCache.setItem(localStore.accountId, accountResponse.data.getAccount, {priority: 4});
+                    account = accountResponse.data.getAccount;
                 }
-                store.view.idNameMap[localStore.accountId] = account.data.getAccount.name;
+                store.view.idNameMap[localStore.accountId] = account.name;
             } catch (error) {
                 logger.error(`Header.useEffect.getAccount(${localStore.accountId})`, error);
             }
