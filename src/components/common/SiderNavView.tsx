@@ -28,7 +28,7 @@ export const SiderNavView : React.FC<RouteComponentProps<SiderNavViewProps>> = (
     }));
 
     React.useEffect(() => {
-        localStore.currentAccount = match.params.accountId
+        localStore.currentAccount = store.auth.isAdmin ? match.params.accountId : store.auth.attributes["custom:tenantId"]
     }, [match.params.accountId]);
 
     return useObserver(() => {
