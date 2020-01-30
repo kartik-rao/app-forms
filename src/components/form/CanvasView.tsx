@@ -9,6 +9,7 @@ import { RouteComponentProps } from "react-router-dom";
 import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import SaveFormVersionView from "./SaveFormVersionView";
+import { ErrorBlock } from "../common/ErrorBlock";
 
 export interface ICanvasViewProps {
     formId   : string;
@@ -55,7 +56,8 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
                 store.view.resetLoading();
                 localStore.showCanvas = true;
             } catch (error) {
-                this.errors = error;
+                console.log(error);
+                localStore.errors = [error];
             }
         };
         if(match.params.versionId) {
@@ -69,6 +71,7 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
 
     return useObserver(() => {
         return <Layout style={{height: '100%', overflow: 'hidden'}}>
+        <ErrorBlock errors={localStore.errors} debug={true}/>
         {localStore.showCanvas && <EditorStoreProvider formStore={localStore.formStore}>
             <React.Suspense fallback="Loading...">
                 <Canvas onSave={() => {localStore.showSaveVersion = true}} onClose={localStore.onClose}/>
