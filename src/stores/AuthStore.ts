@@ -2,6 +2,7 @@ import Auth from "@aws-amplify/auth";
 import { Hub } from "@aws-amplify/core";
 import { CognitoUserSession, CognitoUserAttribute, CognitoUser } from "amazon-cognito-identity-js";
 import { observable, toJS } from "mobx";
+import {BrowserStorageCache as LocalCache} from "@aws-amplify/cache";
 
 export type UserAttributesNames = "email"|"custom:group"|"custom:tenantId"|"custom:tenantName"|"given_name"|"family_name"|"environment"|"stack"|"region";
 
@@ -13,8 +14,6 @@ export const createAuthStore = () => {
         authState: "loading" as string,
         authError: "" as string,
         attributes: {} as { [key in UserAttributesNames]?: string },
-        contextId: null as string,
-        contextName: null as string,
         ready : false as boolean,
         get isReady() : boolean {
             return this.ready == true && this.authState == "signedIn" && this.attributes && Object.keys(this.attributes).length > 0;
@@ -26,9 +25,11 @@ export const createAuthStore = () => {
                     attributes.forEach((attr) => {
                         attrs[attr.getName()] = attr.getValue();
                     });
+
                     this.setAuthData(user);
                     this.setUserAttributes(attrs);
                     this.setAuthState('signedIn');
+                    LocalCache.setItem("cognitoUser", attrs, {priority: 5});
                     this.ready = true;
                 } else {
                     this.authError = err.message;
@@ -75,16 +76,11 @@ export const createAuthStore = () => {
             console.log("Sign Out Called");
             let self = this;
             Auth.signOut().then(() => {
+                LocalCache.removeItem("cognitoUser");
                 self.resetAuth();
             }).catch(e => {
                 console.error(e);
             });
-        },
-        setContextId: function(id: string) {
-            this.contextId = id;
-        },
-        setContextName: function(name: string) {
-            this.contextName = name;
         },
         setAuthState: function (authState: string) {
             this.authState = authState;
