@@ -57,6 +57,8 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
                 let addFormResponse = await withGraphQl<IAddFormMutation>(AddForm, {input: values});
                 if (addFormResponse.errors) {
                     this.errors = addFormResponse.errors;
+                } else {
+                    this.forms.push(addFormResponse.data.addForm);
                 }
             } catch (errorResponse) {
                 console.error(errorResponse);
