@@ -165,6 +165,9 @@ export const FormsView : React.FC<RouteComponentProps<FormsViewProps>> = ({match
                 store.view.setLoading({show: true, message: "Loading forms", status: "active", type : "line", percent: 100});
                 let response = await withGraphQl<IListFormsQuery>(ListForms, {filter: {criteria: [{accountId: {expression: "eq", value: [match.params.accountId]}}]}});
                 localStore.forms = response.data.listForms;
+                localStore.forms.forEach((f) => {
+                    store.view.idNameMap[f.id] = f.name;
+                });
             } catch (errorResponse) {
                 console.error("queries.getAccount.forms", errorResponse);
                 localStore.errors = errorResponse.errors;
