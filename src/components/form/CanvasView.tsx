@@ -64,6 +64,7 @@ export const CanvasView : React.FC<RouteComponentProps<ICanvasViewProps>> = ({ma
             fetch();
         } else {
             localStore.formData = EmptyForm
+            localStore.formData.id = match.params.formId;
             localStore.formStore.setForm(Factory.makeForm(localStore.formStore, localStore.formData))
             localStore.showCanvas = true;
         }
