@@ -1,18 +1,18 @@
 import { AddFormVersion, AttachFormVersion, DeleteForm, DeleteFormVersion, GetForm, IAddFormVersionMutation, IAttachFormVersionMutation, IDeleteFormMutation, IDeleteFormVersionMutation, IGetFormQuery, IGetFormVersionQuery, IMutationAddFormVersionArgs, IUpdateFormMutation, IUpdateFormVersionMutation, UpdateForm } from "@kartikrao/lib-forms-api";
-import { Badge, Button, Card, Col, Dropdown, Empty, Icon, Menu, notification, PageHeader, Popconfirm, Popover, Row, Skeleton, Statistic, Tabs, Tag, Timeline, Typography, Divider } from "antd";
+import { Badge, Button, Card, Col, Divider, Dropdown, Empty, Icon, Menu, notification, PageHeader, Popconfirm, Popover, Row, Statistic, Tabs, Tag, Timeline } from "antd";
 import dayjs from 'dayjs';
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
-import { Link, RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps } from "react-router-dom";
 import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
+import { ErrorBlock } from "../common/ErrorBlock";
+import { LoadingBlock } from "../common/LoadingBlock";
 import { TableWrapper } from "../common/TableWrapper";
-import SelectFormVersionView from "./SelectFormVersionView";
 import EditFormVersionSettingsView from "./EditFormVersionSettingsView";
 import EditFormView from "./EditFormView";
 import { FormVersionPreview } from "./FormVersionPreview";
-import { ErrorBlock } from "../common/ErrorBlock";
-import { LoadingBlock } from "../common/LoadingBlock";
+import SelectFormVersionView from "./SelectFormVersionView";
 
 export interface FormViewProps {
     accountId: string;
@@ -28,6 +28,10 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     if(!store) throw new Error("Store is null");
 
     const config = store.config.envConfig;
+
+    const getCanvasUrl = (versionId: string) => {
+        return `/account/${match.params.accountId}/forms/${match.params.formId}/canvas/${versionId}`;
+    };
 
     const localStore = useLocalStore(() => ({
         loading: true,
@@ -52,7 +56,6 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
             this.showVersionPreview = false;
             this.selectedVersionId = null;
             this.selectedVersion = null;
-
         },
         onUpdateComplete : function (form: IUpdateFormMutation["updateForm"]) {
             this.showEditForm = false;
@@ -196,8 +199,12 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                 }
             }) : [];
         },
-        toggleShowSelectVersion: function() {
-            this.showAddVersion = !this.showAddVersion;
+        toggleShowAddVersion: function() {
+            if(this.showAddVersion == false && !this.hasVersion) {
+                history.push(getCanvasUrl(""));
+            } else {
+                this.showAddVersion = !this.showAddVersion;
+            }
         },
         onAddFormVersion: function(version: IAddFormVersionMutation["addFormVersion"]) {
             this.form.versions.unshift(version);
@@ -231,7 +238,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
     }, [localStore.refresh]);
 
     const columns = [
-        {title: "Name", key: "name", dataIndex: "displayName", render: (text, record) => <><p>{text}{record.id == localStore.form.versionId ? <Tag color="green" className="fl-left-margin-ten">ACTIVE</Tag>:<></>}</p></>},
+        {title: "Name", key: "name", dataIndex: "displayName", render: (text, record) => <><p>{text}{record.id == localStore.form.versionId ? <Tag color="green" className="fl-left-margin-ten">LATEST</Tag>:<></>}</p></>},
         {title: "Notes", key: "notes", dataIndex: "notes", render:(text, record) => <p style={{whiteSpace: "pre-line"}}>{text}</p>},
         {title: "Created", key: "createdAt", dataIndex: "createdAt", render: (text, record) => {return <span>{dayjs(text).format('DD MMM YY hh:mm a')}</span>}},
         {title: "By", key: "owner", dataIndex: "ownedBy", render: (text, record) => {return <span>{record.ownedBy.given_name} {record.ownedBy.family_name}</span>}},
@@ -267,7 +274,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                     <Button className="fl-right-margin-ten"  size="small">
                         <a href={formUrl} target="_blank">Preview</a>
                     </Button>
-                    <Button size="small" className="fl-right-margin-ten" onClick={localStore.toggleShowSelectVersion}>Add Version</Button>
+                    <Button size="small" className="fl-right-margin-ten" onClick={localStore.toggleShowAddVersion}>Add Version</Button>
                     <Popconfirm title={localStore.form.isPaused == 1 ? "Start accepting entries ?" : "Stop accepting entries ?"} onConfirm={() => localStore.toggleFormPause()}>
                         <Button className="fl-right-margin-ten" size="small" disabled={!localStore.form.versions || localStore.form.versions.length == 0} type={localStore.form.isPaused == 1 ? "primary" : "danger"}>{localStore.form.isPaused == 1 ? "Start" : "Pause"}</Button>
                     </Popconfirm>
@@ -305,16 +312,13 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
         })
     };
 
-    const getCanvasUrl = (versionId: string) => {
-        return `/account/${match.params.accountId}/forms/${match.params.formId}/canvas/${versionId}`;
-    };
 
     return useObserver(() => {
         return <>
             <LoadingBlock loading={localStore.loading} />
             <ErrorBlock errors={localStore.errors} debug={store.view.debug} />
             {localStore.errors.length == 0 && !localStore.loading && <>
-                {localStore.showAddVersion && <SelectFormVersionView onVersionSelected={(id: string) => {history.push(getCanvasUrl(id))}} sourceForm={localStore.form} onCancel={localStore.toggleShowSelectVersion}/>}
+                {localStore.showAddVersion && localStore.hasVersion && <SelectFormVersionView onVersionSelected={(id: string) => {history.push(getCanvasUrl(id))}} sourceForm={localStore.form} onCancel={localStore.toggleShowAddVersion}/>}
                 {localStore.showEditVersion && <EditFormVersionSettingsView version={localStore.selectedVersion} onSave={localStore.onEditVersion} onCancel={() => localStore.showEditVersion = false}/>}
                 <PageHeader onBack={() => history.push(`/account/${match.params.accountId}/forms`)} title={localStore.form.name} subTitle={<FormStatus />} extra={<FormActions/>}>
                     <h5>{localStore.form.description}</h5>
