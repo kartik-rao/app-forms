@@ -20,12 +20,21 @@ const signUpConfig = {
     defaultCountryCode: 61,
     signUpFields: [
       {
+        label: 'Account Name',
+        key: 'tenantName',
+        required: true,
+        placeholder: 'Account Name',
+        type: 'string',
+        displayOrder: 1,
+        custom: true
+      },
+      {
         label: 'First Name',
         key: 'given_name',
         required: true,
         placeholder: 'First Name',
         type: 'string',
-        displayOrder: 1,
+        displayOrder: 2,
       },
       {
         label: 'Last Name',
@@ -33,14 +42,6 @@ const signUpConfig = {
         required: true,
         placeholder: 'Last Name',
         type: 'string',
-        displayOrder: 2,
-      },
-      {
-        label: 'Phone Number',
-        key: 'phone_number',
-        required: false,
-        placeholder: 'Phone Number',
-        type: 'phone_number',
         displayOrder: 3,
       },
       {
@@ -52,21 +53,20 @@ const signUpConfig = {
         displayOrder: 4,
       },
       {
+        label: 'Phone Number',
+        key: 'phone_number',
+        required: false,
+        placeholder: 'Phone Number',
+        type: 'phone_number',
+        displayOrder: 5,
+      },
+      {
         label: 'Password',
         key: 'password',
         required: true,
         placeholder: 'Password',
         type: 'password',
         displayOrder: 5,
-      },
-      {
-        label: 'Account Name',
-        key: 'tenantName',
-        required: true,
-        placeholder: 'Account Name',
-        type: 'string',
-        displayOrder: 6,
-        custom: true
       }
     ],
 }
