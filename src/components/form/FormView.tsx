@@ -333,7 +333,6 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                                     <Col span={4}><Statistic title="On Failure" value={localStore.expectedSubmitResult.error} valueStyle={{fontSize: '14px'}}></Statistic></Col>
                                 </Row>
                                 <br/>
-                                <Divider/>
                                 <Row>
                                     <Col span={24}>
                                         <Card title={localStore.form.version.displayName} extra={
@@ -341,7 +340,7 @@ export const FormView: React.FC<RouteComponentProps<FormViewProps>> = ({match, h
                                             <span><Button size="small" type="primary" onClick={() => {localStore.selectedVersion=localStore.form.version; localStore.showEditVersion=true;}}>Rename</Button></span></>
                                             }>
                                             <Row>
-                                                <Col span={4}>
+                                                <Col span={8}>
                                                     <div style={{padding: "25px"}}><ChangeList /></div>
                                                 </Col>
                                             </Row>
