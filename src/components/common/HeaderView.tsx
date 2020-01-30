@@ -1,12 +1,13 @@
+import { BrowserStorageCache as LocalCache } from "@aws-amplify/cache";
+import { GetAccount, IGetAccountQuery } from "@kartikrao/lib-forms-api";
 import { Logger } from "@kartikrao/lib-logging";
 import { Menu } from "antd";
 import { useLocalStore, useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+import { withGraphQl } from "../../ApiHelper";
 import { appStoreContext } from "../../stores/AppStoreProvider";
 import { ProgressView } from "./ProgressView";
-import { withGraphQl } from "../../ApiHelper";
-import { IGetAccountQuery, GetAccount } from "@kartikrao/lib-forms-api";
 
 const logger = Logger.getInstance(['HeaderView'], Logger.severity.info);
 
@@ -18,7 +19,7 @@ const Header : React.FC<RouteComponentProps<any>> = ({match, location, history})
         loading: false as boolean,
         get accountId() : string {
             if(!store.auth.isAdmin) {
-                return null;
+                return store.auth.attributes["custom:tenantId"];
             } else {
                 let matches = store.view.currentPath.match(/account\/([\w|\-]+)/);
                 if(matches && matches.length > 1) {
@@ -38,7 +39,11 @@ const Header : React.FC<RouteComponentProps<any>> = ({match, location, history})
         let fetchAccount = async function() {
             localStore.loading = true;
             try {
-                let account = await withGraphQl<IGetAccountQuery>(GetAccount, {accountId: localStore.accountId});
+                let account = LocalCache.getItem(localStore.accountId);
+                if (!account) {
+                    account = await withGraphQl<IGetAccountQuery>(GetAccount, {accountId: localStore.accountId});
+                    LocalCache.setItem(localStore.accountId, account.data.getAccount, {priority: 4});
+                }
                 store.view.idNameMap[localStore.accountId] = account.data.getAccount.name;
             } catch (error) {
                 logger.error(`Header.useEffect.getAccount(${localStore.accountId})`, error);
