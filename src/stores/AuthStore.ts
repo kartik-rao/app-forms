@@ -15,6 +15,8 @@ export const createAuthStore = () => {
         authError: "" as string,
         attributes: {} as { [key in UserAttributesNames]?: string },
         ready : false as boolean,
+        contextId: null as string,
+        contextName: null as string,
         get isReady() : boolean {
             return this.ready == true && this.authState == "signedIn" && this.attributes && Object.keys(this.attributes).length > 0;
         },
@@ -81,6 +83,12 @@ export const createAuthStore = () => {
             }).catch(e => {
                 console.error(e);
             });
+        },
+        setContextId: function(id: string) {
+            this.contextId = id;
+        },
+        setContextName: function(name: string) {
+            this.contextName = name;
         },
         setAuthState: function (authState: string) {
             this.authState = authState;
