@@ -22,6 +22,13 @@ export const SiderNavView : React.FC<RouteComponentProps<SiderNavViewProps>> = (
             }
 
             return [];
+        },
+        get currentAccount() : string {
+            if (store.auth.isAdmin) {
+                return match.params.accountId;
+            } else {
+                return store.auth.attributes["custom:tenantId"];
+            }
         }
     }));
 
@@ -36,18 +43,18 @@ export const SiderNavView : React.FC<RouteComponentProps<SiderNavViewProps>> = (
                         <Link to="/users"><Icon type="team" /><span>All Users</span></Link>
                     </Menu.Item>
                 }
-                {store.auth.isAdmin && !!match.params.accountId && <Menu.Divider key="admin-divider"/>}
-                {match.params.accountId && <Menu.Item key="a-account" >
-                    <Link to={`/account/${match.params.accountId}/`}><Icon type="home"/><span>Account</span></Link>
+                {store.auth.isAdmin && !!localStore.currentAccount && <Menu.Divider key="admin-divider"/>}
+                {localStore.currentAccount && <Menu.Item key="a-account" >
+                    <Link to={`/account/${localStore.currentAccount}/`}><Icon type="home"/><span>Account</span></Link>
                 </Menu.Item>}
-                {match.params.accountId && <Menu.Item  key="a-users">
-                    <Link to={`/account/${match.params.accountId}/users`}><Icon type="team"/><span>Users</span></Link>
+                {localStore.currentAccount && <Menu.Item  key="a-users">
+                    <Link to={`/account/${localStore.currentAccount}/users`}><Icon type="team"/><span>Users</span></Link>
                 </Menu.Item>}
-                {match.params.accountId && <Menu.Item key="a-forms">
-                    <Link to={`/account/${match.params.accountId}/forms`}><Icon type="file-text"/><span>Forms</span></Link>
+                {localStore.currentAccount && <Menu.Item key="a-forms">
+                    <Link to={`/account/${localStore.currentAccount}/forms`}><Icon type="file-text"/><span>Forms</span></Link>
                 </Menu.Item>}
-                {match.params.accountId && <Menu.Item key="a-admin">
-                    <Link to={`/account/${match.params.accountId}/admin`}><Icon type="tool"/><span>Admin</span></Link>
+                {localStore.currentAccount && <Menu.Item key="a-admin">
+                    <Link to={`/account/${localStore.currentAccount}/admin`}><Icon type="tool"/><span>Admin</span></Link>
                 </Menu.Item>}
                 <Menu.Item key="profile">
                     <Link to={`/profile/${store.auth.user.getUsername()}`}><Icon type="user" /><span>Profile</span></Link>
