@@ -77,7 +77,7 @@
     "cross-env": "^5.2.0",
     "css-loader": "^2.1.0",
     "fork-ts-checker-webpack-plugin": "^1.0.0",
-    "graphql-typescript-definitions": "^0.17.3",
+    "graphql-typescript-definitions": "^0.21.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^4.0.0-beta.8",
     "jasmine": "^3.3.1",
@@ -97,7 +97,7 @@
     "webpack": "^4.39.2",
     "webpack-bundle-analyzer": "^3.4.1",
     "webpack-cli": "^3.3.2",
-    "webpack-dev-server": "^3.7.1"
+    "webpack-dev-server": "^3.11.0"
   },
   "resolutions": {
     "graphql": "0.13.0"
